@@ -1,0 +1,26 @@
+<div id="auto-fill-range-modal" class="grid-modal" style="min-height: 5rem; min-width: 11rem;">
+    Enter start and end of range to <br> fill starting from selected cell:
+    <br>
+    <br>
+    <div style="display: flex; justify-content: space-between; width: 100%; flex-direction: column;">
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+            Start:
+            <input style="width: 3rem;" id="auto-fill-range-input-start">
+        </div>
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+            End:
+            <input style="width: 3rem;" id="auto-fill-range-input-end">
+        </div>
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+            Increment (optional):
+            <input style="width: 3rem;" id="auto-fill-range-input-increment">
+        </div>
+    </div>
+    <br>
+    <div class="modal-button-container">
+        <button id="auto-fill-range-cancel" onclick="toggleAutoFillRangeModal(false)"
+            style="color: black;">Cancel</button>
+        <button id="auto-fill-range-execute" onclick="toggleAutoFillRangeModal(false,true)"
+            style="color: green;">Execute</button>
+    </div>
+</div>

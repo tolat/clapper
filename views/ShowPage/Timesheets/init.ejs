@@ -1,0 +1,73 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>;
+    var _args= <%- JSON.stringify(args)%>;
+
+    var _extraColumns=_show.purchases.extraColumns;
+    var _validators=[];
+    var _totals={};
+
+    var grid;
+    var dataView;
+
+    // Load the grid 
+    async function onLoad() {
+        var sheets=[]//_show.timesheets.timesheetList;
+
+        // Set the week ending if the show has a current week ending
+        if (_show.currentweekending) { _weekEnding=_show.currentweekending }
+        await setWeekEnding();
+
+        // Create options
+        var options=await initializeOptions();
+
+        // Create grid data
+        var data=await initializeData(sheets, _show, _args);
+
+        // Create grid columns
+        var columns=await initializeColumns(sheets, _show, _args);
+
+        // Create data grid
+        await createSlickGrid(data, columns, options, _show, _args);
+
+        // Apply display settings
+        // if (_show.purchases.displaySettings) { applyDisplaySettings(_show.purchases.displaySettings) }
+    }
+
+    // Creates grid data 
+    function initializeData(purchases, _show, _args) {
+        let data=[];
+
+        for (let i=1; i<=50; i++) {
+            data.push({ id: `${i}`, '#': i });
+        }
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(purchases, _show, _args) {
+        let columns=[{ id: "#", name: " ", field: "#", width: 30, editor: Slick.Editors.Text, minWidth: 10, cssClass: 'spreadsheet-header', headerCssClass: 'spreadsheet-header' }];
+        let alphabet='abcdefghijklmnopqrstuvwxyz'.split('');
+        for (letter of alphabet) {
+            l=letter.toUpperCase();
+            columns.push({ id: `${l}`, name: `${l}`, field: `${l}`, width: 80, editor: Slick.Editors.Text, minWidth: 50, headerCssClass: 'spreadsheet-header' });
+        }
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            enableColumnReorder: false,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+            frozenColumn: 0
+        }
+    }
+
+</script>

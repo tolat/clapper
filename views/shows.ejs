@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="/scripts/shows.js"></script>
+
+<head>
+    <%- include("partials/head")%>
+        <script src="../public/scripts/shows.js"></script>
+</head>
+
+<body>
+    <div id="grid-modal-container">
+        <%- include("partials/deleteShowWarningModal") %>
+    </div>
+    <%- include("partials/createShow") %>
+        <%- include("partials/navbar") %>
+            <div id="main-container">
+                <%- include("partials/flash") %>
+                    <h3>My Shows
+                        <a id="create-show-button" onclick="toggleCreateShow('flex')">Create Show</a>
+                    </h3>
+                    <%- include('partials/showsTable') %>
+            </div>
+</body>
+
+</html>

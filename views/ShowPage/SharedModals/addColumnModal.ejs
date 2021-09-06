@@ -1,0 +1,19 @@
+<div id="add-column-modal" class="grid-modal">
+    <label for="add-column-input">
+        Enter column name:
+    </label>
+    <input id="add-column-input" style="width: 100%;">
+    <div style="display: flex; align-items: center; margin-top: 5px;">
+        <input type="checkbox" id="add-column-editor-selector">
+        <label style="margin-left: 5px;" for="add-column-editor-selector">Long Text Editor</label>
+    </div>
+    <div id='add-column-modal-tax-column-selector' style="display: none; align-items: center; margin-top: 5px;">
+        <input type="checkbox" id="add-tax-column-editor-selector">
+        <label style="margin-left: 5px;" for="add-tax-column-editor-selector">Tax Column</label>
+    </div>
+    <div class="modal-button-container">
+        <button id="delete-version-cancel" onclick="toggleAddColumnModal(false)" style="color: black;">Cancel</button>
+        <button id="delete-version-modal-submit" onclick="addColumn()" style="color: green">Create</button>
+    </div>
+    <div id="add-column-direction" style="display: none;"></div>
+</div>

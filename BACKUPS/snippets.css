@@ -1,0 +1,46 @@
+
+/* Jspreadsheet CE styles */
+.jexcel_content{
+    margin-top: 4.9em;
+}
+
+.jexcel_filter{
+    height: 0;
+    margin: 0;
+}
+
+input.jexcel_search{
+    position: absolute;
+    top:calc(6rem + (1/2 * (2.5rem - 30px)));
+    right: 10px;
+    z-index: 99;
+    height: 30px;
+}
+
+.jexcel_toolbar{
+    position: absolute;
+    top: 6rem;
+    height: 2.5rem;
+    width: 100%;
+}
+
+.jexcel_toolbar_item{
+    margin: 0 5px 0 5px;
+}
+
+#control-bar{
+    height: 3.5rem;
+    top: 3.5rem;
+    width: 100%;
+    position: absolute;
+}
+
+@media (max-width: 1100px){
+    .toolbar_wrapper{
+        display: none;
+    }
+
+    .menu_wrapper{
+        display: flex;
+    }
+}

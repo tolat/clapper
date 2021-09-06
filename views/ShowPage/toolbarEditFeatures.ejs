@@ -1,0 +1,16 @@
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle grid-toolbar-dropdown-button" type="button"
+        id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+        Edit
+    </button>
+    <ul class="dropdown-menu grid-toolbar-dropdown" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" onclick="selectAll()">Select all</a></li>
+        <div class="dropdown-item">Group by column: <br><input id="group-by-input"></div>
+        <div class="dropdown-item" style="display: none;" onclick="groupBy(null)" id="cancel-grouping">
+            Clear grouping</div>
+        <div class="dropdown-item">Add rows: <br><input id="add-rows-input"></div>
+        <div class="dropdown-item">Auto-number by column:<br><input id="auto-number-input"></div>
+        <div class="dropdown-item"># of frozen columns: <br><input id="frozen-columns-input"></div>
+        <div class="dropdown-item" onclick="toggleAutoFillRangeModal(true)">Auto-fill range</div>
+    </ul>
+</div>

@@ -1,0 +1,153 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>;
+    var _args= <%- JSON.stringify(args)%>;
+
+    var _extraColumns=_show.positions.extraColumns;
+    var _rentalColumns=_show.positions.rentalColumns;
+    var _validators=[
+        {
+            fields: ['Rate'],
+            isInvalid: function (args, field) {
+                return isNaN(parseFloat(args.item['Rate']))
+            },
+            validationHeader: 'Invalid Rate!',
+            validationMessage: "Rate must be a number."
+        },
+        {
+            fields: ['Department'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Department '${args.item[field]}' Not Found!`
+                this.validationMessage=`New departments can only be added in the 'Estimates' page.\nDepartments are case-sensitive!`
+                if (args.item[field]==undefined) { args.item[field]="" }
+                let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
+                let dep=false;
+                if (depIdx>=0) {
+                    args.item[field]=_show.departments[depIdx];
+                    dataView.updateItem(args.item.id, args.item);
+                    dep=true;
+                }
+                return !dep;
+            }
+        },
+        {
+            fields: ['Code'],
+            isInvalid: function (args, field) {
+                return dataView.getItems().filter(item => item.id!=args.item.id).map(item => item['Code']).includes(args.item['Code'])
+            },
+            validationHeader: 'Invalid Position Code!',
+            validationMessage: "Position codes must be unique."
+        }
+    ];
+    var _totals={};
+    var _multipliers=_show.positions.multipliers
+
+    var grid;
+    var dataView;
+
+    // Load the grid 
+    async function onLoad() {
+        var positions=_show.positions.positionList;
+
+        // Set the week ending if the show has a current week ending
+        if (_show.currentweekending) { _weekEnding=_show.currentweekending }
+        await setWeekEnding();
+
+        // Create options
+        var options=await initializeOptions();
+
+        // Create grid data
+        var data=await initializeData(positions, _show, _args);
+
+        // Create grid columns
+        var columns=await initializeColumns(positions, _show, _args);
+
+        // Create data grid
+        await createSlickGrid(data, columns, options, _show, _args);
+
+        grid.recalculate=function (item) {
+            // Do Nothing
+        }
+
+        // Update grid on cell change
+        grid.onCellChange.subscribe(function (e, args) {
+            // Run validators on cell edit 
+            runValidators(_validators, args);
+        })
+
+        // Hide totals display
+        document.getElementById('grid-footer-totals-container').style.display='none';
+
+        // Apply display settings to grid
+        if (_show.positions.displaySettings) { applyDisplaySettings(_show.positions.displaySettings) }
+
+        // Calcualte totals for totals footer row
+        updateTotalsRow();
+    }
+
+    // Creates grid data 
+    function initializeData(positions, _show, _args) {
+        let data=[];
+
+        for (let i=0; i<positions.length; i++) {
+            let item={
+                id: 'id_'+i,
+                '#': positions[i]['#'],
+                'Name': positions[i]['Name'],
+                'Code': positions[i]['Code'],
+                'Department': positions[i]['Department'],
+                'Rate': positions[i]['Rate'],
+                positionid: positions[i]._id
+            }
+
+            // Mark deleted departments
+            if (!_show.departments.includes(item['Department'])) { item['Department']+='\xa0(NOT FOUND)' }
+
+            // Add extra columns values
+            for (col of _show.positions.extraColumns) {
+                item[col]=positions[i].extraColumnValues[col];
+            }
+
+            data.push(item);
+        }
+
+        // Sort data by #
+        data=sortByNumber(data);
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(positions, _show, _args) {
+        let columns=[
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Code", name: "Code", field: "Code", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Rate", name: "Rate", field: "Rate", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save rate' },
+        ];
+
+        // Add extra columns
+        for (key of _extraColumns) {
+            let column={ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true };
+            if (_rentalColumns.includes(key)) { column.cssClass='rental-column' }
+            columns.push(column);
+        }
+
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            enableColumnReorder: true,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+        }
+    }
+
+</script>

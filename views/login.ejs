@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("partials/head")%>
+</head>
+
+<body>
+    <div id="login-container">
+        <h1>Login</h1>
+        <form action="/login" method="POST">
+            <%- include("partials/flash") %>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Email address</label>
+                    <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password">
+                </div>
+                <button type="submit" class="btn btn-success">Login</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="location.href = '/createAccount';"
+                    style="margin-top: 15px;">Create
+                    Account</button>
+        </form>
+    </div>
+</body>
+
+</html>

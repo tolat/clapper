@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("ShowPage/Template_head")%>
+        <%- include("partials/head") %>
+</head>
+
+<body onload="onLoad()">
+    <div id="grid-modal-container">
+        <% for(m of sharedModals) {%>
+            <%- include(`ShowPage/SharedModals/${m}`) %>
+                <% } %>
+                    <% for(m of pageModals) {%>
+                        <%- include(`ShowPage/${section}/Modals/${m}`) %>
+                            <% } %>
+    </div>
+    <%- include('partials/navbar') %>
+        <%- include(`ShowPage/${section}/toolbar`) %>
+            <%- include('ShowPage/gridComponent') %>
+</body>
+
+<%- include(`ShowPage/${section}/init`) %>
+
+</html>

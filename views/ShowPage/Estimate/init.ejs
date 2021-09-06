@@ -1,0 +1,230 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>;
+    var _args= <%- JSON.stringify(args)%>;
+
+    var _version=_args.version;
+    var _latestVersion=_args.latestVersion;
+    var _extraColumns=[];
+    var _fringes={};
+    var _mandayRates={};
+    if (_version) {
+        _extraColumns=_show.estimateVersions[_version].extraColumns;
+        _fringes=_show.estimateVersions[_version].fringes;
+        _mandayRates=_show.estimateVersions[_version].mandayRates;
+    }
+    var _deletedSets=[];
+    var _validators=[
+        {
+            fields: ['Set Code'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Invalid Set Code: ${args.item[field]}!`
+                this.validationMessage='A set with this code already exists.'
+                return dataView.getItems().find(i => i[field]==args.item[field]&&i.id!=args.item.id)&&args.item[field]
+            }
+        },
+    ];
+    var _totals={ Current: 'sum', Variance: 'sum' };
+    var _departmentTotals={}
+
+    var grid;
+    var dataView;
+
+    // Load the grid 
+    async function onLoad() {
+        var sets=_show.sets;
+
+        // Create options
+        var options=await initializeOptions();
+
+        // Create grid data
+        var data=await initializeData(sets, _show, _args);
+
+        // Create grid columns
+        var columns=await initializeColumns(sets, _show, _args);
+
+        // Create data grid
+        await createSlickGrid(data, columns, options);
+
+        // Recalculate after paste
+        grid.recalculate=async function (item, editedfields=false) {
+            let cols=grid.getColumns()
+            let updateMath=false
+            if (editedfields) {
+                for (d of _show.departments) {
+                    let mathCols=['Man Days', 'Labor', 'Materials', 'Rentals'].map(x => `${d} ${x}`)
+                    for (field of editedfields) {
+                        if (mathCols.includes(field)) {
+                            updateMath=true
+                            if (field==`${d} Man Days`||field==`${d} Labor`) {
+                                let args={ item: item }
+                                args.cell=cols.indexOf(cols.find(c => c.field==field))
+                                console.log(`balancing ${field}`)
+                                await balanceLaborManDays(args)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (updateMath) {
+                await updateEstimateMathColumns()
+                await updateTotalsRow()
+            }
+
+            updateTotalsRow()
+        }
+
+        // Update math columns automatically when a department cell is edited
+        grid.onCellChange.subscribe(function (e, args) {
+            // Uncomment/comment to toggle automatic math column update on cell edit (slow when pasting large amounts)
+            if (isDepartmentKey(grid.getColumns()[args.cell].field)) {
+                balanceLaborManDays(args);
+                updateEstimateMathColumns();
+            }
+
+            // Run validators on cell edit 
+            runValidators(_validators, args);
+
+            updateTotalsRow();
+        });
+
+        // Apply saved display settings
+        if (Object.keys(_show.estimateVersions)[0]&&_show.sets[0]) { applyDisplaySettings(_show.estimateVersions[_version].displaySettings) }
+
+        // Set estimate status to saved
+        await updateSaveStatus(true);
+
+        // If this is the most recent estimate, put(latest in version display)
+        if (_args.version==_args.latestVersion) { document.getElementById('latest-version-display').innerText='(latest)' }
+
+        // if estimate versions exist, populate this version's manday rates and fringes
+        if (_show.estimateVersions[_args.version]) {
+            // Populate Manday Rates
+            await populateMandayRates()
+
+            // Populate Fringes
+            await populateFringes()
+
+            // Compute Math column values
+            await updateEstimateMathColumns()
+
+            // If manday rates are not set, open the manday rate modal to set them
+            if (!Object.keys(_show.estimateVersions[_args.version].mandayRates)[0]) {
+                console.log('here')
+                toggleManDayRatesModal(true)
+            }
+        }
+
+        // Calcualte totals for totals footer row
+        await updateTotalsRow()
+
+        // Add class to week ending display so that it stands out as different (this one applies only to the estimate version)
+        await document.getElementById('week-ending-display-container').classList.add('estimates-week-ending')
+
+        // Add any cols that have been erased by the display settings
+        await addMissingCols(columns)
+
+        // Create sortable departments bar
+        var departmentsBar=Sortable.create(document.getElementById('departments-bar'), {
+            onEnd: reorderDepartments
+        });
+
+        // Preliminary saveData (Sets cost report estimate version to this estimate's number)
+        if (Object.keys(_show.estimateVersions)[0]) {
+            saveData()
+            // If manday rates are not set, open the manday rate modal to set them
+            if (!Object.keys(_show.estimateVersions[_args.version].mandayRates)[0]) {
+                toggleManDayRatesModal(true)
+            }
+        }
+        // If this is first estimate, prompt for first version name
+        else { toggleEnterVersionModal(true, true) }
+
+
+    }
+
+    // Creates grid data 
+    function initializeData(sets, _show, _args) {
+        var data=[];
+
+        if (sets[0]) {
+            for (let i=0; i<sets.length; i++) {
+                let item={
+                    id: 'id_'+i,
+                    '#': sets[i]['#'],
+                    setid: sets[i]._id,
+                    // Core features
+                    'Set Code': sets[i]['Set Code'],
+                    'Episode': sets[i]['Episode'],
+                    'Name': sets[i]['Name'],
+                    departmentTotals: {}
+                }
+
+                // Version specific features
+                if (sets[i].estimates[_args.version]&&sets[i].estimates[_args.version].departmentValues) {
+                    // Add Department specific features
+                    for (key of Object.keys(sets[i].estimates[_args.version].departmentValues)) {
+                        item[key]=zeroNanToNull(parseFloat(sets[i].estimates[_args.version].departmentValues[key]).toFixed(2));
+                    }
+                    // Calculate department-specific labor
+                    for (d of _show.departments) {
+                        item[`${d} Labor`]=zeroNanToNull(parseFloat(item[`${d} Man Days`]*_show.estimateVersions[_version].mandayRates[d]).toFixed(2));
+                    }
+                    // Add Extra Column Values
+                    for (key of _show.estimateVersions[_args.version].extraColumns) {
+                        item[key]=sets[i].estimates[_args.version].extraColumnValues[key]
+                    }
+                }
+                data.push(item);
+            }
+        }
+
+        // Sort data by #
+        data=sortByNumber(data);
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(sets, _show, _args) {
+        let columns=[
+            // Core feature columns
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true, },
+            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
+        ];
+
+        // Non-department estimate specific columns
+        if (Object.keys(_show.estimateVersions)[0]) {
+            for (key of _show.estimateVersions[_args.version].extraColumns) {
+                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.LongText, sortable: true });
+            }
+        }
+
+        // Math columns
+        columns=columns.concat([
+            { id: "No Fringes", name: "No Fringes", field: "No Fringes", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Current", name: "Current", field: "Current", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Previous", name: "Previous", field: "Previous", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Variance", name: "Variance", field: "Variance", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+        ])
+
+        // Department columns 
+        for (d of _show.departments) { columns=columns.concat(addDepartment(d)) }
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+        }
+    }
+</script>

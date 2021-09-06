@@ -1,0 +1,24 @@
+<div class="grid-toolbar" id="purchases-toolbar">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle grid-toolbar-dropdown-button" type="button"
+            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            File
+        </button>
+        <ul class="dropdown-menu grid-toolbar-dropdown" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" onclick="saveData()">Save</a></li>
+        </ul>
+    </div>
+    <%- include('ShowPage/toolbarEditFeatures') %>
+        <button type="button" onclick="undoCellEdit()" class="toolbar-icon"
+            style="background-image: url('/public/images/undo.png'); "></button>
+        <button type="button" onclick="redoCellEdit()" class="toolbar-icon"
+            style="background-image: url('/public/images/redo.png'); "></button>
+        <div class="grid-toolbar-item" id="save-status"
+            style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
+            saved
+        </div>
+        <div class=" grid-toolbar-searchbar">
+            Filter:
+            <input id="textsearch" style="width: 150px; margin-left: 5px;">
+        </div>
+</div>

@@ -1,0 +1,44 @@
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><b id="username">
+                <%= currentUser.Name %>
+            </b></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <% if (title !='Home' && title !='Profile' ) {%>
+            <span id="pageTitle">
+                <div class="dropdown">
+
+                    <button class="btn btn-sm btn-success dropdown-toggle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <%= title %>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/CostReport">Cost Report</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Estimate">Estimate</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Purchases">Purchases</a></li>
+                        <li><a id="rentals-dropdown" class="dropdown-item"
+                                href="/shows/<%=show.id%>/Rentals">Rentals</a></li>
+                        <li><a id="crew-dropdown" class="dropdown-item" href="/shows/<%=show.id%>/Crew">Crew</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Rates">Rates</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Timesheets">Timesheets</a></li>
+                    </ul>
+                </div>
+            </span>
+            <%}%>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-auto">
+                        <% if (title !='Home' ) {%>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/shows">Home</a>
+                            </li>
+                            <%}%>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/logout">Logout</a>
+                                </li>
+                    </ul>
+                </div>
+    </div>
+</nav>

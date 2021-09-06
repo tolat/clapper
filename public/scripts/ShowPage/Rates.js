@@ -1,0 +1,193 @@
+// Set context menu options 
+setContextMenu=() => {
+    // Add copy and paste to context menu
+    document.getElementById('contextMenu').innerHTML=`
+    <li onclick="triggerCopy()">Copy</li>
+    <li onclick="triggerPaste()">Paste</li>
+    <br>`
+
+    document.getElementById('contextMenu').innerHTML+=getHideColumnsOptions();
+    document.getElementById('contextMenu').innerHTML+=`
+        <li onclick="addRow(1, 'above')">Add row above</li>
+        <li onclick="addRow(1, 'below')">Add row below</li>`;
+}
+
+// Set context menu options for column header
+setHeaderContextMenu=(args) => {
+    document.getElementById('contextMenu').innerHTML=getHideColumnsOptions(args.column);
+
+    document.getElementById('contextMenu').innerHTML+=`
+    <li onclick='toggleAddColumnModal(true, 0)'>Add column left</li>
+    <li onclick='toggleAddColumnModal(true, 1)'>Add column right</li>`;
+
+    if (args.column.deletable) {
+        document.getElementById('contextMenu').innerHTML=document.getElementById('contextMenu').innerHTML+`<li onclick='deleteColumn()'>Delete column</li>`;
+    }
+}
+
+// gets the group aggregators for purchases
+getGroupAggregators=() => {
+    let aggregators=[];
+    return aggregators;
+}
+
+// Update estimate
+saveData=() => {
+    if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
+
+    // Indicate grid is saving
+    let statusElement=document.getElementById('save-status');
+    statusElement.innerText='saving...';
+    statusElement.style.color='rgb(255, 193, 49)';
+
+    // Run all validators
+    runAllValidators()
+
+    // Cancel save if invalid cells remain
+    if (invalidCellsRemain()) {
+        toggleLoadingScreen(false)
+        updateSaveStatus(_dataSaved)
+        return
+    }
+
+    // Post estimate data and version to server
+    fetch(server+`shows/${_show._id}/Rates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            data: dataView.getItems(),
+            extraColumns: _extraColumns,
+            multipliers: _multipliers,
+            displaySettings: {
+                groupBy: _groupedBy,
+                reorderColumns: getColumnOrder(),
+                collapseGroups: getCollapsedGroups(),
+                setColumnWidths: getColumnWidths(),
+                setHiddenColumns: getHiddenColumns(),
+                setFrozenColumns: _frozenColumns,
+            }
+        })
+    })
+        .then(response => { return response.json() })
+        .then(responseData => {
+            // Push new item ids to items
+            clearDeletedItems();
+            // Update saveStatus
+            updateSaveStatus(true);
+            // Reflect the change in save point in the Undo/Redo buffer command queue
+            if (undoRedoBuffer.commandQueue[0]) {
+                for (cmd of undoRedoBuffer.commandQueue) { cmd.saveStatus=[false, false] }
+                undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr-1].saveStatus=[false, true];
+                if (undoRedoBuffer.commandCtr<undoRedoBuffer.commandQueue.length) {
+                    undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr].saveStatus=[true, false];
+                }
+            }
+
+        })
+}
+
+// Hide/show  'Multipliers'  modal
+toggleMultipliersModal=(show, update=false) => {
+    // Hide Modal
+    if (!show) {
+        document.getElementById('grid-modal-container').style.display=null;
+        document.getElementById('multipliers-modal').style.display=null;
+        document.getElementById('week-ending-display').style.zIndex=null;
+        document.getElementById('week-ending-display').style.backgroundColor=null;
+
+        // Update _multipliers with table values
+        if (update) {
+            let days=getDaysOfCurrentWeek(new Date(_week.end)).map(day => day.toString().slice(0, 3));
+            for (m of Object.keys(_multipliers)) {
+                for (day of days) {
+                    let val=parseFloat(document.getElementById(`${m}-${day}`).value);
+                    if (!isNaN(val)) { _multipliers[m][day]=val }
+                }
+            }
+            saveData();
+        }
+    }
+    // Show modal
+    else {
+        document.getElementById('grid-modal-container').style.display='flex';
+        document.getElementById('multipliers-modal').style.display='flex';
+        document.getElementById('week-ending-display').style.zIndex=199;
+        document.getElementById('week-ending-display').style.backgroundColor='white';
+        loadMultipliersModal();
+    }
+}
+
+// Hide/show  'Add Multiplier'  modal
+toggleAddMultiplierModal=(show, add=false) => {
+    // Hide Modal
+    if (!show) {
+        document.getElementById('add-multiplier-modal').style.display=null;
+        document.getElementById('multipliers-modal').style.display='flex';
+        // update Multipliers 
+        if (add) {
+            let newMultiplier=parseFloat(document.getElementById('add-multiplier-input').value);
+            _multipliers[newMultiplier]={
+                Mon: 1, Tue: 1, Wed: 1, Thu: 1, Fri: 1, Sat: 1, Sun: 1
+            }
+        }
+        loadMultipliersModal();
+        document.getElementById('add-multiplier-input').value=null;
+    }
+    // Show modal
+    else {
+        document.getElementById('add-multiplier-modal').style.display='flex';
+        document.getElementById('add-multiplier-input').focus();
+        document.getElementById('multipliers-modal').style.display=null;
+    }
+}
+
+// Delete multiplier
+deleteMultiplier=(multiplier) => {
+    delete _multipliers[multiplier];
+    loadMultipliersModal();
+}
+
+// Load _multipliers data into the multipliers modal table
+loadMultipliersModal=() => {
+    // Reset table
+    document.getElementById('multipliers-table').innerHTML=`
+    <thead>
+        <tr id='multiplier-headers'>
+            <th scope="col"></th>
+            <th scope="col">Hour</th>
+        </tr>
+    </thead>
+    <tbody id="multiplier-rows">
+    </tbody>`
+
+    let days=getDaysOfCurrentWeek(new Date(_week.end)).map(day => day.toString().slice(0, 3));
+    let mHeaders=document.getElementById('multiplier-headers');
+    let mRows=document.getElementById('multiplier-rows');
+    let mRowKeys=Object.keys(_multipliers);
+
+    // Add week day columns
+    for (day of days) {
+        mHeaders.innerHTML+=`<th scope="col">${day}</th>`;
+    }
+
+    // Add Multiplier Rows
+    for (m of mRowKeys) {
+        mRows.innerHTML+=`
+        <tr id='${m}'>
+            <th class='delete-multiplier-button' onclick='deleteMultiplier(${m})'>delete</th>
+            <td scope="row"><b>${m}<b></td>
+        </tr>`
+    }
+
+    // Populate table with multiplier data
+    for (m of mRowKeys) {
+        for (day of days) {
+            document.getElementById(`${m}`).innerHTML+=`<td><input onkeydown='refocusElement(this)' class='multiplier-input' id='${m}-${day}' value='${_multipliers[m][day]}'></td>`
+        }
+    }
+
+}
+
+testFun=() => {
+    console.log(dataView.getItems());
+}

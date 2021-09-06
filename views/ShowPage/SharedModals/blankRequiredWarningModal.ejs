@@ -1,0 +1,14 @@
+<div id="blank-required-warning-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
+    <h4 style="font-size: 1rem; padding: 0.5rem;" id="blank-required-warning-modal-header">
+        You have left some required fields blank for non-empty rows. Saving will clear the remaining data in these rows.
+        <br><br>
+        Do you wish to save?
+    </h4>
+    <div id="blank-required-warning-modal-message"></div>
+    <div class="modal-button-container">
+        <button id="blank-required-warning-cancel" onclick="toggleBlankRequiredWarningModal(false)"
+            style="color: black;">Cancel</button>
+        <button id="blank-required-warning-save" onclick="toggleBlankRequiredWarningModal(false, true)"
+            style="color: green;">Save</button>
+    </div>
+</div>

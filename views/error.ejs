@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("partials/head")%>
+</head>
+
+<body style="align-items: center; margin-top: 2rem;">
+    <div class="alert alert-danger" role="alert" id="error-container"
+        style="width: 50%; max-height: 90%; overflow-y: scroll; font-size: 0.75rem;">
+        <h4 class="alert-heading">
+            Error - <%=statusCode%>
+        </h4>
+        <p>
+            <%= err.message%>
+        </p>
+        <% if (process.env.NODE_ENV !=='production' ) { %>
+            <p style="height: 20rem; overflow-y: scroll;">
+                <%= err.stack%>
+            </p>
+            <% } %>
+                <hr>
+                <button type="button" class="btn btn-outline-danger"
+                    onclick="window.history.go(-1); return false;">Back</a>
+    </div>
+</body>
+
+</html>

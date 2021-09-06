@@ -1,0 +1,206 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>;
+    var _args= <%- JSON.stringify(args)%>;
+
+    var _extraColumns=_show.purchases.extraColumns;
+    var _validators=[
+        {
+            fields: ['Set Code'],
+            isInvalid: function (args, field) {
+                return !_show.sets.find(s => s['Set Code']==args.item['Set Code'])&&args.item['Set Code']!='DELETED'
+            },
+            validationHeader: 'Set Not Found!',
+            validationMessage: "New sets can be added in the 'Estimates' page."
+        },
+        {
+            fields: ['Department'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Department '${args.item[field]}' Not Found!`
+                this.validationMessage=`New departments can only be added in the 'Estimates' page.`
+                let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toString().toLowerCase());
+                let existsDep=false;
+                if (depIdx>=0) {
+                    args.item[field]=_show.departments[depIdx];
+                    dataView.updateItem(args.item.id, args.item);
+                    existsDep=true;
+                }
+                return !existsDep;
+            }
+        },
+        {
+            fields: ['Amount'],
+            isInvalid: function (args, field) { return isNaN(parseFloat(args.item['Amount'])) },
+            validationHeader: 'Invalid Amount!',
+            validationMessage: "Amount must only contain numbers and '.'"
+        },
+        {
+            fields: ['PO Num'],
+            isInvalid: function (args, field) { return dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id) },
+            validationHeader: 'Invalid Amount!',
+            validationMessage: "Amount must only contain numbers and '.'"
+        },
+    ];
+    var _totals={ Total: 'sum' };
+    var _taxColumns=_show.purchases.taxColumns
+
+    var grid;
+    var dataView;
+
+    // Load the grid 
+    async function onLoad() {
+        var purchases=_show.purchases.purchaseList;
+
+        // Set the week ending if the show has a current week ending
+        if (_show.currentweekending) { _weekEnding=_show.currentweekending }
+        await setWeekEnding();
+
+        // Create options
+        var options=await initializeOptions();
+
+        // Create grid data
+        var data=await initializeData(purchases, _show, _args);
+
+        // Create grid columns
+        var columns=await initializeColumns(purchases, _show, _args);
+
+        // Create data grid
+        await createSlickGrid(data, columns, options, _show, _args);
+
+        grid.recalculate=function (item) {
+            item=updatePurchaseTotal(item);
+            dataView.updateItem(item.id, item)
+            updateTotalsRow()
+        }
+
+        // Update the purchase total when amount or tax is edited
+        grid.onCellChange.subscribe(function (e, args) {
+            let col=grid.getColumns()[args.cell].name;
+
+            if (col=='Amount'||_taxColumns.includes(col)) {
+                let item=updatePurchaseTotal(args.item);
+                dataView.updateItem(item.id, item);
+            }
+
+            // Run validators on cell edit 
+            runValidators(_validators, args);
+
+            updateTotalsRow();
+        })
+
+        // Apply display settings
+        if (_show.purchases.displaySettings) { applyDisplaySettings(_show.purchases.displaySettings) }
+
+        // Calcualte totals for totals footer row
+        updateTotalsRow();
+    }
+
+    // Creates grid data 
+    function initializeData(purchases, _show, _args) {
+        let data=[];
+        // Load purchases into items for the grid
+        for (let i=0; i<purchases.length; i++) {
+            let item={
+                id: 'id_'+i,
+                purchaseid: purchases[i]._id,
+                '#': purchases[i]['#'],
+                'Department': purchases[i]['Department'],
+                'PO Num': purchases[i]['PO Num'],
+                'Invoice Num': purchases[i]['Invoice Num'],
+                'Supplier': purchases[i]['Supplier'],
+                'Description': purchases[i]['Description'],
+                'Amount': (zeroNanToNull(purchases[i]['Amount'])||0).toFixed(2),
+            }
+
+            // Add tax column values
+            for (taxCol of _taxColumns) {
+                item[taxCol]=zeroNanToNull(parseFloat(purchases[i].taxColumnValues[taxCol]))
+            }
+
+            // ** BASE THIS ON DATE NOT ON WEEK ***
+            let week=_show.weeks.find(w => w._id==purchases[i].weekId)
+            if (week) {
+                item['Week']=week.number
+            } else {
+                item['Week']=undefined
+            }
+
+
+            // Initialize the purchase total (Tax + Amount)
+            item=updatePurchaseTotal(item);
+
+            // Load set data into purchase
+            let set=_show.sets.find(s => s['Set Code']==purchases[i]['Set Code'])
+            if (set) {
+                item['Set Code']=set['Set Code'];
+                item['Episode']=set['Episode'];
+            } else {
+                item['Set Code']='DELETED'
+            }
+
+            // Add date value or none if there is no date
+            if (!purchases[i]['Date']) {
+                item['Date']='';
+            } else {
+                item['Date']=(new Date(purchases[i]['Date'])).toLocaleDateString('en-US');
+            }
+
+            // Add extra column values
+            for (col of _show.purchases.extraColumns) {
+                item[col]=purchases[i].extraColumnValues[col];
+            }
+            data.push(item);
+        }
+
+        // Sort data by #
+        data=sortByNumber(data);
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(purchases, _show, _args) {
+        let columns=[
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "PO Num", name: "PO Num", field: "PO Num", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Episode", name: "Episode", field: "Episode", width: 75, sortable: true, cssClass: 'uneditable' },
+            { id: "Amount", name: "Amount", field: "Amount", width: 100, editor: Slick.Editors.Text, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency' },
+        ]
+
+        for (taxCol of _taxColumns) {
+            columns.push(
+                { id: taxCol, name: taxCol, field: taxCol, width: 60, editor: Slick.Editors.Text, deletable: true, istaxcolumn: true, sortable: true, cssClass: 'tax-column' },
+            )
+        }
+
+        columns.push(...[
+            { id: `Total`, name: `Total`, field: 'Total', width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Date", name: "Date", field: "Date", width: 100, editor: Slick.Editors.Date, sortable: true },
+            { id: "Week", name: "Week", field: "Week", width: 100, editor: Slick.Editors.Date, sortable: true },
+            { id: "Invoice Num", name: "Invoice Num", field: "Invoice Num", width: 100, editor: Slick.Editors.Text, sortable: true },
+            { id: "Supplier", name: "Supplier", field: "Supplier", width: 100, editor: Slick.Editors.Text, sortable: true },
+            { id: "Description", name: "Description", field: "Description", width: 300, editor: Slick.Editors.LongText, sortable: true },])
+
+
+        for (key of _extraColumns) {
+            columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true })
+        }
+
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+        }
+    }
+
+</script>

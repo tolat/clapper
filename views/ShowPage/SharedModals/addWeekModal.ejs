@@ -1,0 +1,27 @@
+<div id="add-week-modal" class="grid-modal" style="align-items: center;">
+    <label for="add-week-input">Enter ending day for new week</label>
+    <input id="add-week-input" type="date" style="padding-left: 5px; margin: 10px;" placeholder="yyyy-mm-dd">
+    <div id="add-week-modal-input-warning" style="color: red; display: none;">Enter a valid date (yyyy-mm-dd)</div>
+    <div>
+
+    </div>
+    <div style="display: flex; flex-direction: column;">
+        Carry over crew and rentals from:
+        <div class="form-check" style="margin-top: 10px;">
+            <input class="form-check-input" name="add-week-radio-group" id="add-week-radio-current" type="radio">
+            <label class="form-check-label" for="add-week-radio-current">Current week</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" name="add-week-radio-group" id="add-week-radio-preceding" type="radio">
+            <label class="form-check-label" for="add-week-radio-preceding">Preceding week</label>
+        </div>
+        <div class="form-check" style="margin-bottom: 10px;">
+            <input class="form-check-input" name="add-week-radio-group" id="add-week-radio-blank" type="radio">
+            <label class="form-check-label" for="add-week-radio-blank">Blank crew list</label>
+        </div>
+    </div>
+    <div class="modal-button-container">
+        <button onclick="toggleAddWeekModal(false)" style="color: black;">Cancel</button>
+        <button onclick="toggleAddWeekModal(false, true)" style="color: green">Add</button>
+    </div>
+</div>

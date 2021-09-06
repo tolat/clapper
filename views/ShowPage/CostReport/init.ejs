@@ -1,0 +1,241 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>;
+    var _args= <%- JSON.stringify(args)%>;
+    setWeekEnding()
+
+    var _extraColumns=_show.costReport.extraColumns;
+    var _validators=[];
+    var _totals={ Budget: 'sum', 'To Date': 'sum', Remaining: 'sum' };
+    var _showCrew=_args.showCrew
+
+    // Set correct version, defaulting to latest version if the cost report's version has been deleted or renamed
+    var _version=_show.costReport.estimateVersion;
+    if (!Object.keys(_show.estimateVersions).includes(_version)) {
+        _version=getLatestVersion();
+        _show.costReport.estimateVersion=_version;
+        document.getElementById('cost-report-estimate-version-display').innerText=`\xa0${_version.replace('_', '.')}`;
+    }
+    if (_version==getLatestVersion()) {
+        document.getElementById('cost-report-estimate-version-display').innerHTML+=`
+        <div style="color: grey; margin-left: 5px">(latest)</div`;
+    }
+
+    var grid;
+    var dataView;
+
+    // Load the grid 
+    async function onLoad() {
+        var sets=_show.sets;
+
+        // Create options
+        var options=await initializeOptions();
+
+        // Create grid data
+        var data=await initializeData(sets);
+
+        // Create grid columns
+        var columns=await initializeColumns(sets);
+
+        // Create data grid
+        await createSlickGrid(data, columns, options);
+
+        // Update grid on cell change
+        grid.onCellChange.subscribe(function (e, args) {
+            // Run validators on cell edit 
+            runValidators(_validators, args);
+
+            // Calcualte totals for totals footer row
+            updateTotalsRow();
+        })
+
+        // Apply display settings to grid
+        if (_show.costReport.displaySettings) { await applyDisplaySettings(_show.costReport.displaySettings) }
+
+        // Calcualte totals for totals footer row
+        await updateTotalsRow();
+
+        // Add any cols that have been erased by the display settings
+        await addMissingCols(columns);
+
+        // Reorder departments
+        await reorderDepartments();
+
+        // Save cost report so the totals variables for the shows table on the homepage are updated
+        await saveData();
+    }
+
+    // Creates grid data 
+    function initializeData(sets) {
+        let data=[];
+
+        for (let i=0; i<sets.length; i++) {
+            let item={
+                id: 'id_'+i,
+                setid: sets[i]._id,
+                // Core features
+                ['Set Code']: sets[i]['Set Code'],
+                ['Episode']: sets[i]['Episode'],
+                ['Name']: sets[i]['Name'],
+            }
+
+            // Set # 
+            item['#']=_show.costReport.setNumberMap[sets[i]['Set Code']];
+
+            // Initialize overall totals
+            let costs=calculateCosts(item);
+
+            // Set total cost keys to 0
+            let costKeys=['To Date', 'This Week', 'Labor', 'Man Days', 'Materials', 'Rentals'];
+            item['Budget']=zeroNanToNull(parseFloat(calculateBudget(item)).toFixed(2));
+            for (key of costKeys) { item[key]=0 }
+
+            // Add department split-out costs
+            for (d of _show.departments) {
+                let labor=costs[0][d].total;
+                let materials=costs[1][d].total;
+                let rentals=costs[2][d].total;
+                let week=costs[0][d].week+costs[1][d].week+costs[2][d].week;
+
+                item[`${d}_week`]=zeroNanToNull(week.toFixed(2));
+                item[`${d}_todate`]=zeroNanToNull((labor+materials+rentals).toFixed(2));
+                item[`${d}_budget`]=zeroNanToNull((sets[i].estimateTotals[_version].departmentTotals[d]).toFixed(2));
+                item[`${d}_labor`]=zeroNanToNull(labor.toFixed(2));
+                item[`${d}_materials`]=zeroNanToNull(materials.toFixed(2));
+                item[`${d}_rentals`]=zeroNanToNull(rentals.toFixed(2));
+
+                // Calculate mandays 
+                let ev=_show.estimateVersions[_version];
+                let totalFringe=0;
+                for (key of Object.keys(ev.fringes)) { totalFringe+=ev.fringes[key] }
+                let mandays=(labor/(1+totalFringe/100))/_show.estimateVersions[_version].mandayRates[d];
+                item[`${d}_mandays`]=zeroNanToNull(mandays.toFixed(2));
+
+                // Calculate precent remaining
+                let pctRemaining=((item[`${d}_budget`]-item[`${d}_todate`])/item[`${d}_budget`]*100);
+                if (isNaN(pctRemaining)) { pctRemaining=0 }
+                item[`${d}_pctremaining`]=zeroNanToNull(pctRemaining.toFixed(0));
+
+                item['Labor']+=labor;
+                item['Man Days']+=mandays;
+                item['Materials']+=materials;
+                item['Rentals']+=rentals;
+                item['This Week']+=week;
+                item['To Date']+=labor+materials+rentals;
+            }
+
+            // Calculate and set overall remaining 
+            if (!item['Budget']&&item['To Date']>0&&item['To Date']!=null) {
+                item['Remaining']=-item['To Date']
+            } else {
+                item['Remaining']=zeroNanToNull((parseFloat(item['Budget'])-parseFloat(item['To Date'])).toFixed(2));
+            }
+
+            // Calculate and set overall % remaining
+            if (item['Budget']!=0) { item['% Remaining']=zeroNanToNull((item['Remaining']/item['Budget']*100).toFixed(0)) }
+
+            // Set total costs to 2 decimal places and set to null if 0 or Nan
+            for (key of costKeys) {
+                item[key]=zeroNanToNull(parseFloat(item[key]).toFixed(2));
+            }
+
+            // Add extra column values
+            for (col of _show.costReport.extraColumns) {
+                let map=_show.costReport.setExtraColumnMap[item['Set Code']];
+                if (map) { item[col]=map[col] }
+            }
+
+            data.push(item);
+        }
+
+        // Sort data by #
+        data=sortByNumber(data);
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(positions) {
+        let columns=[
+            // Core feature columns
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0, cssClass: 'cost-report-column' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, sortable: true, cssClass: 'uneditable cost-report-column' },
+            { id: "Episode", name: "Episode", field: "Episode", width: 80, sortable: true, cssClass: 'uneditable cost-report-column' },
+            { id: "Name", name: "Name", field: "Name", width: 300, sortable: true, cssClass: 'uneditable cost-report-column' },
+            { id: "Budget", name: "Budget", field: "Budget", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+            { id: "This Week", name: "This Week", field: "This Week", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+            { id: "To Date", name: "To Date", field: "To Date", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+            { id: "Remaining", name: "Remaining", field: "Remaining", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+            { id: "% Remaining", name: "% Remaining", field: "% Remaining", width: 80, groupTotalsFormatter: avgPercentFormatter, sortable: true, cssClass: 'uneditable percent-remaining cost-report-column' },
+            { id: "Labor", name: "Labor", field: "Labor", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+            { id: "Man Days", name: "Man Days", field: "Man Days", width: 80, groupTotalsFormatter: sumTotalsFormatter, sortable: true, cssClass: 'uneditable mandays cost-report-column' },
+            { id: "Materials", name: "Materials", field: "Materials", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+            { id: "Rentals", name: "Rentals", field: "Rentals", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, sortable: true, cssClass: 'uneditable currency cost-report-column' },
+        ];
+
+        // Add extra columns (user-defined)
+        for (key of _extraColumns) {
+            columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true })
+        }
+
+        // Colorized Department columns 
+        for (d of _show.departments) {
+            columns=columns.concat([
+                {
+                    id: `${d}_budget`, name: 'Budget', field: `${d}_budget`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency cost-report-column'
+                },
+                {
+                    id: `${d}_todate`, name: 'To Date', field: `${d}_todate`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency cost-report-column'
+                },
+                {
+                    id: `${d}_week`, name: 'This Week', field: `${d}_week`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency cost-report-column'
+                },
+                {
+                    id: `${d}_pctremaining`, name: '% Remaining', field: `${d}_pctremaining`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: avgPercentFormatter, cssClass: 'uneditable percent-remaining cost-report-column'
+                },
+                {
+                    id: `${d}_labor`, name: 'Labor', field: `${d}_labor`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency cost-report-column'
+                },
+                {
+                    id: `${d}_mandays`, name: 'Man Days', field: `${d}_mandays`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsFormatter, cssClass: 'uneditable mandays cost-report-column'
+                },
+                {
+                    id: `${d}_materials`, name: 'Materials', field: `${d}_materials`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency cost-report-column'
+                },
+                {
+                    id: `${d}_rentals`, name: 'Rentals', field: `${d}_rentals`, width: 80, minWidth: 50,
+                    sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency cost-report-column'
+                },
+
+            ])
+            addDepartmentCssClass(d);
+            addToDepartmentsBar(d, `${d.replaceAll(" ", "")}_cssClass`, `scrollToDeptCol('${d}')`);
+        }
+
+        // Add a buffer column
+        columns.push({ id: '___ExtraColumn___', field: '___ExtraColumn___', deletable: true, name: '___ExtraColumn___', width: 1000, cssClass: 'extra-column cost-report-column', headerCssClass: 'extra-column' })
+
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            enableColumnReorder: true,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+        }
+    }
+
+</script>

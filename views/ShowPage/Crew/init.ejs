@@ -1,0 +1,261 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>
+    var _args= <%- JSON.stringify(args)%>
+        setWeekEnding()
+
+    var _removeEditedField
+    var _multipliers=_show.positions.multipliers
+    var _extraColumns=_week.crew.extraColumns
+    var _totals={}
+    var _currentWeekDays=getDaysOfCurrentWeek()
+    var _prevColumns
+    var _validators=[
+        {
+            fields: _currentWeekDays.map(day => day.toString().slice(0, 3)),
+            isInvalid: function (args, field) {
+                _removeEditedField=isNaN(args.item[field])||args.item[field]>24;
+                return _removeEditedField;
+            },
+            validationHeader: 'Invalid Hours!',
+            validationMessage: "Hours must be a number between 0 and 24.",
+            skipOnSave: true
+        },
+        {
+            fields: _currentWeekDays.map(day => day.toString().slice(0, 3)+'_set'),
+            isInvalid: function (args, field) {
+                this.validationHeader=`Set '${args.item[field]}' Not Found!`
+                this.validationMessage=`New sets can only be added in the 'Estimates' page.`
+                return args.item[field]&&!_show.sets.find(s => s['Set Code']==args.item[field])
+            },
+        },
+        {
+            fields: ['Position'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Position '${args.item[field]}' Not Found!`
+                this.validationMessage='New positions can only be added in the Rates page'
+                return !_positions.find(pos => pos['Code']==args.item[field])&&args.item['Position']!=undefined&&args.item['username']!=undefined
+            }
+        },
+        {
+            fields: ['username', 'Name'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`There is already an entry for user: ${args.item['username']} with position: ${args.item['Position']}`
+                this.validationMessage=''
+                let items=dataView.getItems()
+                return items.find(i => i['username']==args.item['username']&&i['Position']==args.item['Position']
+                    &&i.id!=args.item.id&&item[field]!=undefined)
+            }
+        },
+    ]
+    var _totals={ Total: 'sum' }
+    var _allUsers=_args.allUsers
+    var _allNames=_allUsers.map(user => `${user['Name']} [${user['username']}]`)
+    var _allusernames=_allUsers.map(user => user['username'])
+    var _positions=_show.positions.positionList
+    var _taxColumns=_week.crew.taxColumns
+
+    var grid
+    var dataView
+
+    // Load the grid 
+    async function onLoad() {
+        var crew=_week.crew.crewList
+
+        // Create options
+        var options=await initializeOptions()
+
+        // Create grid data
+        var data=await initializeData(crew, _show, _args)
+
+        // Create grid columns
+        var columns=await initializeColumns(crew, _show, _args)
+
+        // Create data grid
+        await createSlickGrid(data, columns, options, _show, _args)
+
+        // Add a listener to prevent day and set columns from being interrupted by other columns
+        grid.onColumnsReordered.subscribe(function (e, args) {
+            let currentCols=grid.getColumns().map(col => col.name)
+            let weekDays=_currentWeekDays.map(day => day.toString().slice(0, 10))
+            let weekColNames=currentCols.slice(currentCols.indexOf('Set')-1, currentCols.lastIndexOf('Set')+1)
+            weekDays.push('Set')
+            for (let i=0; i<weekColNames.length-1; i++) {
+                if (!weekDays.includes(weekColNames[i])
+                    ||((i%2!=0)&&weekColNames[i]!='Set')
+                    ||((i==weekColNames.length-2)&&weekColNames[i]=='Set')) {
+                    grid.setColumns(_prevColumns);
+                    return
+                }
+
+            }
+
+            setFrozenColumns(_frozenColumns);
+            createReorderColumnCommand()
+            _prevColumns=grid.getColumns()
+        });
+
+        // Recalculate function to recalculate item
+        grid.recalculate=function (item, editedfields) {
+            if (editedfields&&editedfields.includes('username')) {
+                autoFillUserData({ item: item, cell: grid.getColumns().indexOf(grid.getColumns().find(c => c.field=='username')) })
+            }
+
+            console.log('recalculating')
+            item['Total']=calculateWeeklyTotal(item)
+            dataView.updateItem(item.id, item)
+            updateTotalsRow()
+
+
+        }
+
+        // Crew page cell change handler
+        grid.onCellChange.subscribe(async function (e, args) {
+            // Auto fill user data when user is added, and trim useid from name if necessary (user added from autofill menu)
+            await autoFillUserData(args);
+
+            // Record which cells have been edited for updating daysworked hours
+            await updateEditedFields(args);
+
+            // Run validators (again) on cell edit so changes made with this grid.onCellChange are validated
+            await runValidators(_validators, args);
+
+            // Recalculate total for item
+            await recalculateWeeklyTotal(args);
+
+            // Calculate totals for totals footer row
+            await updateTotalsRow();
+
+            grid.invalidate();
+            grid.setData(dataView);
+            grid.render();
+
+            grid.gotoCell(grid.getActiveCell().row, grid.getActiveCell().cell, false);
+        })
+
+        // Apply display settings to grid
+        applyDisplaySettings(_week.crew.displaySettings)
+
+        // Calculate totals for totals footer row
+        updateTotalsRow()
+
+        // Make sure weekday and set columns are all grouped together
+        setCrewPageColumnOrder()
+    }
+
+    // Creates grid data 
+    function initializeData(crew, _show, _args) {
+        let data=[];
+        let count=0;
+
+        for (let i=0; i<crew.length; i++) {
+            let record=crew[i].showrecords.find(r => r.showid==_show._id);
+            for (pos of record.positions) {
+                if (daysWorkedInWeek(pos)) {
+                    let position=_show.positions.positionList.find(p => p['Code']==pos.code)||{ 'Code': 'DELETED' }
+                    let department=_show.departments.find(d => d==position['Department'])
+
+                    let item={
+                        '#': record.weeksWorked[_week._id]['#'],
+                        id: 'id_'+count,
+                        userid: crew[i]._id,
+                        'username': crew[i]['username'],
+                        'Name': crew[i]['Name'],
+                        'Position': position['Code'],
+                        'Phone': crew[i]['Phone'],
+                        'Email': crew[i]['Email'],
+                        'Date Joined': (new Date(record['Date Joined'])).toLocaleDateString('en-US'),
+                        'Department': department,
+                        editedfields: [],
+                    }
+
+                    // Load tax column values 
+                    let taxColumnValues=record.weeksWorked[_week._id].taxColumnValues
+                    for (tax in taxColumnValues) {
+                        item[tax]=zeroNanToNull(taxColumnValues[tax])
+                    }
+
+                    // Load hours and setscodes for each day of this week ending
+                    item=loadUserHours(pos, item);
+
+                    // Set Rentals (payment due from rentals to this user for this week ending)
+                    item['Rentals']=zeroNanToNull(calculateWeeklyRentals(item));
+
+                    // Calculate weekly pay total and load it
+                    item['Total']=zeroNanToNull(calculateWeeklyTotal(item));
+
+                    // Add extra column values
+                    for (col of _week.crew.extraColumns) {
+                        item[col]=record.weeksWorked[_week._id].extraColumnValues[col];
+                    }
+
+                    data.push(item);
+
+                    count++;
+                }
+
+            }
+        }
+
+        // Sort data by #
+        data=sortByNumber(data);
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(crew, _show, _args) {
+        let columns=[
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _allusernames, sortable: true, minWidth: 0, cssClass: 'required-for-save' },
+            { id: "Position", name: "Position", field: "Position", width: 50, editor: Slick.Editors.Text, sortable: true, minWidth: 0, cssClass: 'required-for-save' },
+            { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _allNames, sortable: true, minWidth: 0, },
+            { id: "Department", name: "Department", field: "Department", width: 120, sortable: true, minWidth: 0, cssClass: 'uneditable' },
+            { id: "Email", name: "Email", field: "Email", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "Phone", name: "Phone", field: "Phone", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "Date Joined", name: "Date Joined", field: "Date Joined", width: 120, editor: Slick.Editors.Date, sortable: true, minWidth: 0 },
+        ];
+
+        // Add extra columns (user-defined)
+        for (key of _extraColumns) {
+            columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true })
+        }
+
+        // Add hours and set columns
+        for (day of _currentWeekDays) {
+            let dayString=day.toString().slice(0, 10);
+            let dayStringId=dayString.toString().slice(0, 3);
+            columns.push(
+                { id: dayStringId, name: dayString, field: dayStringId, width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'hours-column', groupTotalsFormatter: countTotalsFormatter },
+                { id: `${dayStringId}_set`, name: `Set`, field: `${dayStringId}_set`, width: 60, editor: Slick.Editors.Text, sortable: true, cssClass: 'set-column' },
+            );
+        }
+
+        // Add tax columns
+        for (tax of _taxColumns) {
+            columns.push({ id: tax, name: tax, field: tax, width: 60, sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column', deletable: true, istaxcolumn: true })
+        }
+
+        // Add rentals and total columns
+        columns.push(...[
+            { id: `Rentals`, name: `Rentals`, field: 'Rentals', width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: `Total`, name: `Total`, field: 'Total', width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' }
+        ])
+
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            enableColumnReorder: true,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+        }
+    }
+
+</script>

@@ -1,0 +1,40 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">First Week Ending</th>
+            <th scope="col">Budget</th>
+            <th scope="col">To Date</th>
+            <th scope="col">Remaining</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody id="showsTable">
+        <% for (let show of shows){%>
+            <tr id="<%=show.id%>_row">
+                <th class="first-column-header" scope="row">
+                    <a href="/shows/<%=show._id%>/CostReport" id="<%=show.id%>_name">
+                        <%=show['Name']%>
+                    </a>
+                </th>
+                <td>
+                    <%=show.weeks.find(w=> w._id == show.currentWeek).end.toString().slice(0,15)%>
+                </td>
+                <td>
+                    <%=show.costReport.budget%>
+                </td>
+                <td>
+                    <%=show.costReport.toDate%>
+                </td>
+                <td>
+                    <%=show.costReport.remaining%>
+                </td>
+                <td>
+                    <div class="shows-table-delete-button"
+                        onclick="toggleDeleteShowWarningModal(true, false,'<%=show._id%>')">
+                        Delete</div>
+                </td>
+            </tr>
+            <% }%>
+    </tbody>
+</table>

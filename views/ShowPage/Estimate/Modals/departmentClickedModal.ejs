@@ -1,0 +1,15 @@
+<div id="department-clicked-modal" class="grid-modal" style="min-height: 5rem; min-width: 20rem;">
+    <div style="display: flex; justify-content: space-between; width: 100%;">
+        <div id="department-clicked-modal-title"></div>
+        <input id="department-color-input" style="border: none !important;" type="color">
+    </div>
+    <div id="department-store" style="display: none;"></div>
+    <br>
+    <br>
+    <div class="modal-button-container">
+        <button id="department-clicked-modal-cancel" onclick="toggleDepartmentClickedModal(false)"
+            style="color: black;">Done</button>
+        <button id="department-clicked-modal-submit" onclick="toggleDepartmentClickedModal(false,false,true)"
+            style="color: red">Delete</button>
+    </div>
+</div>

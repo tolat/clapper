@@ -1,0 +1,22 @@
+<div id="open-version-modal" class="grid-modal">
+    <% let keys=Object.keys(show.estimateVersions).sort((a, b)=> { %>
+        <% return (parseFloat(b.replace('_', '.' ))-parseFloat(a.replace('_', '.' ))) }) %>
+            Versions (most recent first):
+            <div id="open-versions-container" style="max-height: 16rem; overflow-y: scroll; padding: 5px;">
+                <%for (key of keys) { %>
+                    <div
+                        style="width: 100%; margin-bottom: 5px; display: flex; justify-content: space-between;  border-bottom: 1px solid grey;">
+                        <div>
+                            <%=key.replace('_','.')%>
+                        </div>
+                        <div>
+                            <button onclick="openEstimate('<%=key%>')" style="color: rgb(24, 135, 86);">Open</button>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+            <div class="modal-button-container">
+                <button id="open-version-modal-cancel" onclick="toggleOpenVersionModal(false)"
+                    style="color: black;">Cancel</button>
+            </div>
+</div>

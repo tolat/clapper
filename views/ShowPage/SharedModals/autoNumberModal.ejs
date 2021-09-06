@@ -1,0 +1,23 @@
+<div id="auto-number-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
+    <div style="display: flex; flex-direction: row;">Auto-numbering by <div id='auto-number-modal-group-display'
+            style="color: green;"></div>
+    </div>
+    <br>
+    Set start number for each group:
+    <br>
+    <div id="auto-number-modal-groups-display" style="width: 100%;">
+
+    </div>
+    <br>
+    <div style="display: flex; justify-content: flex-start; width: 100%; margin-top: 5px; align-items: center;">
+        <input type="checkbox" id="auto-number-modal-preserve-numbers-checkbox">
+        <div style="margin-left: 5px;">Preserve existing numbering</div>
+    </div>
+    <br>
+    <div class="modal-button-container">
+        <button id="auto-number-cancel" onclick="toggleAutoNumberModal(false, false, false)"
+            style="color: black;">Cancel</button>
+        <button id="auto-number-execute" onclick="toggleAutoNumberModal(false, false, true)"
+            style="color: green;">Execute</button>
+    </div>
+</div>

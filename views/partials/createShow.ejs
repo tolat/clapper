@@ -1,0 +1,25 @@
+<div id="create-show-container">
+    <form action="/shows" id="newShowForm" method="POST">
+        <label for="name" class="form-label">Show Name</label>
+        <input type="text" id="name" class="form-control" aria-describedby="name" name="show[Name]">
+        <label for="first-week-ending" class="form-label" style="margin-top: 10px;">First Week Ending</label>
+        <input type="date" id="first-week-ending" class="form-control" placeholder="yyyy-mm-dd" aria-describedby="name"
+            name="show[firstweekending]">
+        <div style="display: flex; justify-content: space-between; width: 100%; margin: 20px 0 0 0;">
+            Departments
+            <div id="add-department-button" style="font-size: 2rem; font-weight: 300;" onclick="addDepartment()">
+                +
+            </div>
+        </div>
+        </label>
+        <div style="width: 100%; height: 10px;">
+            <hr>
+        </div>
+        <div id='entered-departments'></div>
+        <span id="createShowButtonContainer">
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                onclick="toggleCreateShow(null)">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-success">Create Show</button>
+        </span>
+    </form>
+</div>

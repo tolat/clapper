@@ -1,0 +1,218 @@
+<script>
+    // Global variables
+    var _show= <%- JSON.stringify(show)%>;
+    var _args= <%- JSON.stringify(args)%>;
+    setWeekEnding()
+
+    var _extraColumns=_week.rentals.extraColumns;
+    var _validators=[
+        {
+            fields: ['Day Rate', 'Days Rented'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`${field} Invalid!`;
+                this.validationMessage=`${field} must be a number.`;
+                return isNaN(parseFloat(args.item[field]));
+            }
+        },
+        {
+            fields: ['Supplier'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Cannot find supplier '${args.item[field]}'!`;
+                this.validationMessage=`Suppliers are crew members.\nCrew members can only be added in the 'Crew' page.`;
+                let user=false;
+                if (args.item['Supplier']&&args.item['Supplier'].includes('[')&&args.item['Supplier'].includes(']')) {
+                    user=_allShowCrewUsers.find(u => u['username']==args.item['Supplier'].slice(args.item['Supplier'].indexOf('[')+1, args.item['Supplier'].indexOf(']')));
+                } else {
+                    user=_allShowCrewUsers.find(u => u['username']==args.item['Supplier'])
+                }
+                return (!user||user==undefined)&&item['Supplier']
+            }
+        },
+        {
+            fields: ['Set Code'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Set '${args.item[field]}' Not Found!`
+                this.validationMessage=`New sets can only be added in the 'Estimates' page.`
+                return !_show.sets.find(s => s['Set Code']==args.item['Set Code'])
+            }
+        },
+        {
+            fields: ['Code'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Position '${args.item[field]}' Not Found!`
+                this.validationMessage=`New positions can only be added in the 'Rates' page.\nPosition codes are case-sensitive!`
+                return !_show.positions.positionList.find(p => p['Code']==args.item['Code'])&&item['Code']!=undefined
+            }
+        },
+        {
+            fields: ['Department'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Department '${args.item[field]}' Not Found!`
+                this.validationMessage=`New departments can only be added in the 'Estimates' page.\nDepartments are case-sensitive!`
+                let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
+                let dep=false;
+                if (depIdx>=0) {
+                    args.item[field]=_show.departments[depIdx];
+                    dataView.updateItem(args.item.id, args.item);
+                    dep=true;
+                }
+                return !dep;
+            }
+        },
+    ];
+    var _totals={ 'Week Total': 'sum' };
+    var _allShowCrew=_args.allShowCrew
+    var _allUsers=_args.allUsers
+    var _taxColumns=_week.rentals.taxColumns
+
+    var _allShowCrewNames=[]
+    var _allShowCrewUsers=[]
+    for (id of _allShowCrew) {
+        let user=_allUsers.find(u => u._id==id)
+        _allShowCrewUsers.push(user)
+        _allShowCrewNames.push(`${user['Name']} [${user['username']}]`)
+    }
+
+    var grid;
+    var dataView;
+
+    // Load the grid 
+    async function onLoad() {
+        var rentals=_week.rentals.rentalList;
+
+        // Create options
+        var options=await initializeOptions();
+
+        // Create grid data
+        var data=await initializeData(rentals);
+
+        // Create grid columns
+        var columns=await initializeColumns(rentals);
+
+        // Create data grid
+        await createSlickGrid(data, columns, options);
+
+        // Update grid on cell change
+        grid.onCellChange.subscribe(function (e, args) {
+            // Run validators on cell edit 
+            runValidators(_validators, args);
+
+            // Auto fill rental data when cell changed
+            autoFillSupplierData(args);
+
+            // Calculate the weekly total when cell changed
+            calculateWeeklyTotal(args);
+
+            // Calcualte totals for totals footer row
+            updateTotalsRow();
+
+            grid.gotoCell(grid.getActiveCell().row, grid.getActiveCell().cell, false);
+        })
+
+        // Update supplier options when the active cell is changed
+        grid.onActiveCellChanged.subscribe(function (e, args) {
+            setSupplierOptions(args);
+        })
+
+        grid.recalculate=function (item) {
+            calculateWeeklyTotal({ item: item })
+            updateTotalsRow()
+        }
+
+        // Apply display settings to grid
+        applyDisplaySettings(_week.rentals.displaySettings)
+
+        // Calculate all rental weekly totals
+        await calculateAllWeeklyTotals();
+
+        // Calcualte totals for totals footer row
+        await updateTotalsRow();
+    }
+
+    // Creates grid data 
+    function initializeData(rentals) {
+        let data=[];
+
+        for (let i=0; i<rentals.length; i++) {
+            let item={
+                id: 'id_'+i,
+                '#': rentals[i]['#'],
+                'Day Rate': rentals[i]['Day Rate'],
+                'Days Rented': rentals[i]['Days Rented'],
+                'Description': rentals[i]['Description'],
+                'Department': rentals[i]['Department'],
+                'Set Code': rentals[i]['Set Code'],
+                'Supplier': rentals[i]['Supplier'],
+                editedfields: []
+            }
+
+            if (rentals[i]['Code']) {
+                item['Code']=rentals[i]['Code']
+            }
+
+            for (taxCol of _week.rentals.taxColumns) {
+                item[taxCol]=zeroNanToNull(parseFloat(rentals[i].taxColumnValues[taxCol]))
+            }
+
+            for (extraCol of _week.rentals.extraColumns) {
+                item[extraCol]=rentals[i].extraColumnValues[extraCol]
+            }
+
+            item['Week Total']=getWeekTotal(item)
+
+            data.push(item);
+        }
+
+        // Sort data by #
+        data=sortByNumber(data);
+
+        return data;
+    }
+
+    // Creates grid columns 
+    function initializeColumns(positions) {
+        let columns=[
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true },
+            { id: "Description", name: "Description", field: "Description", width: 200, editor: Slick.Editors.Text, sortable: true },
+            { id: "Day Rate", name: "Day Rate", field: "Day Rate", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save currency' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 90, sortable: true, editor: Slick.Editors.Text, cssClass: 'required-for-save' },
+            { id: "Days Rented", name: "Days Rented", field: "Days Rented", width: 90, editor: Slick.Editors.Text, sortable: true },
+            { id: "Supplier", name: "Supplier", field: "Supplier", width: 150, sortable: true, editor: AutoCompleteEditor, dataSource: _allShowCrewNames },
+            { id: "Code", name: "Code", field: "Code", width: 80, editor: Slick.Editors.Text, sortable: true },
+        ];
+
+        // Add extra columns (user-defined)
+        for (key of _extraColumns) {
+            columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true })
+        }
+
+        // Add tax columns
+        for (taxCol of _week.rentals.taxColumns) {
+            columns.push({
+                id: taxCol, name: taxCol, field: taxCol, width: 80,
+                sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column'
+            })
+        }
+
+        columns.push({ id: "Week Total", name: "Week Total", field: "Week Total", width: 80, sortable: true, cssClass: 'uneditable currency' })
+
+
+
+        return columns;
+    }
+
+    // Returns array of grid options
+    function initializeOptions() {
+        return {
+            editable: true,
+            enableAddRow: true,
+            enableCellNavigation: true,
+            enableColumnReorder: true,
+            asyncEditorLoading: false,
+            autoEdit: false,
+            editCommandHandler: queueAndExecuteEdit,
+        }
+    }
+
+</script>

@@ -1,0 +1,15 @@
+<div id="enter-version-modal" class="grid-modal">
+    <label for="enter-version"></label>
+    <input type="text" id="enter-version" style="width: 100%; font-size: 0.8rem;">
+    <div id="enter-version-modal-blank-selector"
+        style="font-size: 0.8rem; margin: 10px 0 5px 0; flex-direction: row; align-items: center; ">
+        <input type="checkbox" id="blank-selector-checkbox">
+        <label style="margin-left: 5px;" for="blank-selector-checkbox">Create blank version</label>
+    </div>
+    <div class="modal-button-container">
+        <button id="enter-version-modal-cancel" onclick="toggleEnterVersionModal(false)"
+            style="color: black;">Cancel</button>
+        <button id="enter-version-modal-submit" onclick="updateVersionName()"
+            style="color: rgb(24, 135, 86);">Submit</button>
+    </div>
+</div>

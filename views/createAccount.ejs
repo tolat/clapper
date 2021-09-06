@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("partials/head")%>
+</head>
+
+<body>
+    <div id="create-account-container">
+        <h1 style="text-align: center;">Create Account</h1>
+        <form action="/createAccount" class="needs-validation" method="POST" novalidate>
+            <%- include("partials/flash") %>
+                <div id="input-name-container">
+                    <div class="mb-3" style="margin-right: 15px;">
+                        <label for="InputFirstname" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="InputFirstname" name="user[firstname]" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="InputLastname" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="InputLastname" name="user[lastname]" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="InputEmail" class="form-label">Email Address (username)</label>
+                    <input type="email" class="form-control" id="InputEmail" aria-describedby="emailHelp"
+                        name="user[Email]" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid email address.
+                    </div>
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="InputPhone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="InputPhone" name="user[Phone]" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid phone number.
+                    </div>
+                    <div id="emailHelp" class="form-text">We'll never share your phone number with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="InputPassword" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="InputPassword" name="user[password]" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid password.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success" style="width: 100%;">Submit</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="location.href = '/login';"
+                    style="margin-top: 15px; width: 100%;">Cancel</button>
+        </form>
+    </div>
+</body>
+
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms=document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+
+</script>
+
+</html>

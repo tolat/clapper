@@ -1,0 +1,48 @@
+<div id="estimate-toolbar" class="grid-toolbar">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle grid-toolbar-dropdown-button" type="button"
+            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            File
+        </button>
+        <ul class="dropdown-menu grid-toolbar-dropdown" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" onclick="toggleEnterVersionModal(true, true, true)">New version</a></li>
+            <li><a class="dropdown-item" onclick="saveData()">Save</a></li>
+            <li><a class="dropdown-item" onclick="toggleOpenVersionModal(true)">Open</a></li>
+            <li><a class="dropdown-item" onclick="toggleDeleteVersionModal(true)">Delete</a></li>
+            <li><a class="dropdown-item" onclick="toggleEnterVersionModal(true)">Rename</a>
+            </li>
+        </ul>
+    </div>
+    <%- include('ShowPage/toolbarEditFeatures') %>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle grid-toolbar-dropdown-button" type="button"
+                id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
+                Constants
+            </button>
+            <ul class="dropdown-menu grid-toolbar-dropdown" aria-labelledby="dropdownMenuButton3">
+                <li><a class="dropdown-item" onclick="toggleFringesModal(true)">Fringes</a></li>
+                <li><a class="dropdown-item" onclick="toggleManDayRatesModal(true)">Man-Day rates</a></li>
+            </ul>
+        </div>
+        <button type="button" onclick="undoCellEdit()" class="toolbar-icon"
+            style="background-image: url('/public/images/undo.png'); "></button>
+        <button type="button" onclick="redoCellEdit()" class="toolbar-icon"
+            style="background-image: url('/public/images/redo.png'); "></button>
+        <div class="grid-toolbar-item" id="estimate-version" style="font-weight: bold;">Version:
+            <div id="estimate-version-display" style="margin-left: 5px;">
+                <% if(args.version) { %>
+                    <%=args.version.replace('_', '.' ) %>
+                        <% } %>
+            </div>
+            <div id='latest-version-display' style="margin-left: 5px; color: rgb(108, 117, 124);">
+            </div>
+            <div id="save-status" style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
+                saved
+            </div>
+        </div>
+        <%- include('ShowPage/departmentsBar') %>
+            <div class=" grid-toolbar-searchbar">
+                Filter:
+                <input id="textsearch" style="width: 150px; margin-left: 5px;">
+            </div>
+</div>
