@@ -204,7 +204,9 @@ async function createWeek(body, show, newWeekId) {
                 if (activeInNewWeek.includes(pos)) {
                     for (day of getDaysOfWeekEnding(body.newWeek.end)) {
                         let dateKey=new Date(day).toLocaleDateString('en-US')
-                        pos.daysWorked[dateKey]={ hours: null, set: null }
+                        if (!pos.daysWorked[dateKey]) {
+                            pos.daysWorked[dateKey]={ hours: null, set: null }
+                        }
                     }
                 }
             }

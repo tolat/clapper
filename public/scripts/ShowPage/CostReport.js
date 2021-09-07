@@ -74,6 +74,16 @@ findFirstContainingWeek=(day, user) => {
     return false
 }
 
+isInCurrentWeek=(day, user) => {
+    let dateMS=new Date(day).getTime()
+    let weekEndMS=new Date(_week.end).getTime()
+    if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
+        if (week.crew.crewList.find(c => c.username==user.username)) {
+            return true
+        }
+    }
+}
+
 // Calculates the total spent on a set to date (labour, purchases, and rentals)
 calculateCosts=(item) => {
 
@@ -106,7 +116,8 @@ calculateCosts=(item) => {
                     for (k in departmentLabor) {
                         if (position['Department']==k) {
                             departmentLabor[k].total+=cost;
-                            if (week._id==_week._id) {
+
+                            if (isInCurrentWeek(day, user)) {
                                 departmentLabor[k].week+=cost;
                             }
                         }

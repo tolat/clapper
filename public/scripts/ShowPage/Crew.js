@@ -132,7 +132,7 @@ saveData=(reload=false) => {
     })
         .then(response => { return response.json() })
         .then(responseData => {
-            //console.log(responseData.message)
+            console.log(responseData.message)
             if (reload) { location.reload() }
             else {
                 // Push new item ids to items
