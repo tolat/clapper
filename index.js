@@ -49,7 +49,7 @@ const contentSecurityPolicy={
     directives: {
         defaultSrc: [],
         connectSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         workerSrc: ["'self'"],
         objectSrc: [],
