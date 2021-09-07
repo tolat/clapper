@@ -103,6 +103,8 @@ saveData=(reload=false) => {
     // Grey screen if reloading since the save can take some time
     if (reload) { toggleLoadingScreen(true, 'Reloading...') }
 
+    console.log(_currentWeekDays)
+
     // Post estimate data and version to server
     fetch(server+`shows/${_show._id}/Crew`, {
         method: 'POST',
