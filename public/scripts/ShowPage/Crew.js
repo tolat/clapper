@@ -103,11 +103,12 @@ saveData=(reload=false) => {
     // Grey screen if reloading since the save can take some time
     if (reload) { toggleLoadingScreen(true, 'Reloading...') }
 
+    let weekDays=[]
     for (day of _currentWeekDays) {
-        day=day.toLocaleDateString('en-US')
+        weekDays.push(day.toString())
     }
 
-    console.log(_currentWeekDays)
+    console.log(weekDays)
 
     // Post estimate data and version to server
     fetch(server+`shows/${_show._id}/Crew`, {
@@ -116,7 +117,7 @@ saveData=(reload=false) => {
         body: JSON.stringify({
             data: dataView.getItems(),
             extraColumns: _extraColumns,
-            currentWeekDays: _currentWeekDays,
+            currentWeekDays: weekDays,
             newWeek: _newWeek,
             weeks: _show.weeks,
             taxColumns: _taxColumns,
