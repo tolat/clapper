@@ -57,11 +57,15 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
 // Delete show with id
 router.delete('/:id', isLoggedIn, tryCatch(async (req, res, next) => {
     // Delete all user records of show
+    let messages=[]
     let show=await (await Show.findById(req.params.id))
     for (week of show.weeks) {
         for (crew of week.crew.crewList) {
+            messages.push(crew)
             let user=await User.findById(crew)
+            messages.push(user)
             let record=user.showrecords.find(r => r.showid==show._id.toString())
+            messages.push(record)
             if (record) { delete record }
             await user.save()
         }
@@ -70,7 +74,7 @@ router.delete('/:id', isLoggedIn, tryCatch(async (req, res, next) => {
     // Delete show
     await Show.findByIdAndDelete(req.params.id)
 
-    res.send({ success: true })
+    res.send({ success: true, messages: messages })
 }))
 
 

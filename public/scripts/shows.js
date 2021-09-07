@@ -70,7 +70,7 @@ deleteShow=(showid) => {
     // Send Delete request to server
     fetch(_args.server+`shows/${showid}`, { method: 'DELETE' })
         .then(response => { return response.json() })
-        .then(responseData => { })
+        .then(responseData => { console.log(responseData) })
 
     document.getElementById(`${showid}_row`).remove()
 }
