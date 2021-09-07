@@ -6,6 +6,7 @@ const { isLoggedIn }=require('../utils/customMiddleware')
 const router=express.Router({ mergeParams: true });
 
 const Show=require('../models/show');
+const User=require('../models/user');
 const { genUniqueId }=require('../utils/numberUtils')
 
 // Shows Load
@@ -55,7 +56,16 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
 
 // Delete show with id
 router.delete('/:id', isLoggedIn, tryCatch(async (req, res, next) => {
+    // Delete all user records of show
+    let show=await (await Show.findById(req.params.id))
+    for (crew of show.weeks.crew.crewList) {
+        let user=await User.findById(crew)
+        delete user.showrecords.find(r => r.showid==show._id.toString())
+    }
+
+    // Delete show
     await Show.findByIdAndDelete(req.params.id)
+
     res.send({ success: true })
 }))
 
