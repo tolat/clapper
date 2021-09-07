@@ -103,7 +103,7 @@ saveData=(reload=false) => {
     // Grey screen if reloading since the save can take some time
     if (reload) { toggleLoadingScreen(true, 'Reloading...') }
 
-    for (day of currentWeekDays) {
+    for (day of _currentWeekDays) {
         day=day.toLocaleDateString('en-US')
     }
 
