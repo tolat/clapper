@@ -46,6 +46,7 @@ createSlickGrid=(data, columns, options) => {
 
     // Set server
     server=_args.server;
+    console.log(server)
 
     // Create the DataView
     var groupItemMetadataProvider=new Slick.Data.GroupItemMetadataProvider();
