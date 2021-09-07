@@ -61,12 +61,12 @@ router.delete('/:id', isLoggedIn, tryCatch(async (req, res, next) => {
     let show=await (await Show.findById(req.params.id))
     for (week of show.weeks) {
         for (crew of week.crew.crewList) {
-            messages.push(crew)
             let user=await User.findById(crew)
-            messages.push(user)
             let record=user.showrecords.find(r => r.showid==show._id.toString())
-            messages.push(record)
-            if (record) { delete record }
+            if (record) {
+                messages.push("deleting record")
+                await delete record
+            }
             await user.save()
         }
     }
