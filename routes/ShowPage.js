@@ -641,7 +641,8 @@ updateCrew=async function (body, showId) {
                 // Update the hours and set for each day worked
                 for (day of body.currentWeekDays) {
                     let dayString=new Date(day).toString().slice(0, 3);
-                    let dateKey=new Date(day).toLocaleDateString('en-US');
+                    let dateKey=day
+                    message.push(dateKey)
 
                     // If no day exists in the daysWorked record, create one
                     if (!recordPosition.daysWorked[`${dateKey}`]) {

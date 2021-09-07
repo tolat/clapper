@@ -105,7 +105,7 @@ saveData=(reload=false) => {
 
     let weekDays=[]
     for (day of _currentWeekDays) {
-        weekDays.push(day.toString())
+        weekDays.push(day.toLocaleDateString('en-US'))
     }
 
     console.log(weekDays)
