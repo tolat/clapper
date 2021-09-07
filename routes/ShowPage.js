@@ -68,14 +68,16 @@ router.get('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
             break;
     }
 
-    // Get shared and page-specific modals to include in rendered template
-    let sharedModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/sharedModals`));
-    let pageModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/${section}/Modals`));
-
     throw new ExpressError(
         `__dirname: ${__dirname}\n
         Path: ${path.join(__dirname, `../views/ShowPage/sharedModals`)}\n  
         `, 999)
+
+
+    // Get shared and page-specific modals to include in rendered template
+    let sharedModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/sharedModals`));
+    let pageModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/${section}/Modals`));
+
 
 
     res.render('ShowPage/Template', {
