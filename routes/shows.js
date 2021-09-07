@@ -61,6 +61,7 @@ router.delete('/:id', isLoggedIn, tryCatch(async (req, res, next) => {
     for (crew of show.weeks.crew.crewList) {
         let user=await User.findById(crew)
         delete user.showrecords.find(r => r.showid==show._id.toString())
+        await user.save()
     }
 
     // Delete show
