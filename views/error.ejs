@@ -14,14 +14,11 @@
         <p>
             <%= err.message%>
         </p>
-        <% if (process.env.NODE_ENV !=='production' ) { %>
-            <p style="height: 20rem; overflow-y: scroll;">
-                <%= err.stack%>
-            </p>
-            <% } %>
-                <hr>
-                <button type="button" class="btn btn-outline-danger"
-                    onclick="window.history.go(-1); return false;">Back</a>
+        <p style="height: 20rem; overflow-y: scroll;">
+            <%= err.stack%>
+        </p>
+        <hr>
+        <button type="button" class="btn btn-outline-danger" onclick="window.history.go(-1); return false;">Back</a>
     </div>
 </body>
 
