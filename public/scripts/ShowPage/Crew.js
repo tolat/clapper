@@ -127,6 +127,7 @@ saveData=(reload=false) => {
     })
         .then(response => { return response.json() })
         .then(responseData => {
+            console.log(responseData.message)
             if (reload) { location.reload() }
             else {
                 // Push new item ids to items
@@ -237,9 +238,9 @@ autoFillUserData=(args) => {
     if (_groupedBy) { Object.defineProperty(item, _groupedBy, { writable: false, configurable: true }) }
 
     // Do nothing if not editing auto-populate fields
-    if (!['username', 'Position', 'Name'].includes(col.name)) { return }
+    if (!['username', 'Position', 'Name'].includes(col.field)) { return }
 
-    if (col.name=='username'||(col.name=='Name'&&item['Name'].includes('['))) {
+    if (col.field=='username'||(col.name=='Name'&&item['Name'].includes('['))) {
         // Auto-populate if editing forwards
         if (_editDirectionForwards) {
             let user;

@@ -533,6 +533,7 @@ function getDepartmentKeys(show) {
 
 // Update crew
 updateCrew=async function (body, showId) {
+    let message=["Success"]
     let show=await Show.findById(showId)
         .populate('weeks.crew.crewList')
         .populate('positions.positionList')
@@ -640,6 +641,7 @@ updateCrew=async function (body, showId) {
                 for (day of body.currentWeekDays) {
                     let dayString=new Date(day).toString().slice(0, 3);
                     let dateKey=new Date(day).toLocaleDateString('en-US');
+                    message.push(dateKey)
 
                     // If no day exists in the daysWorked record, create one
                     if (!recordPosition.daysWorked[`${dateKey}`]) {
@@ -706,7 +708,7 @@ updateCrew=async function (body, showId) {
         await deleteWeek(body.deletedWeek, show, body.weeks)
     }
 
-    return {};
+    return { message: message };
 }
 
 // Update rentals
