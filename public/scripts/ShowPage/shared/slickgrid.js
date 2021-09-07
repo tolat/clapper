@@ -46,7 +46,6 @@ createSlickGrid=(data, columns, options) => {
 
     // Set server
     server=_args.server;
-    console.log(server)
 
     // Create the DataView
     var groupItemMetadataProvider=new Slick.Data.GroupItemMetadataProvider();
@@ -183,7 +182,6 @@ createSlickGrid=(data, columns, options) => {
     // Update context cell and context Item on active cell change
     grid.onActiveCellChanged.subscribe(function (e, args) {
         // Set context cell
-        console.log('active cell changed')
         let activeCell=grid.getActiveCell()
         _contextCell={ row: activeCell.row, cell: activeCell.cell }
         grid.focus()
