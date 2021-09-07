@@ -107,6 +107,8 @@ saveData=(reload=false) => {
         day=day.toLocaleDateString('en-US')
     }
 
+    console.log(_currentWeekDays)
+
     // Post estimate data and version to server
     fetch(server+`shows/${_show._id}/Crew`, {
         method: 'POST',
