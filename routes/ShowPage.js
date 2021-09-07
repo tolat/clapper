@@ -637,12 +637,10 @@ updateCrew=async function (body, showId) {
                     record.positions.push(recordPosition)
                 }
 
-                message.push(body.currentWeekDays)
                 // Update the hours and set for each day worked
                 for (day of body.currentWeekDays) {
                     let dayString=new Date(day).toString().slice(0, 3);
                     let dateKey=day
-                    message.push(dateKey)
 
                     // If no day exists in the daysWorked record, create one
                     if (!recordPosition.daysWorked[`${dateKey}`]) {
@@ -685,8 +683,7 @@ updateCrew=async function (body, showId) {
             for (pos of record.positions) {
                 if (!body.data.find(item => item['username']==crew['username']&&item['Position']==pos.code)) {
                     for (day of body.currentWeekDays) {
-                        let dateKey=new Date(day).toLocaleDateString('en-US');
-                        delete pos.daysWorked[`${dateKey}`]
+                        delete pos.daysWorked[day]
                     }
                 }
             }

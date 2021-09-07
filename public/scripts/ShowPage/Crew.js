@@ -108,8 +108,6 @@ saveData=(reload=false) => {
         weekDays.push(day.toLocaleDateString('en-US'))
     }
 
-    console.log(weekDays)
-
     // Post estimate data and version to server
     fetch(server+`shows/${_show._id}/Crew`, {
         method: 'POST',
@@ -134,7 +132,7 @@ saveData=(reload=false) => {
     })
         .then(response => { return response.json() })
         .then(responseData => {
-            console.log(responseData.message)
+            //console.log(responseData.message)
             if (reload) { location.reload() }
             else {
                 // Push new item ids to items
