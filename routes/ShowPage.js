@@ -72,6 +72,12 @@ router.get('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
     let sharedModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/sharedModals`));
     let pageModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/${section}/Modals`));
 
+    throw new ExpressError(
+        `__dirname: ${__dirname}\n
+        Path: ${path.join(__dirname, `../views/ShowPage/sharedModals`)}\n  
+        `, 999)
+
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show: show,
