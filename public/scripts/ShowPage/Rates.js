@@ -32,7 +32,7 @@ getGroupAggregators=() => {
 }
 
 // Update estimate
-saveData=() => {
+saveData=(reload=false) => {
     if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
 
     // Indicate grid is saving
@@ -58,6 +58,9 @@ saveData=() => {
             data: dataView.getItems(),
             extraColumns: _extraColumns,
             multipliers: _multipliers,
+            newWeek: _newWeek,
+            weeks: _show.weeks,
+            deletedWeek: _deletedWeek,
             displaySettings: {
                 groupBy: _groupedBy,
                 reorderColumns: getColumnOrder(),
@@ -70,6 +73,7 @@ saveData=() => {
     })
         .then(response => { return response.json() })
         .then(responseData => {
+            if (reload) { location.reload() }
             // Push new item ids to items
             clearDeletedItems();
             // Update saveStatus

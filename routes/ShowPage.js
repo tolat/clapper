@@ -887,6 +887,19 @@ updateRates=async function (body, showId) {
     show.positions.multipliers=body.multipliers;
     show.markModified('positions.multipliers');
 
+    // Create new id if new week is being created
+    const newWeekId=genUniqueId()
+
+    // Create new week if required
+    if (body.newWeek) {
+        await createWeek(body, show, newWeekId)
+    }
+
+    // Delete all records for deleted week if required
+    if (body.deletedWeek) {
+        await deleteWeek(body.deletedWeek, show, body.weeks)
+    }
+
     await show.save();
 
     // Save items

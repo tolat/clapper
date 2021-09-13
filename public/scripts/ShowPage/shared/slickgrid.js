@@ -1781,10 +1781,10 @@ toggleWeekEndingModal=(show) => {
 
 changeWeek=async (weekNum, weekEnd=false, isNewWeek=false, copyCrewFrom='current') => {
     if (weekNum==_week.number&&!isNewWeek&&_deletedWeek!=_week._id) { return }
-    if (['Crew', 'Rentals', 'CostReport', 'Purchases'].includes(_args.section)) {
+    if (['Crew', 'Rentals', 'CostReport', 'Purchases', 'Rates'].includes(_args.section)) {
         _newWeek={ number: weekNum, end: weekEnd, isNewWeek: isNewWeek, copyCrewFrom: copyCrewFrom }
 
-        console.log('changing week')
+        console.log(`changing to week ${weekNum}`)
         await toggleAddWeekModal(false)
         await toggleWeekEndingModal(false)
         await saveData(true)
