@@ -56,7 +56,6 @@ TODO:
 Necessary:
 
 -   Add all actions to undoredo buffer and add validation to all fields including modals
-        Remaining actions:  
 
 TODO:
 
