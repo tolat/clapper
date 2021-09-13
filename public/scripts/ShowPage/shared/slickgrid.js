@@ -382,7 +382,7 @@ createSlickGrid=(data, columns, options) => {
     // Add listener to frozen-columns input 
     createFrozenColumnsListener();
 
-    // Set prev variables
+    // Initialize prev variables
     _prevColumns=grid.getColumns()
     _prevColMap=getColumnWidths()
     _prevDepartmentOrder=getDeptOrder()
@@ -391,25 +391,24 @@ createSlickGrid=(data, columns, options) => {
     setNavRestrictions()
 }
 
+// Retrun greyed out node for dropdown links
+greyOutLink=(elt) => {
+    let newElt=elt.cloneNode(true)
+    newElt.href=''
+    newElt.style.color='rgb(140, 140, 140)';
+    newElt.style.paddingLeft='16px'
+    newElt.innerText+=' (No Rates)'
+    return newElt
+}
+
 // Restricts page selector dropdown in nav bar so that pages are filled out in correct order
 setNavRestrictions=() => {
-    // grey out function for dropdown links
-    greyOutLink=(elt) => {
-        let newElt=document.createElement('div')
-        newElt.innerHTML=elt.innerHTML
-        elt.parentElement.replaceChild(newElt, elt)
-        newElt.href=''
-        newElt.style.color='rgb(140, 140, 140)';
-        newElt.style.paddingLeft='16px'
-        newElt.innerText+=' (No Rates)'
-    }
-
     // If no rates exist, block access to crew and rates
     if (!_show.positions.positionList[0]) {
         let crewDropdown=document.getElementById('crew-dropdown')
         let rentalsDropdown=document.getElementById('rentals-dropdown')
-        greyOutLink(crewDropdown)
-        greyOutLink(rentalsDropdown)
+        crewDropdown.parentElement.replaceChild(greyOutLink(crewDropdown), crewDropdown)
+        rentalsDropdown.parentElement.replaceChild(greyOutLink(rentalsDropdown), rentalsDropdown)
     }
 }
 

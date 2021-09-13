@@ -82,7 +82,8 @@ saveData=() => {
                     undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr].saveStatus=[true, false];
                 }
             }
-
+            // If save successful update nav restrictions
+            updateNavDropdown()
         })
 }
 
@@ -186,6 +187,33 @@ loadMultipliersModal=() => {
         }
     }
 
+}
+
+// Initialize _dropdown nodes so saving can toggle access to crew and rates page 
+initDropdownNodes=() => {
+    let c=document.getElementById('crew-dropdown')
+    let r=document.getElementById('rentals-dropdown')
+    let greyCrew=greyOutLink(c)
+    let greyRentals=greyOutLink(r)
+    let originalCrew=c
+    let originalRentals=r
+
+    return { greyCrew, greyRentals, originalCrew, originalRentals }
+}
+
+// Update the navbar dropdown options to block access to crew and rates pages if no rates exist
+updateNavDropdown=() => {
+    let c=document.getElementById('crew-dropdown')
+    let r=document.getElementById('rentals-dropdown')
+    for (item of dataView.getItems()) {
+        if (!isEmpty(item)) {
+            c.parentElement.replaceChild(_dropdownNodes.originalCrew, c)
+            r.parentElement.replaceChild(_dropdownNodes.originalRentals, r)
+            return
+        }
+    }
+    c.parentElement.replaceChild(_dropdownNodes.greyCrew, c)
+    r.parentElement.replaceChild(_dropdownNodes.greyRentals, r)
 }
 
 testFun=() => {

@@ -47,6 +47,8 @@ Fixes:
 -   Figure out validation on save - done in estimate sheet but not in rest (started in crew) (DONE)
 -   Grey out pages that need to be set after others when creating new show (DONE)
 -   if required for save fields are left blank on save, warn (DONE)
+-   sort purchases by week option (Done)
+
 
 
 TODO:
@@ -54,39 +56,35 @@ TODO:
 Necessary:
 
 -   Add all actions to undoredo buffer and add validation to all fields including modals
+        Remaining actions:  
 
-Features:
+TODO:
 
--   STYLING TOOLBAR (Get cell styles to presist through grouping events)
+1. Grid Mechanics
+-   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
+-   Drop down for all department fields + positions list in crew and rentals
+-   sort option in context menu for columns -> click on column selects column
+-   context menu opotion to select row
+-   *** SAVE STYLES EVEN IF DATA IS EMPTY *** ++ CONSOLIDATE SAVE FUNCTIONS?
+-   Man Days in cost report count days a crew member worked not amount of money spent/manday rate
+
+2. Timesheets
+
+3. Styling Toolbar (Get cell styles to presist through grouping events)
     Need to add updates to styles when:
         -   Grouping is changed
         -   Sorting
         -   adding and removing rows
         -   Attach styles to the item id not the row
-        
--   auto save option
--   Drop down for all department fields
--   sort purchases by week option
--   Audit feature for each crew member
--   Custom crew sheet where we can add hours to past weeks?
--   sort option in context menu for columns -> click on column selects column
--   context menu opotion to select row
--   Man Days in cost report count days a crew membner worked not amount of money spent/manday rate
--   *** UPDATE CELL STYLES ON REORDER, GROUPING, ADD/DELETE ROW, column reorder
--   *** SAVE STYLES EVEN IF DATA IS EMPTY *** ++ CONSOLIDATE SAVE FUNCTIONS
--   Need GST and PST Column in Purchases sheet (Values not percent)
--   Pruduction debug feature: reset database to earlier backup
 
+4. Permission based access
 
-NEXT STEPS:
--   Take Online
-    -   Use A link sharing system and have sharing restrictions so a sheet accessed via a link can only interact with it as specified by the 
-        creator of the show
+5. Audit Page for Indivicual crew members -> rows are days worked, cols are show, set, hours, position
 
--   Make available offline
-    -   Use system where a script is downloaded that installs mongodb if not already installed, and runs the app locally after cloning the most 
+6. Make available offline
+    Use system where a script is downloaded that installs mongodb if not already installed, and runs the app locally after cloning the most 
     recent online database. then when desired the user can upload the changes to the master online database -  this would work best paired with
     a desktop app that can be used to do the database changing/uploading/downloading, it just uses the browser to do the rendering.
     EDIT: the whole app could be run as a desktop app, just online and offline and other settings are chosen from the desktop app, but the app
     rendering is done using the browser. Then app can be used as a web app on mobile etc., but can also be downloaded as a desktop app for offline use
-    when needed.
+    when needed. Allow user to download individual shows for offline use. then when updating, just update all master db objects associated with that show.
