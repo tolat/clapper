@@ -424,6 +424,13 @@ sortColumn=(field) => {
 
 function executeSortColumn() {
     _colSortMap[this.field]=!_colSortMap[this.field]
+
+    // Reset other sorted columns to sort ascending
+    for (field in _colSortMap) {
+        if (field!=this.field) {
+            _colSortMap[field]=false
+        }
+    }
     let asc=_colSortMap[this.field]
 
     let items=dataView.getItems();
