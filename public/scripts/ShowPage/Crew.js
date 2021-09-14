@@ -307,6 +307,7 @@ autoFillUserData=(args) => {
             let position=_show.positions.positionList.find(p => p['Code']==item['Position'])
             if (position) {
                 item['Department']=position['Department']
+                // FILL ITEM WITH RECOD DATA OR CLEAR HOURS WORKED FIELDS
             }
         } else {
             item=loadPrevItemFromCommand(item)

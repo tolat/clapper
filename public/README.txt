@@ -61,7 +61,7 @@ TODO:
 
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
--   Drop down for all department fields + positions list in crew and rentals
+-   Drop down for all department fields + positions list in crew and rentals (DONE)
 -   sort option in context menu for columns -> click on column selects column
 -   context menu opotion to select row
 -   *** SAVE STYLES EVEN IF DATA IS EMPTY *** ++ CONSOLIDATE SAVE FUNCTIONS?

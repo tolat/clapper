@@ -16,6 +16,9 @@ var _prevColumns
 var _prevColMap
 var _prevDepartmentOrder
 var _overrideBlankRFSWarning=false
+var _headerDblCLick=false
+var _colSortMap={}
+
 // Edit History Buffer
 var undoRedoBuffer={
     commandQueue: [],
@@ -280,14 +283,12 @@ createSlickGrid=(data, columns, options) => {
         grid.render();
     });
 
-    // Single column sort functionality
-    grid.onSort.subscribe(function (e, args) {
-        let items=dataView.getItems();
-        items.sort((a, b) => { return stableSort(a, b, args.sortAsc, args.sortCol.field) });
-
-        dataView.setItems(items);
-
-        applyCellStyles(_cellCssStyles)
+    grid.onHeaderClick.subscribe(function (e, args) {
+        if (_headerDblCLick) {
+            sortColumn(args.column.field)
+        }
+        _headerDblCLick=true
+        setTimeout(() => { _headerDblCLick=false }, 250)
     })
 
     // Update _cssCellStyles when the dataView cell styles are changes
@@ -389,6 +390,62 @@ createSlickGrid=(data, columns, options) => {
 
     // Set page selector dropdown restrictions
     setNavRestrictions()
+
+    // Initialize column sort map
+    for (col of grid.getColumns()) {
+        _colSortMap[col.field]=false
+    }
+}
+
+// Sort column and reapply grid styles
+sortColumn=(field) => {
+    let editCommand={ type: 'sortColumn' }
+
+    // Make copies of previtems
+    let prevItems=dataView.getItems()
+    editCommand.prevItems=[]
+    for (item of prevItems) {
+        let copy={}
+        Object.assign(copy, item)
+        editCommand.prevItems.push(copy)
+    }
+
+    editCommand.prevColSortMap={}
+    Object.assign(editCommand.prevColSortMap, _colSortMap)
+
+    editCommand.field=field
+
+    editCommand.execute=executeSortColumn
+    editCommand.undo=undoSortColumn
+
+    queueAndExecuteEdit(null, null, editCommand)
+
+}
+
+function executeSortColumn() {
+    _colSortMap[this.field]=!_colSortMap[this.field]
+    let asc=_colSortMap[this.field]
+
+    let items=dataView.getItems();
+    items.sort((a, b) => { return stableSort(a, b, asc, this.field) });
+    dataView.setItems(items);
+    grid.setSortColumn(this.field, asc)
+
+    applyCellStyles(_cellCssStyles)
+}
+
+function undoSortColumn() {
+    Object.assign(_colSortMap, this.prevColSortMap)
+
+    let newItems=[]
+    for (item of this.prevItems) {
+        let copy={}
+        Object.assign(copy, item)
+        newItems.push(copy)
+    }
+
+    dataView.setItems(newItems)
+    applyCellStyles(_cellCssStyles)
 }
 
 // Retrun greyed out node for dropdown links
