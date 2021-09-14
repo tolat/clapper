@@ -163,8 +163,8 @@
         let columns=[
             { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
             { id: "PO Num", name: "PO Num", field: "PO Num", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
-            { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
-            { id: "Department", name: "Department", field: "Department", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: AutoCompleteEditor, dataSource: _show.sets.map(s => s['Set Code']), sortable: true, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 100, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
             { id: "Episode", name: "Episode", field: "Episode", width: 75, sortable: true, cssClass: 'uneditable' },
             { id: "Amount", name: "Amount", field: "Amount", width: 100, editor: Slick.Editors.Text, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency' },
         ]

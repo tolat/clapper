@@ -208,7 +208,7 @@
         let columns=[
             { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
             { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _allusernames, sortable: true, minWidth: 0, cssClass: 'required-for-save' },
-            { id: "Position", name: "Position", field: "Position", width: 50, editor: Slick.Editors.Text, sortable: true, minWidth: 0, cssClass: 'required-for-save' },
+            { id: "Position", name: "Position", field: "Position", width: 50, editor: AutoCompleteEditor, dataSource: _show.positions.positionList.map(p => p.Code), sortable: true, minWidth: 0, cssClass: 'required-for-save' },
             { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _allNames, sortable: true, minWidth: 0, },
             { id: "Department", name: "Department", field: "Department", width: 120, sortable: true, minWidth: 0, cssClass: 'uneditable' },
             { id: "Email", name: "Email", field: "Email", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
