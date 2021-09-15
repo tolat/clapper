@@ -2715,8 +2715,22 @@ selectRow=() => {
     grid.focus()
 }
 
+// Validator for modal inputs
 validateModalInput=(e, type) => {
-    if (type=='number'&&e.key!="Delete"&&isNaN(parseFloat(e.target.value+e.key))) {
+    let navKeys=['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight']
+    console.log(e.key)
+    // Integer Validator
+    if (type=='integer'&&!navKeys.includes(e.key)) {
+        e.target.value=zeroNanToNull(parseInt(e.target.value))
         e.preventDefault()
+    }
+    // Number Validator
+    if (type=='number'&&!navKeys.includes(e.key)) {
+        if (e.key=='.'&&!e.target.value.includes('.')) { return }
+        else if (e.key=='-'&&!e.target.value.includes('-')) { return }
+        else {
+            e.target.value=zeroNanToNull(parseFloat(e.target.value+e.key))||''
+            e.preventDefault()
+        }
     }
 }
