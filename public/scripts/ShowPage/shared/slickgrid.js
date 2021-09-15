@@ -283,6 +283,7 @@ createSlickGrid=(data, columns, options) => {
         grid.render();
     });
 
+    // Handle double click event on column header click (used for sorting)
     grid.onHeaderClick.subscribe(function (e, args) {
         if (_headerDblCLick) {
             sortColumn(args.column.field)
@@ -298,7 +299,6 @@ createSlickGrid=(data, columns, options) => {
         _headerDblCLick=true
         setTimeout(() => { _headerDblCLick=false }, 250)
     })
-
 
     // Update _cssCellStyles when the dataView cell styles are changes
     grid.onCellCssStylesChanged.subscribe(function (e, args) {
@@ -757,6 +757,7 @@ triggerCopy=() => {
 
 // Returns the grid columns in the order specified by columnOrder
 reorderColumns=(columnOrder) => {
+    console.trace()
     let columns=grid.getColumns();
     let newColumns=[];
     columns=duplicateArray(columns);

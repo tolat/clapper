@@ -90,7 +90,9 @@
         });
 
         // Apply saved display settings
-        if (Object.keys(_show.estimateVersions)[0]&&_show.sets[0]) { applyDisplaySettings(_show.estimateVersions[_version].displaySettings) }
+        if (_show.estimateVersions[_version]&&_show.estimateVersions[_version].displaySettings) {
+            applyDisplaySettings(_show.estimateVersions[_version].displaySettings)
+        }
 
         // Set estimate status to saved
         await updateSaveStatus(true);
