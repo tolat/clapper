@@ -191,7 +191,7 @@ loadMultipliersModal=() => {
     // Populate table with multiplier data
     for (m of mRowKeys) {
         for (day of days) {
-            document.getElementById(`${m}`).innerHTML+=`<td><input onkeydown='refocusElement(this)' class='multiplier-input' id='${m}-${day}' value='${_multipliers[m][day]}'></td>`
+            document.getElementById(`${m}`).innerHTML+=`<td><input type="number" onkeydown='refocusElement(this)' class='multiplier-input' id='${m}-${day}' value='${_multipliers[m][day]}'></td>`
         }
     }
 

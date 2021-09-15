@@ -2714,3 +2714,9 @@ selectRow=() => {
     grid.setSelectedRows(selectedRows)
     grid.focus()
 }
+
+validateModalInput=(e, type) => {
+    if (type=='number'&&e.key!="Delete"&&isNaN(parseFloat(e.target.value+e.key))) {
+        e.preventDefault()
+    }
+}
