@@ -202,7 +202,7 @@ populateMandayRates=() => {
         cont.innerHTML+=`<div class="rate-container">
         <div style="min-width: 2rem;">${d}</div>
         <div>
-        $\xa0<input class="manday-rates-modal-input" id="${d}_mandayRate" value="${_mandayRates[d]}" type="number">
+        $\xa0<input class="manday-rates-modal-input" id="${d}_mandayRate" value="${_mandayRates[d]}" onkeydown="validateModalInput(event, 'number')">
         </div>
         </div>`;
     }
@@ -237,7 +237,7 @@ populateFringes=() => {
         cont.innerHTML+=`<div id="${key}_fringe-container" style="display: flex; justify-content: space-between; width: 100%;">
         <div style="min-width: 2rem;">${key}</div>
         <div style="display: flex; justify-content: flex-end;">
-        <input class="modal-input" id="${key}_fringe" value="${_fringes[key]}">\xa0%
+        <input class="modal-input" id="${key}_fringe" value="${_fringes[key]}" onkeydown="validateModalInput(event, 'number')">\xa0%
         </div></div>
         <button style="color: red;" onclick="deleteFringe('${key}')">Delete</button>`;
     }
@@ -271,6 +271,7 @@ toggleAddFringeModal=(show, addFringe=false) => {
 
 // Updates the displayed version name
 updateVersionName=(isNewVersion=false) => {
+    if (['', null, undefined, false].includes(document.getElementById('enter-version').value)) { return }
     document.getElementById('estimate-version-display').innerText=document.getElementById('enter-version').value;
     toggleEnterVersionModal(false);
 
