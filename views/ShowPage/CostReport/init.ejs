@@ -60,6 +60,8 @@
 
         // Reorder departments
         await reorderDepartments();
+        undoRedoBuffer.commandQueue.pop()
+        undoRedoBuffer.commandCtr--
 
         // Save cost report so the totals variables for the shows table on the homepage are updated
         await saveData();

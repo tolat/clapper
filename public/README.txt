@@ -48,6 +48,8 @@ Fixes:
 -   Grey out pages that need to be set after others when creating new show (DONE)
 -   if required for save fields are left blank on save, warn (DONE)
 -   sort purchases by week option (Done)
+-   Drop down for all department fields + positions list in crew and rentals (DONE)
+-   sort option in context menu for columns -> click on column selects column (DONE)
 
 
 
@@ -55,14 +57,12 @@ TODO:
 
 Necessary:
 
--   Add all actions to undoredo buffer and add validation to all fields including modals
+-   Add validation to fields and modals 
 
 TODO:
 
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
--   Drop down for all department fields + positions list in crew and rentals (DONE)
--   sort option in context menu for columns -> click on column selects column (DONE)
 -   context menu opotion to select row
 -   *** SAVE STYLES EVEN IF DATA IS EMPTY *** ++ CONSOLIDATE SAVE FUNCTIONS?
 -   Man Days in cost report count days a crew member worked not amount of money spent/manday rate
