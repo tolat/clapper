@@ -9,6 +9,10 @@ setContextMenu=() => {
     document.getElementById('contextMenu').innerHTML+=getHideColumnsOptions();
     document.getElementById('contextMenu').innerHTML+=`<li onclick="addRow(1, 'above')">Add row above</li>
         <li onclick="addRow(1, 'below')">Add row below</li>`;
+    let range=grid.getSelectionModel().getSelectedRanges()[0]
+    let s=''
+    if (range&&range.toRow!=range.fromRow) { s='s' }
+    document.getElementById('contextMenu').innerHTML+=`<li onclick="selectRow()">Select row${s}</li>`
 }
 
 // Set contezt menu options for column header

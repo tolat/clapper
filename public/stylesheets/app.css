@@ -67,6 +67,10 @@ button.navbar-toggler{
     border-bottom: none;
 }
 
+#dropdownMenuButton1{
+    border-radius: .1rem;
+}
+
 .container-fluid.sheet-container{
     height: 100%;
     width: 100%;

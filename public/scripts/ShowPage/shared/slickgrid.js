@@ -2674,3 +2674,17 @@ isEmpty=(item) => {
     }
     return true
 }
+
+selectRow=() => {
+    let ranges=grid.getSelectionModel().getSelectedRanges()
+    let selectedRows=[]
+    if (ranges[0]) {
+        for (let i=ranges[0].fromRow; i<=ranges[0].toRow; i++) {
+            selectedRows.push(i)
+        }
+    } else {
+        selectedRows.push(_contextCell.row)
+    }
+    grid.setSelectedRows(selectedRows)
+    grid.focus()
+}
