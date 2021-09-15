@@ -286,10 +286,19 @@ createSlickGrid=(data, columns, options) => {
     grid.onHeaderClick.subscribe(function (e, args) {
         if (_headerDblCLick) {
             sortColumn(args.column.field)
+        } else {
+            // Remove sort arrows from grid column headers
+            for (elt of document.getElementsByClassName('slick-sort-indicator')) {
+                elt.classList.remove('slick-sort-indicator-asc')
+                elt.classList.remove('slick-sort-indicator-desc')
+            }
         }
+
+        // Set double click delay
         _headerDblCLick=true
         setTimeout(() => { _headerDblCLick=false }, 250)
     })
+
 
     // Update _cssCellStyles when the dataView cell styles are changes
     grid.onCellCssStylesChanged.subscribe(function (e, args) {
@@ -392,9 +401,7 @@ createSlickGrid=(data, columns, options) => {
     setNavRestrictions()
 
     // Initialize column sort map
-    for (col of grid.getColumns()) {
-        _colSortMap[col.field]=false
-    }
+    for (col of grid.getColumns()) { _colSortMap[col.field]=2 }
 }
 
 // Sort column and reapply grid styles
@@ -414,6 +421,13 @@ sortColumn=(field) => {
     Object.assign(editCommand.prevColSortMap, _colSortMap)
 
     editCommand.field=field
+    editCommand.prevSortCol={}
+    for (col in _colSortMap) {
+        if (_colSortMap[col]<2) {
+            editCommand.prevSortCol.field=col
+            editCommand.prevSortCol.asc=_colSortMap[col]
+        }
+    }
 
     editCommand.execute=executeSortColumn
     editCommand.undo=undoSortColumn
@@ -422,13 +436,14 @@ sortColumn=(field) => {
 
 }
 
+// Execute sort column
 function executeSortColumn() {
-    _colSortMap[this.field]=!_colSortMap[this.field]
+    _colSortMap[this.field]==0? _colSortMap[this.field]++:_colSortMap[this.field]--
 
     // Reset other sorted columns to sort ascending
     for (field in _colSortMap) {
         if (field!=this.field) {
-            _colSortMap[field]=false
+            _colSortMap[field]=2
         }
     }
     let asc=_colSortMap[this.field]
@@ -441,6 +456,7 @@ function executeSortColumn() {
     applyCellStyles(_cellCssStyles)
 }
 
+// Undo sort column
 function undoSortColumn() {
     Object.assign(_colSortMap, this.prevColSortMap)
 
@@ -451,6 +467,12 @@ function undoSortColumn() {
         newItems.push(copy)
     }
 
+    // Reset sort column to previous
+    if (this.prevSortCol.field) {
+        grid.setSortColumn(this.prevSortCol.field, this.prevSortCol.asc)
+    } else {
+        grid.setSortColumn(null, null)
+    }
     dataView.setItems(newItems)
     applyCellStyles(_cellCssStyles)
 }
@@ -1234,8 +1256,6 @@ stableSort=(a, b, sortAsc, field, tiebreak='Set Code') => {
     bTie=b[tiebreak]
     a=a[field]
     b=b[field]
-    if (a==undefined) { a='zzzzz__' }
-    if (b==undefined) { b='zzzzz__' }
 
     // Sort Dates
     if (field.toLowerCase().includes('date')) {
@@ -1246,19 +1266,18 @@ stableSort=(a, b, sortAsc, field, tiebreak='Set Code') => {
     // Sort numbers
     let aNum=parseFloat(a);
     let bNum=parseFloat(b);
-    if (a=='zzzzz__') { aNum=99999999 }
-    if (b=='zzzzz__') { bNum=99999999 }
+    if (!a) { if (sortAsc) { aNum=Infinity } else { aNum=-Infinity } }
+    if (!b) { if (sortAsc) { bNum=Infinity } else { bNum=-Infinity } }
     let aNumTie=parseFloat(aTie);
     let bNumTie=parseFloat(bTie);
-
     if (!isNaN(aNum)&&!isNaN(bNum)) {
         if (sortAsc) { if (aNum==bNum) { if (aNumTie>bNumTie) { return 1 } if (bNumTie>aNumTie) { return -1 } return 0 } return aNum-bNum }
         else { if (bNum==aNum) { if (bNumTie>aNumTie) { return 1 } if (aNumTie>bNumTie) { return -1 } return 0 } return bNum-aNum }
     }
-    // Sort alphabetical
+    // Else sort alphabetical
     else {
-        if (!a) { a='ZZZ' }
-        if (!b) { b='ZZZ' }
+        if (!a) { if (sortAsc) { a='ZZZZZZZZZ' } else { a='AAAAAAAAA' } }
+        if (!b) { if (sortAsc) { b='ZZZZZZZZZ' } else { b='AAAAAAAAA' } }
         if (sortAsc) { if (a>b) { return 1 } if (b>a) { return -1 } return 0 }
         else { if (b>a) { return 1 } if (a>b) { return -1 } return 0 }
     }

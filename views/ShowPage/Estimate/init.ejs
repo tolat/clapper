@@ -190,25 +190,25 @@
     function initializeColumns(sets, _show, _args) {
         let columns=[
             // Core feature columns
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, minWidth: 0 },
-            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, cssClass: 'required-for-save' },
-            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, },
-            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text }
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true, },
+            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
         ];
 
         // Non-department estimate specific columns
         if (Object.keys(_show.estimateVersions)[0]) {
             for (key of _show.estimateVersions[_args.version].extraColumns) {
-                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.LongText });
+                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.LongText, sortable: true });
             }
         }
 
         // Math columns
         columns=columns.concat([
-            { id: "No Fringes", name: "No Fringes", field: "No Fringes", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
-            { id: "Current", name: "Current", field: "Current", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
-            { id: "Previous", name: "Previous", field: "Previous", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
-            { id: "Variance", name: "Variance", field: "Variance", width: 80, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "No Fringes", name: "No Fringes", field: "No Fringes", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Current", name: "Current", field: "Current", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Previous", name: "Previous", field: "Previous", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
+            { id: "Variance", name: "Variance", field: "Variance", width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
         ])
 
         // Department columns 
