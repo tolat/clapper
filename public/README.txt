@@ -51,6 +51,8 @@ Fixes:
 -   Drop down for all department fields + positions list in crew and rentals (DONE)
 -   sort option in context menu for columns -> click on column selects column (DONE)
 -   context menu opotion to select row (DONE)
+-   SAVE STYLES EVEN IF DATA IS EMPTY (DONE)
+
 
 
 
@@ -64,7 +66,6 @@ TODO:
 
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
--   *** SAVE STYLES EVEN IF DATA IS EMPTY *** ++ CONSOLIDATE SAVE FUNCTIONS?
 -   Man Days in cost report count days a crew member worked not amount of money spent/manday rate
 
 2. Timesheets

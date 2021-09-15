@@ -757,7 +757,6 @@ triggerCopy=() => {
 
 // Returns the grid columns in the order specified by columnOrder
 reorderColumns=(columnOrder) => {
-    console.trace()
     let columns=grid.getColumns();
     let newColumns=[];
     columns=duplicateArray(columns);
@@ -2240,15 +2239,32 @@ lightOrDark=(color) => {
 
 // Hides and shows columns in range
 hideColumns=(hide, range) => {
+    let editCommand={ type: 'hideColumns' }
+
+    editCommand.prevCols=[]
+    for (col of grid.getColumns()) {
+        editCommand.prevCols.push(Object.assign({}, col))
+    }
+
+    editCommand.hide=hide
+    editCommand.range=range
+
+    editCommand.execute=executeHideColumns
+    editCommand.undo=undoHideColumns
+
+    queueAndExecuteEdit(null, null, editCommand)
+}
+
+function executeHideColumns() {
     let cols=grid.getColumns();
-    if (hide) {
-        for (let i=range[0]; i<=range[1]; i++) {
+    if (this.hide) {
+        for (let i=this.range[0]; i<=this.range[1]; i++) {
             if (!cols[i].isHidden) {
                 hideColumn(true, cols[i]);
             }
         }
     } else {
-        for (let i=range[0]; i<=range[1]; i++) {
+        for (let i=this.range[0]; i<=this.range[1]; i++) {
             if (cols[i].isHidden) {
                 cols[i]=cols[i].colDef;
             }
@@ -2256,6 +2272,14 @@ hideColumns=(hide, range) => {
     }
 
     grid.setColumns(cols);
+}
+
+function undoHideColumns() {
+    let copyCols=[]
+    for (col of this.prevCols) {
+        copyCols.push(Object.assign({}, col))
+    }
+    grid.setColumns(copyCols)
 }
 
 // Hides and shows individual columns
@@ -2286,11 +2310,12 @@ getHideColumnsOptions=(args=_contextCell) => {
     if (args.id) {
         let cols=grid.getColumns();
         _contextCell.cell=cols.map(c => c.id).indexOf(args.id);
+        args.cell=_contextCell.cell
     }
 
     // Show and hide individual columns
-    if (grid.getColumns()[args.cell].isHidden) { options=`<li onclick='hideColumn(false)'>Show column</li>` }
-    else { options=`<li onclick='hideColumn(true)'>Hide column</li>` }
+    if (grid.getColumns()[args.cell].isHidden) { options=`<li onclick='hideColumns(false, [${_contextCell.cell}, ${_contextCell.cell}])'>Show column</li>` }
+    else { options=`<li onclick='hideColumns(true, [${_contextCell.cell}, ${_contextCell.cell}])'>Hide column</li>` }
 
     // Show and hide columns in selection range
     let ranges=grid.getSelectionModel().getSelectedRanges();
