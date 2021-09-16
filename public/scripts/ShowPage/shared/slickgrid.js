@@ -1253,8 +1253,8 @@ function undoAutoNumberData() {
 // Custom sorting algorithm for numbers, strings, and dates
 stableSort=(a, b, sortAsc, field, tiebreak='Set Code') => {
     if (_args.section=='Crew') { tiebreak='Date Joined' }
-    aTie=a[tiebreak]
-    bTie=b[tiebreak]
+    a? aTie=a[tiebreak]:null
+    b? bTie=b[tiebreak]:null
     a=a[field]
     b=b[field]
 

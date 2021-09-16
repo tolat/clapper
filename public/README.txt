@@ -54,14 +54,14 @@ Fixes:
 -   SAVE STYLES EVEN IF DATA IS EMPTY (DONE)
 -   Add validation to fields and modals (DONE)
 -   Prevent copy out of hidden columns (DONE)
-
+-   Man Days in cost report count days a crew member worked not amount of money spent/manday rate (DONE)
 
 
 TODO:
 
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
--   Man Days in cost report count days a crew member worked not amount of money spent/manday rate
+-   Add sort by field for page loading (saves sort column)
 
 2. Timesheets
 
