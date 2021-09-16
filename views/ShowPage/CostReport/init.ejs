@@ -98,6 +98,7 @@
                 let materials=costs[1][d].total;
                 let rentals=costs[2][d].total;
                 let week=costs[0][d].week+costs[1][d].week+costs[2][d].week;
+                let mandays=costs[0][d].mandays
 
                 item[`${d}_week`]=zeroNanToNull(week.toFixed(2));
                 item[`${d}_todate`]=zeroNanToNull((labor+materials+rentals).toFixed(2));
@@ -105,12 +106,6 @@
                 item[`${d}_labor`]=zeroNanToNull(labor.toFixed(2));
                 item[`${d}_materials`]=zeroNanToNull(materials.toFixed(2));
                 item[`${d}_rentals`]=zeroNanToNull(rentals.toFixed(2));
-
-                // Calculate mandays 
-                let ev=_show.estimateVersions[_version];
-                let totalFringe=0;
-                for (key of Object.keys(ev.fringes)) { totalFringe+=ev.fringes[key] }
-                let mandays=(labor/(1+totalFringe/100))/_show.estimateVersions[_version].mandayRates[d];
                 item[`${d}_mandays`]=zeroNanToNull(mandays.toFixed(2));
 
                 // Calculate precent remaining

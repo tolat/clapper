@@ -53,6 +53,8 @@ Fixes:
 -   context menu opotion to select row (DONE)
 -   SAVE STYLES EVEN IF DATA IS EMPTY (DONE)
 -   Add validation to fields and modals (DONE)
+-   Prevent copy out of hidden columns (DONE)
+
 
 
 TODO:
@@ -60,7 +62,6 @@ TODO:
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
 -   Man Days in cost report count days a crew member worked not amount of money spent/manday rate
--   Prevent copy out of hidden columns
 
 2. Timesheets
 

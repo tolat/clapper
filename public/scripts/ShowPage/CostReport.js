@@ -94,7 +94,7 @@ calculateCosts=(item) => {
     /* Add cost of crew labor for this set */
     // Initialize labor variable
     let departmentLabor={};
-    for (d of _show.departments) { departmentLabor[d]={ week: 0, total: 0 } }
+    for (d of _show.departments) { departmentLabor[d]={ week: 0, total: 0, mandays: 0 } }
 
     // Calculate
     for (user of _showCrew) {
@@ -120,7 +120,7 @@ calculateCosts=(item) => {
                     for (k in departmentLabor) {
                         if (position['Department']==k) {
                             departmentLabor[k].total+=cost;
-
+                            departmentLabor[k].mandays++;
                             if (isInCurrentWeek(day, user)) {
                                 departmentLabor[k].week+=cost;
                             }
