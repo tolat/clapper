@@ -2,12 +2,11 @@ const express=require('express');
 const tryCatch=require('../utils/tryCatch');
 const ExpressError=require('../utils/ExpressError');
 const { isLoggedIn }=require('../utils/customMiddleware')
-
 const router=express.Router({ mergeParams: true });
-
 const Show=require('../models/show');
 const User=require('../models/user');
 const { genUniqueId }=require('../utils/numberUtils')
+const moment=require('../node_modules/moment')
 
 // Shows Load
 router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
@@ -28,11 +27,10 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.currentWeek=genUniqueId()
     show.departmentColorMap={}
     show.owner=req.user.username
-    let endDate=new Date(req.body.show.firstweekending)
 
     let newWeek={
         _id: show.currentWeek,
-        end: new Date(endDate.getTime()+endDate.getTimezoneOffset()*60*1000),
+        end: new Date(moment(req.body.show.firstweekending)),
         number: 1,
         crew: {
             crewList: [],
