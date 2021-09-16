@@ -28,10 +28,11 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.currentWeek=genUniqueId()
     show.departmentColorMap={}
     show.owner=req.user.username
+    let endDate=new Date(req.body.show.firstweekending)
 
     let newWeek={
         _id: show.currentWeek,
-        end: new Date(req.body.show.firstweekending+'T00:00'),
+        end: new Date(endDate.getTime()+endDate.getTimezoneOffset()*60*1000),
         number: 1,
         crew: {
             crewList: [],
