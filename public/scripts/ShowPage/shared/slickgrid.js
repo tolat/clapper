@@ -1166,7 +1166,7 @@ toggleAutoNumberModal=(show, group, execute) => {
                 document.getElementById('auto-number-modal-groups-display').innerHTML+=`
                 <div style="display: flex; justify-content: space-between; width: 100%;">
                 <div><b>${g}<b>:</div>
-                <input id="${g}-auto-number-input" style="width: 50px;"> 
+                <input id="${g}-auto-number-input" style="width: 50px;" onkeydown="validateModalInput(event, 'number')"> 
                 </div
                 `
             }

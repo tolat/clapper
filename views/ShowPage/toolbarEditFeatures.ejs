@@ -8,9 +8,11 @@
         <div class="dropdown-item">Group by column: <br><input id="group-by-input"></div>
         <div class="dropdown-item" style="display: none;" onclick="groupBy(null)" id="cancel-grouping">
             Clear grouping</div>
-        <div class="dropdown-item">Add rows: <br><input id="add-rows-input"></div>
+        <div class="dropdown-item">Add rows: <br><input id="add-rows-input"
+                onkeydown="validateModalInput(event, 'number')"></div>
         <div class="dropdown-item">Auto-number by column:<br><input id="auto-number-input"></div>
-        <div class="dropdown-item"># of frozen columns: <br><input id="frozen-columns-input"></div>
+        <div class="dropdown-item"># of frozen columns: <br><input id="frozen-columns-input"
+                onkeydown="validateModalInput(event, 'number')"></div>
         <div class="dropdown-item" onclick="toggleAutoFillRangeModal(true)">Auto-fill range</div>
     </ul>
 </div>

@@ -5,15 +5,17 @@
     <div style="display: flex; justify-content: space-between; width: 100%; flex-direction: column;">
         <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
             Start:
-            <input style="width: 3rem;" id="auto-fill-range-input-start">
+            <input style="width: 3rem;" id="auto-fill-range-input-start"
+                onkeydown="validateModalInput(event, 'number')">
         </div>
         <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
             End:
-            <input style="width: 3rem;" id="auto-fill-range-input-end">
+            <input style="width: 3rem;" id="auto-fill-range-input-end" onkeydown="validateModalInput(event, 'number')">
         </div>
         <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
             Increment (optional):
-            <input style="width: 3rem;" id="auto-fill-range-input-increment">
+            <input style="width: 3rem;" id="auto-fill-range-input-increment"
+                onkeydown="validateModalInput(event, 'number')">
         </div>
     </div>
     <br>
