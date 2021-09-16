@@ -22,7 +22,6 @@ const ShowSchema=new Schema({
             taxColumns: [String],
             rentalList: [Object],
         },
-        timeZone: String
     }],
     purchases: {
         displaySettings: Object,
