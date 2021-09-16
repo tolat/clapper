@@ -746,7 +746,8 @@ triggerCopy=() => {
     for (let i=copyRange.fromRow; i<=copyRange.toRow; i++) {
         item=dataView.getItemByIdx(i)
         for (let j=copyRange.fromCell; j<=copyRange.toCell; j++) {
-            let value=item[columns[j].field]
+            let value=false
+            if (!columns[j].isHidden) { value=item[columns[j].field] }
             value? copyString+='\"'+value.toString().replaceAll('"', '""')+'\"\t':copyString+='\t'
         }
         copyString+='\r\n'
@@ -2718,12 +2719,13 @@ selectRow=() => {
 // Validator for modal inputs
 validateModalInput=(e, type) => {
     let navKeys=['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight']
-    console.log(e.key)
+
     // Integer Validator
     if (type=='integer'&&!navKeys.includes(e.key)) {
         e.target.value=zeroNanToNull(parseInt(e.target.value))
         e.preventDefault()
     }
+
     // Number Validator
     if (type=='number'&&!navKeys.includes(e.key)) {
         if (e.key=='.'&&!e.target.value.includes('.')) { return }
