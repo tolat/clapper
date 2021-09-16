@@ -45,7 +45,8 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
             extraColumns: [],
             taxColumns: [],
             displaySettings: {}
-        }
+        },
+        timeZone: (new Date(Date.now())).getTimezoneOffset()
     }
 
     show.weeks.push(newWeek)
