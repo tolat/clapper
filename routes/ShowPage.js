@@ -534,7 +534,7 @@ function getDepartmentKeys(show) {
 /* CREW, RENTALS & PURCHASES FUNCTIONS */
 
 // Update crew
-updateCrew=tryCatch(async function (body, showId) {
+updateCrew=async function (body, showId) {
     let message=["Success"]
     let show=await Show.findById(showId)
         .populate('weeks.crew.crewList')
@@ -611,7 +611,7 @@ updateCrew=tryCatch(async function (body, showId) {
                     record.weeksWorked[_cw]={
                         extraColumnValues: {},
                         taxColumnValues: {},
-                        //'#': null
+                        '#': null
                     }
                     user.showrecords.push(record)
                 }
@@ -710,7 +710,7 @@ updateCrew=tryCatch(async function (body, showId) {
     }
 
     return { message: message };
-})
+}
 
 // Update rentals
 updateRentals=async function (body, showId) {
