@@ -617,6 +617,8 @@ updateCrew=async function (body, showId) {
                 }
 
                 // Update user #
+                console.log(_cw)
+                console.log(record)
                 record.weeksWorked[_cw]['#']=item['#'];
 
                 // Update tax
