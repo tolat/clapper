@@ -19,79 +19,85 @@ const Position=require('../models/position')
 
 // Load a Show Page section
 router.get('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
-    const { id, section }=req.params;
-    const q=req.query;
-    let show=await populateShow(id);
-    let args={ section: section, server: req.app.get('server') };
-
-    // Set appropriate data for the requested section
-    switch (section) {
-        case 'Estimate':
-            show=await Show.findById(id).populate('sets');
-            // Case: first estimate version
-            if (!Object.keys(show.estimateVersions).length) { args.isFirstEstimate=true }
-            // Case: requesting specific estimate version
-            else if (q.version) {
-                args.version=q.version;
-                args.latestVersion=getLatestEstimateVersion(show);
-                args.weekEnding=show.estimateVersions[q.version].weekEnding;
-            }
-            //Case: no specified version, default to the cost report's version
-            else {
-                let version=show.costReport.estimateVersion
-                args.latestVersion=getLatestEstimateVersion(show)
-                version? args.version=version:args.version=args.latestVersion
-                args.weekEnding=show.estimateVersions[args.version].weekEnding;
-            }
-            break;
-        case 'Purchases':
-            show=await Show.findById(id)
-                .populate('sets')
-                .populate('purchases')
-                .populate({
-                    path: 'purchases.purchaseList',
-                    populate: { path: 'set' }
-                });
-            break;
-        case 'Crew':
-            args.reloadOnWeekChange=true;
-            args.allUsers=await User.find({});
-            break;
-        case 'Rentals':
-            args.reloadOnWeekChange=true
-            args.allUsers=await User.find({})
-            args.allShowCrew=await getAllCrewIDs(show._id)
-            break;
-        case 'CostReport':
-            args.reloadOnWeekChange=true;
-            args.showCrew=await getAllCrewUsers(await getAllCrewIDs(show._id.toString()))
-            break;
-    }
-
-    let sharedModals=[]
-    let pageModals=[]
-
-
-    // Get shared and page-specific modals to include in rendered template
     try {
+        const { id, section }=req.params;
+        const q=req.query;
+        let show=await populateShow(id);
+        let args={ section: section, server: req.app.get('server') };
+
+        // Set appropriate data for the requested section
+        switch (section) {
+            case 'Estimate':
+                show=await Show.findById(id).populate('sets');
+                // Case: first estimate version
+                if (!Object.keys(show.estimateVersions).length) { args.isFirstEstimate=true }
+                // Case: requesting specific estimate version
+                else if (q.version) {
+                    args.version=q.version;
+                    args.latestVersion=getLatestEstimateVersion(show);
+                    args.weekEnding=show.estimateVersions[q.version].weekEnding;
+                }
+                //Case: no specified version, default to the cost report's version
+                else {
+                    let version=show.costReport.estimateVersion
+                    args.latestVersion=getLatestEstimateVersion(show)
+                    version? args.version=version:args.version=args.latestVersion
+                    args.weekEnding=show.estimateVersions[args.version].weekEnding;
+                }
+                break;
+            case 'Purchases':
+                show=await Show.findById(id)
+                    .populate('sets')
+                    .populate('purchases')
+                    .populate({
+                        path: 'purchases.purchaseList',
+                        populate: { path: 'set' }
+                    });
+                break;
+            case 'Crew':
+                args.reloadOnWeekChange=true;
+                args.allUsers=await User.find({});
+                break;
+            case 'Rentals':
+                args.reloadOnWeekChange=true
+                args.allUsers=await User.find({})
+                args.allShowCrew=await getAllCrewIDs(show._id)
+                break;
+            case 'CostReport':
+                args.reloadOnWeekChange=true;
+                args.showCrew=await getAllCrewUsers(await getAllCrewIDs(show._id.toString()))
+                break;
+        }
+
+        let sharedModals=[]
+        let pageModals=[]
+
+
+        // Get shared and page-specific modals to include in rendered template
         sharedModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/SharedModals`));
         pageModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/${section}/Modals`));
-    } catch (e) { }
 
-    res.render('ShowPage/Template', {
-        title: `${show['Name']} - ${section}`,
-        show: show,
-        section: section,
-        args: args,
-        sharedModals: sharedModals,
-        pageModals: pageModals
-    })
+        res.render('ShowPage/Template', {
+            title: `${show['Name']} - ${section}`,
+            show: show,
+            section: section,
+            args: args,
+            sharedModals: sharedModals,
+            pageModals: pageModals
+        })
+    } catch (e) {
+        res.send({ message: `${e.message}\n\n${e.stack}` })
+    }
 }))
 
 // Delete route for ShowPage sections
 router.delete('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
-    let responseData=await global[`delete${req.params.section}`](req.body, req.params.id);
-    res.send(responseData);
+    try {
+        let responseData=await global[`delete${req.params.section}`](req.body, req.params.id);
+        res.send(responseData);
+    } catch (e) {
+        res.send({ message: `${e.message}\n\n${e.stack}` })
+    }
 }))
 
 // Post (update) route for ShowPage sections
