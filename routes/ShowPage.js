@@ -103,7 +103,7 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
         res.send(responseData);
     }
     catch (e) {
-        res.send({ message: e.message })
+        res.send({ message: `${e.message}\n\n${e.stack}` })
     }
 }))
 
