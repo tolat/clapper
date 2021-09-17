@@ -610,7 +610,8 @@ updateCrew=async function (body, showId) {
                     }
                     record.weeksWorked[_cw]={
                         extraColumnValues: {},
-                        taxColumnValues: {}
+                        taxColumnValues: {},
+                        '#': null
                     }
                     user.showrecords.push(record)
                 }

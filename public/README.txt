@@ -61,7 +61,7 @@ TODO:
 
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
--   Add sort by field for page loading (saves sort column)
+-   Add sort by field on page loading (saves sort column instead of loading and sorting by number always)
 
 2. Timesheets
 
