@@ -96,10 +96,15 @@ router.delete('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
 
 // Post (update) route for ShowPage sections
 router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
-    // Sanitize incoming data
-    req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
-    let responseData=await global[`update${req.params.section}`](req.body, req.params.id);
-    res.send(responseData);
+    try {
+        // Sanitize incoming data
+        req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
+        let responseData=await global[`update${req.params.section}`](req.body, req.params.id);
+        res.send(responseData);
+    }
+    catch (e) {
+        res.send({ message: e })
+    }
 }))
 
 module.exports=router;
