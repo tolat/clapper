@@ -619,11 +619,15 @@ updateCrew=async function (body, showId) {
                         '#': null
                     }
                     user.showrecords.push(record)
+                } else if (!record.weeksWorked[_cw]) {
+                    record.weeksWorked[_cw]={
+                        extraColumnValues: {},
+                        taxColumnValues: {},
+                        '#': null
+                    }
                 }
 
                 // Update user #
-                console.log(_cw)
-                console.log(record)
                 record.weeksWorked[_cw]['#']=item['#'];
 
                 // Update tax
