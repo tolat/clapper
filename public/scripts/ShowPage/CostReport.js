@@ -105,7 +105,6 @@ calculateCosts=(item) => {
                 let week=findFirstContainingWeek(day, user)
                 // Only count day worked if it has the same set code as the item and it falls in a valid week 
                 if (recordPosition.daysWorked[day].set==item['Set Code']&&week) {
-                    console.log(day)
                     let multipliers=_show.positions.multipliers;
                     let hours=recordPosition.daysWorked[day].hours||0
                     let rate=position['Rate']
