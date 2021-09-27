@@ -1158,9 +1158,7 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
     function isInCurrentWeek(day, user) {
         let dateMS=new Date(day).getTime()
         let weekEndMS=new Date(week.end).getTime()
-        console.log(new Date(week.end))
-        console.log(week.end)
-        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
+        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
             if (week.crew.crewList.find(c => c.username==user.username)) {
                 return true
             }
@@ -1246,8 +1244,6 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
                 }
                 mulHoursMap[`${weekDay}-Hours-Total`]=hours
             }
-
-            console.log(mulHoursMap)
 
             // Assign variable values to cells in spreadsheet
             for (col in valueMap) {

@@ -81,7 +81,7 @@ findFirstContainingWeek=(day, user) => {
 isInCurrentWeek=(day, user) => {
     let dateMS=new Date(day).getTime()
     let weekEndMS=new Date(_week.end).getTime()
-    if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
+    if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
         if (_week.crew.crewList.find(c => c.username==user.username)) {
             return true
         }
