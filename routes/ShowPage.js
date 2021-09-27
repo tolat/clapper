@@ -1158,6 +1158,8 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
     function isInCurrentWeek(day, user) {
         let dateMS=new Date(day).getTime()
         let weekEndMS=new Date(week.end).getTime()
+        console.log(new Date(week.end))
+        console.log(week.end)
         if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
             if (week.crew.crewList.find(c => c.username==user.username)) {
                 return true
@@ -1224,7 +1226,7 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
 
             // Create map of all multiplier values to hours worked in that interval
             let mulHoursMap={}
-            let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(new Date(dw), user))
+            let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(dw, user))
             for (day of posDays) {
                 let weekDay=new Date(day).toDateString('en-US').slice(0, 3)
                 let hours=pos.daysWorked[day].hours
