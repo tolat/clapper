@@ -1195,15 +1195,15 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
-    console.console.log('TRACING 2')
+    console.log('TRACING 2')
 
 
     // Reload workbook after saving worksheet copies
     await workbook.xlsx.writeFile(filepath)
-    console.console.log('TRACING 3')
+    console.log('TRACING 3')
 
     await workbook.xlsx.readFile(filepath)
-    console.console.log('TRACING 4')
+    console.log('TRACING 4')
 
 
     // Populate worksheet copies with data
@@ -1286,7 +1286,7 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
-    console.console.log('TRACING 5')
+    console.log('TRACING 5')
 
 
     await workbook.xlsx.writeFile(filepath)
