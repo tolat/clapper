@@ -1172,8 +1172,6 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
             // Make sure sheet name is under 31 chars (excel limitation)
             let sheetName=`${user.username} - ${pos.code}`
             if (sheetName.length>31) {
-                console.log('handling name > 31 chars')
-
                 let postAt=sheetName.slice(sheetName.indexOf('@'))
                 let preAt=sheetName.slice(0, sheetName.indexOf('@'))
                 let overshoot=sheetName.length-28
@@ -1247,6 +1245,8 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
                 mulHoursMap[`${weekDay}-Hours-Total`]=hours
             }
 
+            console.log(mulHoursMap)
+
             // Assign variable values to cells in spreadsheet
             for (col in valueMap) {
                 for (row in valueMap[col]) {
@@ -1283,13 +1283,7 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
-    console.log('TRACING 1')
-    console.log(`TOTAL MEMORY: ${Math.round((process.memoryUsage().heapTotal/1024/1024)*100)/100}`)
-    console.log(`TOTAL USED: ${Math.round((process.memoryUsage().heapUsed/1024/1024)*100)/100}`)
     await workbook.xlsx.writeFile(filepath)
-    console.log(`TOTAL MEMORY: ${Math.round((process.memoryUsage().heapTotal/1024/1024)*100)/100}`)
-    console.log(`TOTAL USED: ${Math.round((process.memoryUsage().heapUsed/1024/1024)*100)/100}`)
-    console.log('TRACING 2')
 }
 
 
