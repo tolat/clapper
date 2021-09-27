@@ -55,6 +55,7 @@ Fixes:
 -   Add validation to fields and modals (DONE)
 -   Prevent copy out of hidden columns (DONE)
 -   Man Days in cost report count days a crew member worked not amount of money spent/manday rate (DONE)
+-   Changed multipliers to be week-based (DONE)
 
 
 TODO:
@@ -64,6 +65,9 @@ TODO:
 -   Add sort by field on page loading (saves sort column instead of loading and sorting by number always)
 
 2. Timesheets
+    -   TODO: finish timesheet crud
+    -   Finish timesheet cellValueMap parser to export values to template
+    -   Block sort by column on timesheets cols
 
 3. Styling Toolbar (Get cell styles to presist through grouping events)
     Need to add updates to styles when:
@@ -76,7 +80,13 @@ TODO:
 
 5. Audit Page for Indivicual crew members -> rows are days worked, cols are show, set, hours, position
 
+6. Change Purchases and rentals to weekly rentals and purchases+rentals (add columns for is Rental)
+
 6. Make available offline
+
+    Alternative: create feature where app can be exported as an excel workbook.
+    To upload, add a feature for each show to upload data from an excel workbook show
+
     Use system where a script is downloaded that installs mongodb if not already installed, and runs the app locally after cloning the most 
     recent online database. then when desired the user can upload the changes to the master online database -  this would work best paired with
     a desktop app that can be used to do the database changing/uploading/downloading, it just uses the browser to do the rendering.

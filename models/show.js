@@ -10,6 +10,7 @@ const ShowSchema=new Schema({
         _id: String,
         number: Number,
         end: Date,
+        multipliers: Object,
         crew: {
             displaySettings: Object,
             extraColumns: [String],
@@ -38,7 +39,6 @@ const ShowSchema=new Schema({
         displaySettings: Object,
         extraColumns: [String],
         positionList: [{ type: Schema.Types.ObjectId, ref: 'Position' }],
-        multipliers: Object,
         rentalColumns: [String]
     },
     costReport: {
@@ -50,6 +50,14 @@ const ShowSchema=new Schema({
         budget: String,
         toDate: String,
         remaining: String,
+    },
+    timesheets: {
+        timesheetMaps: [{
+            name: String,
+            cellValueMap: Object,
+            displaySettings: Object,
+        }],
+        currentMap: String
     }
 }, { minimize: false })
 

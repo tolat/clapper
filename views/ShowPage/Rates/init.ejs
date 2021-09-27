@@ -2,6 +2,7 @@
     // Global variables
     var _show= <%- JSON.stringify(show)%>;
     var _args= <%- JSON.stringify(args)%>;
+    setWeekEnding()
 
     var _extraColumns=_show.positions.extraColumns;
     var _rentalColumns=_show.positions.rentalColumns;
@@ -40,7 +41,7 @@
         }
     ];
     var _totals={};
-    var _multipliers=_show.positions.multipliers
+    var _multipliers=_week.multipliers
     var _dropdownNodes=initDropdownNodes()
 
     var grid;
@@ -49,10 +50,6 @@
     // Load the grid 
     async function onLoad() {
         var positions=_show.positions.positionList;
-
-        // Set the week ending if the show has a current week ending
-        if (_show.currentweekending) { _weekEnding=_show.currentweekending }
-        await setWeekEnding();
 
         // Create options
         var options=await initializeOptions();

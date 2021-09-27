@@ -1,0 +1,19 @@
+<div id="new-timesheet-map-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
+    <div id="new-timesheet-map-modal-message"></div>
+    <div style="display: flex; justify-items: space-between; align-items: center; width: 100%;">
+        <input style="margin: 10px; width: 100%;" id="new-timesheet-map-modal-input">
+    </div>
+    <div id="copy-current-checkbox-container"
+        style="display: flex; justify-content: space-between; align-items: center; margin-left: 10px;">
+        <input id="copy-current-checkbox" type="checkbox">
+        <div style="margin-left: 5px;">Copy current map</div>
+    </div>
+    <div class="modal-button-container">
+        <button id="new-timesheet-map-modal-cancel" onclick="toggleNewTimesheetMapModal(false)"
+            style="color: black;">Cancel</button>
+        <button id="new-timesheet-map-modal-create" onclick="toggleNewTimesheetMapModal(false, true)"
+            style="color: green">Create</button>
+        <button id="new-timesheet-map-modal-rename" onclick="toggleNewTimesheetMapModal(false, false, true)"
+            style="color: green; display: none;">Rename</button>
+    </div>
+</div>

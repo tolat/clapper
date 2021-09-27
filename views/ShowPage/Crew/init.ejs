@@ -5,7 +5,7 @@
         setWeekEnding()
 
     var _removeEditedField
-    var _multipliers=_show.positions.multipliers
+    var _multipliers=_show.weeks.find(w => w._id==_show.currentWeek).multipliers
     var _extraColumns=_week.crew.extraColumns
     var _totals={}
     var _currentWeekDays=getDaysOfCurrentWeek()

@@ -2,17 +2,41 @@
     // Global variables
     var _show= <%- JSON.stringify(show)%>;
     var _args= <%- JSON.stringify(args)%>;
+    setWeekEnding()
 
-    var _extraColumns=_show.purchases.extraColumns;
     var _validators=[];
     var _totals={};
+    var _currentMap=_show.timesheets.currentMap
+    var _currentMapObject=false
+    if (_currentMap) {
+        _currentMapObject=_show.timesheets.timesheetMaps.find(m => m.name==_currentMap)
+    }
+    const _currentWeekDays=getDaysOfCurrentWeek()
+
+    // Create list of unique hour multipliers
+    let _uniqueMuls=[]
+    for (mul in _week.multipliers) {
+        for (day of _currentWeekDays) {
+            let dayAbbrv=day.toString().slice(0, 3)
+            let mulVal=_week.multipliers[mul][dayAbbrv]
+            if (!_uniqueMuls.includes(mulVal)) {
+                _uniqueMuls.push(mulVal)
+            }
+        }
+    }
+
+    // Initlialize variable picker variables
+    let _variables=initializeVariables()
 
     var grid;
     var dataView;
 
     // Load the grid 
     async function onLoad() {
-        var sheets=[]//_show.timesheets.timesheetList;
+        var sheets=[]
+
+        // Add variable picker component to page
+        await addVariablePicker()
 
         // Set the week ending if the show has a current week ending
         if (_show.currentweekending) { _weekEnding=_show.currentweekending }
@@ -31,14 +55,30 @@
         await createSlickGrid(data, columns, options, _show, _args);
 
         // Apply display settings
-        // if (_show.purchases.displaySettings) { applyDisplaySettings(_show.purchases.displaySettings) }
+        if (_currentMapObject.displaySettings) { applyDisplaySettings(_currentMapObject.displaySettings) }
+
+        // Update Totals Row (use just to show week ending here)
+        await updateTotalsRow()
+
+        // Does nothing, here to placate my angry console
+        grid.recalculate=function () { }
+
+        if (!_currentMap) {
+            document.getElementById("copy-current-checkbox-container").style.display='none'
+            document.getElementById("new-timesheet-map-modal-cancel").style.display='none'
+            toggleNewTimesheetMapModal(true, true, false, 'Enter name for first timesheet map:')
+        } else {
+            // Load timesheet map values into grid
+            await initializeMap()
+            await populateOpenMapsModal()
+        }
     }
 
     // Creates grid data 
     function initializeData(purchases, _show, _args) {
         let data=[];
 
-        for (let i=1; i<=50; i++) {
+        for (let i=1; i<=100; i++) {
             data.push({ id: `${i}`, '#': i });
         }
 
@@ -47,12 +87,13 @@
 
     // Creates grid columns 
     function initializeColumns(purchases, _show, _args) {
-        let columns=[{ id: "#", name: " ", field: "#", width: 30, editor: Slick.Editors.Text, minWidth: 10, cssClass: 'spreadsheet-header', headerCssClass: 'spreadsheet-header' }];
-        let alphabet='abcdefghijklmnopqrstuvwxyz'.split('');
+        let columns=[{ id: "#", name: " ", field: "#", width: 30, minWidth: 10, cssClass: 'spreadsheet-header', headerCssClass: 'spreadsheet-header' }];
+        let alphabet='a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.aa.ab.ac.ad.ae.af.ag.ah.ai.aj.ak.al.am.an.ao.ap.aq.ar.as.at.au.av.aw.ax.ay.az.ba.bb.bc.bd.be.bf.bg.bh.bi.bj.bk.bl.bm.bn.bo.bp.bq.br.bs.bt.bu.bv.bw.bx.by.bz'.split('.')
         for (letter of alphabet) {
             l=letter.toUpperCase();
-            columns.push({ id: `${l}`, name: `${l}`, field: `${l}`, width: 80, editor: Slick.Editors.Text, minWidth: 50, headerCssClass: 'spreadsheet-header' });
+            columns.push({ id: `${l}`, name: `${l}`, field: `${l}`, width: 30, editor: Slick.Editors.LongText, minWidth: 50, headerCssClass: 'spreadsheet-header' });
         }
+
         return columns;
     }
 

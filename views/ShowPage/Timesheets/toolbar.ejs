@@ -6,15 +6,37 @@
         </button>
         <ul class="dropdown-menu grid-toolbar-dropdown" aria-labelledby="dropdownMenuButton1">
             <li><a class="dropdown-item" onclick="saveData()">Save</a></li>
+            <li><a class="dropdown-item"
+                    onclick="toggleNewTimesheetMapModal(true, true, false, 'Set name for new timesheet map:')">New</a>
+            </li>
+            <li><a class="dropdown-item" onclick="toggleOpenTimesheetMapModal(true)">Open/Delete</a></li>
+            <li><a class="dropdown-item"
+                    onclick="toggleNewTimesheetMapModal(true, false, true, 'Rename <%= show.timesheets.currentMap%> to:')">Rename</a>
+            </li>
+            <!-- <li><a class="dropdown-item"
+                    onclick="saveData(true, false, false, false,'<%=show.timesheets.currentMap%>')">Delete</a>
+            </li> -->
         </ul>
     </div>
-    <%- include('ShowPage/toolbarEditFeatures') %>
-        <div class="grid-toolbar-item" id="save-status"
-            style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
-            saved
-        </div>
-        <div class=" grid-toolbar-searchbar">
-            Filter:
-            <input id="textsearch" style="width: 150px; margin-left: 5px;">
-        </div>
+    <button type="button" onclick="undoCellEdit()" class="toolbar-icon"
+        style="background-image: url('/public/images/undo.png'); "></button>
+    <button type="button" onclick="redoCellEdit()" class="toolbar-icon"
+        style="background-image: url('/public/images/redo.png'); "></button>
+    <div class="grid-toolbar-item" id="save-status"
+        style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
+        saved
+    </div>
+    <button class="grid-toolbar-dropdown-button" id="generate-timesheets-button"
+        onclick="toggleGenerateTimesheetsModal(true)">
+        Generate Timesheets
+    </button>
+    <div class="grid-toolbar-item" id="timesheet-map-title-display">
+        Timesheet map:&nbsp; <b>
+            <%=show.timesheets.currentMap %>
+        </b>
+    </div>
+    <div class=" grid-toolbar-searchbar">
+        Filter:
+        <input id="textsearch" style="width: 150px; margin-left: 5px;">
+    </div>
 </div>

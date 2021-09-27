@@ -41,6 +41,17 @@ const seedShows=async () => {
                 _id: firstWeekId,
                 number: 1,
                 end: firstWeekEnd,
+                multipliers: {
+                    0: {
+                        Mon: 1,
+                        Tue: 1,
+                        Wed: 1,
+                        Thu: 1,
+                        Fri: 1,
+                        Sat: 1,
+                        Sun: 1
+                    }
+                },
                 crew: {
                     displaySettings: {},
                     extraColumns: [],
@@ -84,7 +95,6 @@ const seedShows=async () => {
                 extraColumns: [],
                 rentalColumns: [],
                 positionList: [],
-                multipliers: {}
             },
             costReport: {
                 displaySettings: {},
@@ -92,6 +102,25 @@ const seedShows=async () => {
                 estimateVersion: '100',
                 setNumberMap: {},
                 setExtraColumnMap: {},
+            },
+            timesheets: {
+                timesheetMaps: [{
+                    name: "Map1",
+                    cellValueMap: {
+                        "C": {
+                            "3": "Show-Name",
+                            "5": "Crew-Name"
+                        },
+                        "P": {
+                            "5": "Crew-Name",
+                        },
+                        "W": {
+                            "4": "Crew-Position-Rate"
+                        }
+                    },
+                    displaySettings: {},
+                }],
+                currentMap: "Map1"
             }
         })
 

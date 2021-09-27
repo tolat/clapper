@@ -82,7 +82,7 @@ isInCurrentWeek=(day, user) => {
     let dateMS=new Date(day).getTime()
     let weekEndMS=new Date(_week.end).getTime()
     if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
-        if (week.crew.crewList.find(c => c.username==user.username)) {
+        if (_week.crew.crewList.find(c => c.username==user.username)) {
             return true
         }
     }
@@ -105,7 +105,7 @@ calculateCosts=(item) => {
                 let week=findFirstContainingWeek(day, user)
                 // Only count day worked if it has the same set code as the item and it falls in a valid week 
                 if (recordPosition.daysWorked[day].set==item['Set Code']&&week) {
-                    let multipliers=_show.positions.multipliers;
+                    let multipliers=week.multipliers;
                     let hours=recordPosition.daysWorked[day].hours||0
                     let rate=position['Rate']
                     let dayOfWeek=new Date(day).toString().slice(0, 3);

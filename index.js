@@ -19,6 +19,7 @@ const mongoSanitize=require('express-mongo-sanitize')
 const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
 const MongoStore=require('connect-mongo')
+const fs=require('fs')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -59,8 +60,9 @@ const contentSecurityPolicy={
 }
 app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
-// const morgan=require('morgan');
-// app.use(morgan('dev'));
+// Morgan logger
+const morgan=require('morgan');
+app.use(morgan('dev'));
 
 // Session
 const secret=process.env.SECRET||'devsecret'
@@ -110,6 +112,13 @@ app.use('/createAccount', createAccountRoutes);
 app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
+
+// Download from uploads folder route
+app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
+    let filepath=path.join(__dirname, `uploads/${req.params.filename}`)
+    const file=await fs.readFileSync(filepath)
+    res.send(file)
+})
 
 // Logout route
 app.get('/logout', isLoggedIn, (req, res) => {

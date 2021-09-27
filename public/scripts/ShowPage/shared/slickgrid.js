@@ -18,6 +18,7 @@ var _prevDepartmentOrder
 var _overrideBlankRFSWarning=false
 var _headerDblCLick=false
 var _colSortMap={}
+var _userYesNo=true
 
 // Edit History Buffer
 var undoRedoBuffer={
@@ -40,12 +41,14 @@ var formatter=new Intl.NumberFormat('en-US', {
 // Creates a slick grid with parameters
 createSlickGrid=(data, columns, options) => {
     // Add 5 blank rows at end of grid
-    data.push(...[
-        { id: 'empty_0', editedfields: [] },
-        { id: 'empty_1', editedfields: [] },
-        { id: 'empty_2', editedfields: [] },
-        { id: 'empty_3', editedfields: [] },
-        { id: 'empty_4', editedfields: [] }])
+    if (!data[0]) {
+        data.push(...[
+            { id: 'empty_0', editedfields: [] },
+            { id: 'empty_1', editedfields: [] },
+            { id: 'empty_2', editedfields: [] },
+            { id: 'empty_3', editedfields: [] },
+            { id: 'empty_4', editedfields: [] }])
+    }
 
     // Set server
     server=_args.server;
@@ -380,17 +383,20 @@ createSlickGrid=(data, columns, options) => {
     // Set Week Ending 
     setWeekEnding();
 
-    // Add listener to add rows input
-    createAddRowListener();
+    // No toolbar edit features if in timesheets section
+    if (_args.section!='Timesheets') {
+        // Add listener to add rows input
+        createAddRowListener();
 
-    // Add listener to group by input 
-    createGroupByListener();
+        // Add listener to group by input 
+        createGroupByListener();
 
-    // Add listener to auto-number input 
-    createAutoNumberListener();
+        // Add listener to auto-number input 
+        createAutoNumberListener();
 
-    // Add listener to frozen-columns input 
-    createFrozenColumnsListener();
+        // Add listener to frozen-columns input 
+        createFrozenColumnsListener();
+    }
 
     // Initialize prev variables
     _prevColumns=grid.getColumns()
@@ -1866,7 +1872,7 @@ toggleWeekEndingModal=(show) => {
 
 changeWeek=async (weekNum, weekEnd=false, isNewWeek=false, copyCrewFrom='current') => {
     if (weekNum==_week.number&&!isNewWeek&&_deletedWeek!=_week._id) { return }
-    if (['Crew', 'Rentals', 'CostReport', 'Purchases', 'Rates'].includes(_args.section)) {
+    if (['Crew', 'Rentals', 'CostReport', 'Purchases', 'Rates', 'Timesheets'].includes(_args.section)) {
         _newWeek={ number: weekNum, end: weekEnd, isNewWeek: isNewWeek, copyCrewFrom: copyCrewFrom }
 
         console.log(`changing to week ${weekNum}`)
@@ -2376,6 +2382,7 @@ zeroNanToNull=(val) => {
 
 // Hide and show the loading screen with spinner and message 'msg'
 toggleLoadingScreen=(show, msg='Loading...') => {
+
     if (show) {
         document.getElementById('grid-modal-container').style.display='flex';
         if (!document.getElementById('loading-spinner')) {
@@ -2719,7 +2726,7 @@ selectRow=() => {
 
 // Validator for modal inputs
 validateModalInput=(e, type) => {
-    let navKeys=['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight']
+    let navKeys=['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight', 'Tab']
 
     // Integer Validator
     if (type=='integer'&&!navKeys.includes(e.key)) {
@@ -2735,5 +2742,21 @@ validateModalInput=(e, type) => {
             e.target.value=zeroNanToNull(parseFloat(e.target.value+e.key))||''
             e.preventDefault()
         }
+    }
+}
+
+// Check if use wants to save before reloading
+toggleCheckYesNoModal=(show, message) => {
+    // Hide Modal
+    if (!show) {
+        document.getElementById('grid-modal-container').style.display=null;
+        document.getElementById('check-yes-no-modal').style.display=null;
+        grid.focus()
+    }
+    // Show modal
+    else {
+        document.getElementById('grid-modal-container').style.display='flex';
+        document.getElementById('save-check-modal').style.display='flex';
+        document.getElementById('check-yes-no-modal-message').innerText=message;
     }
 }

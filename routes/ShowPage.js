@@ -4,12 +4,15 @@ const tryCatch=require('../utils/tryCatch')
 const ExpressError=require('../utils/ExpressError')
 const { isLoggedIn, isShowOwner }=require('../utils/customMiddleware')
 const sanitizeHtml=require('sanitize-html')
+const ExcelJS=require('exceljs')
+const fs=require('fs')
+const multer=require('multer')
+const upload=multer({ dest: 'uploads/' })
 
 const router=express.Router({ mergeParams: true })
 
 const { populateShow }=require('../utils/schemaUtils')
 const { genUniqueId }=require('../utils/numberUtils')
-const fs=require('fs')
 
 const Show=require('../models/show')
 const User=require('../models/user')
@@ -66,13 +69,14 @@ router.get('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
             args.reloadOnWeekChange=true;
             args.showCrew=await getAllCrewUsers(await getAllCrewIDs(show._id.toString()))
             break;
+        case 'Timesheets':
+            break;
     }
 
     let sharedModals=[]
     let pageModals=[]
 
-
-    // Get shared and page-specific modals to include in rendered template
+    // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error
     try {
         sharedModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/SharedModals`));
         pageModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/${section}/Modals`));
@@ -105,6 +109,18 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
     catch (e) {
         res.send({ message: `${e.message}\n\n${e.stack}` })
     }
+}))
+
+// Put route for uplaoding new timesheet templates
+router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, next) => {
+    let show=await populateShow(req.params.id)
+    let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
+    let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
+
+    let filepath=await path.join(__dirname, `../${req.file.path}`)
+    await fs.rename(filepath, filepath+'.xlsx', (e) => { if (e) { console.log(e.message) } })
+    await generateTimesheets(show, cellValueMap, filepath+'.xlsx', week)
+    res.send({ file: req.file, body: req.body })
 }))
 
 module.exports=router;
@@ -223,6 +239,17 @@ async function createWeek(body, show, newWeekId) {
         newWeek._id=newWeekId
         newWeek.number=body.newWeek.number
         newWeek.end=body.newWeek.end
+        newWeek.multipliers={
+            0: {
+                Mon: 1,
+                Tue: 1,
+                Wed: 1,
+                Thu: 1,
+                Fri: 1,
+                Sat: 1,
+                Sun: 1
+            }
+        }
 
         show.currentWeek=newWeekId
         await show.weeks.push(newWeek)
@@ -303,7 +330,7 @@ async function getAllCrewUsers(IDlist) {
 
 
 
-/* ESTIMATE FUNCTIONS */
+/* SHOW PAGE FUNCTIONS */
 
 // Delete Estimate Version
 deleteEstimate=async function (body, showId) {
@@ -532,11 +559,6 @@ function getDepartmentKeys(show) {
     }
     return keys;
 }
-
-
-
-
-/* CREW, RENTALS & PURCHASES FUNCTIONS */
 
 // Update crew
 updateCrew=async function (body, showId) {
@@ -876,11 +898,6 @@ updatePurchases=async function (body, showId) {
     return {}
 }
 
-
-
-
-/* RATES FUNCTIONS */
-
 // Update rates
 updateRates=async function (body, showId) {
     let show=await Show.findById(showId)
@@ -896,8 +913,8 @@ updateRates=async function (body, showId) {
     show.markModified('positions.extraColumns');
 
     // Set multipliers
-    show.positions.multipliers=body.multipliers;
-    show.markModified('positions.multipliers');
+    show.weeks.find(w => w._id.toString()==show.currentWeek).multipliers=body.multipliers;
+    show.markModified('weeks');
 
     // Create new id if new week is being created
     const newWeekId=genUniqueId()
@@ -963,11 +980,6 @@ updateRates=async function (body, showId) {
     return {};
 }
 
-
-
-
-/* COST REPORT FUNCTIONS */
-
 // Update Cost Report
 updateCostReport=async function (body, showId) {
     let show=await Show.findById(showId).populate('sets');
@@ -1025,5 +1037,243 @@ updateCostReport=async function (body, showId) {
     return { success: true }
 }
 
+// Update Timesheets
+updateTimesheets=async function (body, showId) {
+    let messages=[]
+    let show=await populateShow(showId)
+    let currentMap=await show.timesheets.timesheetMaps.find(m => m.name==show.timesheets.currentMap)
+
+    if (show.timesheets.currentMap) {
+        // Parse value map from grid and save new map values
+        currentMap.cellValueMap=await parseValueMap(body.data)
+        show.markModified('timesheets.timesheetMaps')
+
+        // Save display settings to show
+        currentMap.displaySettings=body.displaySettings;
+        show.markModified('timesheets.timesheetMaps');
+    }
+
+    await show.save()
+
+    // Create new map, either copying current map or blank new map
+    if (body.newMapName) {
+        if (body.isNewMap) {
+            let newMap={}
+            if (body.copyCurrentMap) {
+                newMap=JSON.parse(JSON.stringify(currentMap))
+                newMap.name=body.newMapName
+            } else {
+                newMap={
+                    cellValueMap: {},
+                    displaySettings: {},
+                    extraColumns: [],
+                    name: body.newMapName
+                }
+            }
+            show.timesheets.timesheetMaps.push(newMap)
+        } else {
+            currentMap.name=body.newMapName
+        }
+        show.timesheets.currentMap=body.newMapName
+        show.markModified('timesheets.timesheetMaps')
+        await show.save()
+    }
+
+    // Delete map with name newMapName
+    if (body.deleteMap) {
+        const map=await show.timesheets.timesheetMaps.find(m => m.name==body.deleteMap)
+        show.timesheets.timesheetMaps.splice(show.timesheets.timesheetMaps.indexOf(map), 1)
+        if (show.timesheets.currentMap==body.deleteMap) {
+            if (show.timesheets.timesheetMaps[0]) {
+                show.timesheets.currentMap=show.timesheets.timesheetMaps[0].name
+            } else {
+                show.timesheets.currentMap=null
+            }
+        }
+        show.markModified('timesheets.timesheetMaps')
+        await show.save()
+    }
+
+    // Set current map as newMapName if opening a new map
+    if (body.openMap) {
+        show.timesheets.currentMap=body.openMap
+        show.markModified('timesheets')
+        await show.save()
+    }
+
+    // Create new week if required
+    if (body.newWeek) {
+        await createWeek(body, show, genUniqueId())
+    }
+
+    // Delete all records for deleted week if required
+    if (body.deletedWeek) {
+        await deleteWeek(body.deletedWeek, show, body.weeks)
+    }
+
+    return { messages: messages }
+}
+
+// Parse cell-value map for timesheet generation from slickgrid data
+parseValueMap=(items) => {
+    let cellValueMap={}
+    let sheetCols='a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.aa.ab.ac.ad.ae.af.ag.ah.ai.aj.ak.al.am.an.ao.ap.aq.ar.as.at.au.av.aw.ax.ay.az.ba.bb.bc.bd.be.bf.bg.bh.bi.bj.bk.bl.bm.bn.bo.bp.bq.br.bs.bt.bu.bv.bw.bx.by.bz'.split('.').map(x => { return x.toUpperCase() })
+
+    // ADD EXTRA COLUMN VALUES HERE
+
+    for (item of items) {
+        for (col of sheetCols) {
+            if (item[col]) {
+                if (!cellValueMap[col]) { cellValueMap[col]={} }
+                cellValueMap[col][item.id]=item[col]
+            }
+        }
+    }
+
+    return cellValueMap
+}
+
+// Generate timesheets using the file at filepath as the template workbook
+generateTimesheets=async function (show, valueMap, filepath, week) {
+    // Set filepath and get timesheet template workbook
+    let workbook=new ExcelJS.Workbook()
+    // Just here to make sure file exists before trying to read it using workbook.xlsx.readfile
+    await fs.readFileSync(filepath)
+
+    await workbook.xlsx.readFile(filepath)
+    let sheet=workbook.worksheets[0]
+    let currentWeekDays=getDaysOfWeekEnding(week.end)
+    const oneDay=24*60*60*1000;
+
+    function isInCurrentWeek(day, user) {
+        let dateMS=new Date(day).getTime()
+        let weekEndMS=new Date(week.end).getTime()
+        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
+            if (week.crew.crewList.find(c => c.username==user.username)) {
+                return true
+            }
+        }
+    }
+
+    // Create worksheet copies
+    for (user of week.crew.crewList) {
+        let record=user.showrecords.find(r => r.showid==show._id.toString())
+        for (pos of record.positions) {
+            // Make sure sheet name is under 31 chars (excel limitation)
+            let sheetName=`${user.username} - ${pos.code}`
+            if (sheetName.length>31) {
+                console.log('handling name > 31 chars')
+
+                let postAt=sheetName.slice(sheetName.indexOf('@'))
+                let preAt=sheetName.slice(0, sheetName.indexOf('@'))
+                let overshoot=sheetName.length-28
+                preAt='('+preAt.slice(0, preAt.length-overshoot-1)+')'
+                let newName=preAt.concat(postAt)
+                sheetName=newName
+            }
+
+
+            let newSheet=workbook.addWorksheet(sheetName)
+
+            // Save sheetName in position for use when populating values
+            pos.sheetName=sheetName
+
+            // Copy base sheet fields that don't throw error
+            for (key of Object.keys(sheet)) {
+                try { Object.assign(newSheet[`${key}`], sheet[`${key}`]) } catch (e) { }
+            }
+            // Copy base sheet column widths
+            for (let i=0; i<sheet._columns.length; i++) {
+                newSheet.getColumn(i+1).width=sheet._columns[i].width
+            }
+        }
+    }
+
+    // Reload workbook after saving worksheet copies
+    await workbook.xlsx.writeFile(filepath)
+    await workbook.xlsx.readFile(filepath)
+
+    // Populate worksheet copies with data
+    for (user of week.crew.crewList) {
+        let record=user.showrecords.find(r => r.showid==show._id.toString())
+
+        for (pos of record.positions) {
+            let position=show.positions.positionList.find(p => p.Code==pos.code)
+
+            let sheet=await workbook.getWorksheet(pos.sheetName)
+
+            // Create list of unique multipliers for this week
+            let uniqueMuls=[0]
+            for (mul in week.multipliers) {
+                for (day of currentWeekDays) {
+                    let dayAbbrv=day.toString().slice(0, 3)
+                    let mulVal=week.multipliers[mul][dayAbbrv]
+                    if (!uniqueMuls.includes(mulVal)) {
+                        uniqueMuls.push(mulVal)
+                    }
+                }
+            }
+
+            // Create map of all multiplier values to hours worked in that interval
+            let mulHoursMap={}
+            let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(new Date(dw), user))
+            for (day of posDays) {
+                let weekDay=new Date(day).toDateString('en-US').slice(0, 3)
+                let hours=pos.daysWorked[day].hours
+                let mulKeys=Object.keys(week.multipliers)
+
+                for (let i=0; i<mulKeys.length; i++) {
+                    let mul=week.multipliers[mulKeys[i]][weekDay]
+                    let mulHours=0
+                    if (hours>mulKeys[i]) {
+                        mulHours=hours-mulKeys[i]
+                    }
+                    if (mulKeys[i+1]&&hours>mulKeys[i+1]) {
+                        mulHours=mulKeys[i+1]-mulKeys[i]
+                    }
+
+                    mulHoursMap[`${weekDay}-Hours-${mul}x`]=mulHours
+                }
+                mulHoursMap[`${weekDay}-Hours-Total`]=hours
+            }
+
+            // Assign variable values to cells in spreadsheet
+            for (col in valueMap) {
+                for (row in valueMap[col]) {
+                    let cell=`${col}:${row}`
+                    let value=valueMap[col][row]
+
+                    // Load basic variables into spreadsheet
+                    switch (value) {
+                        case 'Show-Name':
+                            sheet.getCell(cell).value=show.Name
+                            break;
+                        case 'Crew-Name':
+                            sheet.getCell(cell).value=user.Name
+                            break;
+                        case 'Crew-Phone':
+                            sheet.getCell(cell).value=user.Phone
+                            break;
+                        case 'Crew-Position':
+                            sheet.getCell(cell).value=pos.code
+                            break;
+                        case 'Crew-Position-Rate':
+                            sheet.getCell(cell).value=position.Rate
+                            break;
+                    }
+
+                    // Load hour variable values into spreadsheet
+                    if (Object.keys(mulHoursMap).includes(value)) {
+                        let val=mulHoursMap[value]
+                        if (isNaN(val)) { val=0 }
+                        sheet.getCell(cell).value=val
+                    }
+                }
+            }
+        }
+    }
+
+    await workbook.xlsx.writeFile(filepath)
+}
 
 

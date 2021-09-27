@@ -24,7 +24,6 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     const show=await new Show(req.body.show)
     show.departments=show.departments.filter(d => d!='')
     show.estimateVersions={}
-    show.positions.multipliers={}
     show.currentWeek=genUniqueId()
     show.departmentColorMap={}
     show.owner=req.user.username
@@ -33,6 +32,17 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
         _id: show.currentWeek,
         end: new Date(req.body.show.firstweekending+'T07:00'),
         number: 1,
+        multipliers: {
+            0: {
+                Mon: 1,
+                Tue: 1,
+                Wed: 1,
+                Thu: 1,
+                Fri: 1,
+                Sat: 1,
+                Sun: 1
+            }
+        },
         crew: {
             crewList: [],
             displaySettings: {},
@@ -47,6 +57,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
         }
     }
 
+    show.timesheets.currentMap=false
     show.weeks.push(newWeek)
     show.markModified('weeks')
     await show.save()

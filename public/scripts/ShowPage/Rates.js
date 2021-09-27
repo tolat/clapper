@@ -181,11 +181,19 @@ loadMultipliersModal=() => {
 
     // Add Multiplier Rows
     for (m of mRowKeys) {
-        mRows.innerHTML+=`
+        if (m==0) {
+            mRows.innerHTML+=`
+            <tr id='${m}'>
+            <th class='delete-multiplier-button' onclick=''></th>
+            <td scope="row"><b>${m}<b></td>
+        </tr>`
+        } else {
+            mRows.innerHTML+=`
         <tr id='${m}'>
             <th class='delete-multiplier-button' onclick='deleteMultiplier(${m})'>delete</th>
             <td scope="row"><b>${m}<b></td>
         </tr>`
+        }
     }
 
     // Populate table with multiplier data
