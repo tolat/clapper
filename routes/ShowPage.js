@@ -113,6 +113,8 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
 
 // Put route for uplaoding new timesheet templates
 router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, next) => {
+    console.log('RECEIVED PUT REQUEST')
+    console.log(req)
     let show=await populateShow(req.params.id)
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
