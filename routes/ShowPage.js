@@ -119,6 +119,18 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
 
     let filepath=await path.join(__dirname, `../${req.file.path}`)
     await fs.rename(filepath, filepath+'.xlsx', (e) => { if (e) { console.log(e.message) } })
+
+    // Make sure uploaded excel file exists before trying to generate timesheets
+    let fileCreated=false
+    while (!fileCreated) {
+        try {
+            await fs.readFileSync(filepath)
+            fileCreated=true
+        } catch (e) {
+            continue
+        }
+    }
+
     await generateTimesheets(show, cellValueMap, filepath+'.xlsx', week)
     res.send({ file: req.file, body: req.body })
 }))
@@ -1137,8 +1149,6 @@ parseValueMap=(items) => {
 generateTimesheets=async function (show, valueMap, filepath, week) {
     // Set filepath and get timesheet template workbook
     let workbook=new ExcelJS.Workbook()
-    // Just here to make sure file exists before trying to read it using workbook.xlsx.readfile
-    await fs.readFileSync(filepath)
 
     await workbook.xlsx.readFile(filepath)
     let sheet=workbook.worksheets[0]
@@ -1154,8 +1164,6 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
             }
         }
     }
-
-    console.log('TRACING 1')
 
     // Create worksheet copies
     for (user of week.crew.crewList) {
@@ -1174,19 +1182,15 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
                 sheetName=newName
             }
 
-            console.log(sheetName)
-
             let newSheet=workbook.addWorksheet(sheetName)
 
             // Save sheetName in position for use when populating values
             pos.sheetName=sheetName
 
-
             // Copy base sheet fields that don't throw error
             for (key of Object.keys(sheet)) {
                 try { Object.assign(newSheet[`${key}`], sheet[`${key}`]) } catch (e) { }
             }
-
 
             // Copy base sheet column widths
             for (let i=0; i<sheet._columns.length; i++) {
@@ -1195,16 +1199,9 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
-    console.log('TRACING 2')
-
-
     // Reload workbook after saving worksheet copies
     await workbook.xlsx.writeFile(filepath)
-    console.log('TRACING 3')
-
     await workbook.xlsx.readFile(filepath)
-    console.log('TRACING 4')
-
 
     // Populate worksheet copies with data
     for (user of week.crew.crewList) {
@@ -1286,12 +1283,13 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
-    console.log('TRACING 5')
-
-
+    console.log('TRACING 1')
+    console.log(`TOTAL MEMORY: ${Math.round((process.memoryUsage().heapTotal/1024/1024)*100)/100}`)
+    console.log(`TOTAL USED: ${Math.round((process.memoryUsage().heapUsed/1024/1024)*100)/100}`)
     await workbook.xlsx.writeFile(filepath)
-
-    console.log('TRACING 6')
+    console.log(`TOTAL MEMORY: ${Math.round((process.memoryUsage().heapTotal/1024/1024)*100)/100}`)
+    console.log(`TOTAL USED: ${Math.round((process.memoryUsage().heapUsed/1024/1024)*100)/100}`)
+    console.log('TRACING 2')
 }
 
 
