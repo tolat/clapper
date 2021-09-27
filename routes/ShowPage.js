@@ -1290,6 +1290,8 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
 
 
     await workbook.xlsx.writeFile(filepath)
+
+    console.log('TRACING 6')
 }
 
 
