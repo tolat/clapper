@@ -113,8 +113,6 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
 
 // Put route for uplaoding new timesheet templates
 router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, next) => {
-    console.log('RECEIVED PUT REQUEST')
-    console.log(req)
     let show=await populateShow(req.params.id)
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
@@ -1157,6 +1155,8 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
+    console.log('TRACING 1')
+
     // Create worksheet copies
     for (user of week.crew.crewList) {
         let record=user.showrecords.find(r => r.showid==show._id.toString())
@@ -1174,16 +1174,20 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
                 sheetName=newName
             }
 
+            console.log(sheetName)
 
             let newSheet=workbook.addWorksheet(sheetName)
 
             // Save sheetName in position for use when populating values
             pos.sheetName=sheetName
 
+
             // Copy base sheet fields that don't throw error
             for (key of Object.keys(sheet)) {
                 try { Object.assign(newSheet[`${key}`], sheet[`${key}`]) } catch (e) { }
             }
+
+
             // Copy base sheet column widths
             for (let i=0; i<sheet._columns.length; i++) {
                 newSheet.getColumn(i+1).width=sheet._columns[i].width
@@ -1191,9 +1195,16 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
         }
     }
 
+    console.console.log('TRACING 2')
+
+
     // Reload workbook after saving worksheet copies
     await workbook.xlsx.writeFile(filepath)
+    console.console.log('TRACING 3')
+
     await workbook.xlsx.readFile(filepath)
+    console.console.log('TRACING 4')
+
 
     // Populate worksheet copies with data
     for (user of week.crew.crewList) {
@@ -1274,6 +1285,9 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
             }
         }
     }
+
+    console.console.log('TRACING 5')
+
 
     await workbook.xlsx.writeFile(filepath)
 }
