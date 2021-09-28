@@ -24,6 +24,7 @@ getGroupAggregators=() => {
     return aggregators;
 }
 
+// Hide and show generate timesheets modal
 toggleGenerateTimesheetsModal=(show, generate=false) => {
     if (show) {
         // Show Modal
@@ -40,7 +41,8 @@ toggleGenerateTimesheetsModal=(show, generate=false) => {
     }
 }
 
-generateTimesheets=async () => {
+// Generate timesheets through put request to server =>
+generateTimesheets=() => {
     let template=document.getElementById('timesheet-template-selection').files[0]
     let data=new FormData()
     data.append('file', template)
@@ -51,21 +53,39 @@ generateTimesheets=async () => {
 
     toggleLoadingScreen(true, 'Generating...')
 
+    let checkGenerationInterval
+    let downloadPath
+    console.log('sending put request')
+
     // Post estimate data and version to server
     fetch(server+`shows/${_show._id}/Timesheets`, {
         method: 'PUT',
         body: data,
     }).then(response => { return response.json() })
         .then(responseData => {
-            toggleLoadingScreen(false)
-            downlaodTimesheets(responseData)
+            downloadPath=responseData.file.path
+            // Check evey 500 ms to see if generation is done
+            checkGenerationInterval=setInterval(() => {
+                fetch(server+`checkgenerated/${responseData.file.filename}`, { method: 'GET' })
+                    .then(response => { return response.json() })
+                    .then(responseData => {
+                        // If timesheets generated then download the .xlsx file from server
+                        if (responseData.generated) {
+                            toggleLoadingScreen(true, 'Done!')
+                            setTimeout(toggleLoadingScreen(false), 500)
+                            downloadTimesheets(downloadPath)
+                            window.clearInterval(checkGenerationInterval)
+                        }
+                    })
+            }, 1000);
         })
 }
 
-function downlaodTimesheets(data) {
+// Downlaod timesheets from server
+function downloadTimesheets(path) {
     let downloadElt=document.createElement('div')
     downloadElt.style.diplay='none'
-    downloadElt.innerHTML=`<a id="download-link" href="/${data.file.path}.xlsx" download></a>`
+    downloadElt.innerHTML=`<a id="download-link" href="/${path}.xlsx" download></a>`
     document.body.appendChild(downloadElt)
     document.getElementById('download-link').click()
     downloadElt.parentElement.removeChild(downloadElt)
@@ -151,6 +171,7 @@ saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteM
     }
 }
 
+// add variable picker to grid
 addVariablePicker=() => {
     document.getElementById('grid-footer-totals-container').style.display='none'
 
@@ -230,6 +251,7 @@ initializeVariables=() => {
     return variables
 }
 
+// Assign variable picker variable to grid cell
 assignVariable=(varName) => {
     if (!_contextCell) { return }
 
@@ -246,6 +268,7 @@ assignVariable=(varName) => {
 
 }
 
+// Execute ^
 function executeAssignVariable() {
     let item=dataView.getItemById(dataView.mapRowsToIds([this.row])[0])
     item[grid.getColumns()[this.cell].field]=this.varName
@@ -254,6 +277,7 @@ function executeAssignVariable() {
     grid.focus()
 }
 
+// Undo ^
 function undoAssignVariable() {
     let item=dataView.getItemById(dataView.mapRowsToIds([this.row])[0])
     item[grid.getColumns()[this.cell].field]=this.prevVal
@@ -262,6 +286,7 @@ function undoAssignVariable() {
     grid.focus()
 }
 
+// Initialize timesheet map using timesheet map's currentMap object
 initializeMap=() => {
     let map=_show.timesheets.timesheetMaps.find(m => m.name==_show.timesheets.currentMap)
     for (col in map.cellValueMap) {
@@ -275,6 +300,7 @@ initializeMap=() => {
     }
 }
 
+// Hide/show new timesheet map modal
 toggleNewTimesheetMapModal=(show, createMap=false, renameMap=false, message) => {
     // Hide Modal
     if (!show) {
@@ -314,6 +340,7 @@ toggleNewTimesheetMapModal=(show, createMap=false, renameMap=false, message) => 
     }
 }
 
+// Hide/show open timesheet map modal
 toggleOpenTimesheetMapModal=(show, openName=false) => {
     // Hide Modal
     if (!show) {
@@ -334,6 +361,7 @@ toggleOpenTimesheetMapModal=(show, openName=false) => {
     }
 }
 
+// Populate open maps modal with names of all timesheet maps
 populateOpenMapsModal=() => {
     const tsCont=document.getElementById("open-timesheet-map-list-container")
     tsCont.innerHTML=null

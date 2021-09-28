@@ -131,12 +131,12 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
         }
     }
 
-    await generateTimesheets(show, cellValueMap, filepath+'.xlsx', week)
+    // Do not await  - client will poll server to see if generation is complete
+    generateTimesheets(show, cellValueMap, filepath+'.xlsx', week, req.file.filename)
     res.send({ file: req.file, body: req.body })
 }))
 
 module.exports=router;
-
 
 
 /* SHARED FUNCTIONS */
@@ -1146,7 +1146,7 @@ parseValueMap=(items) => {
 }
 
 // Generate timesheets using the file at filepath as the template workbook
-generateTimesheets=async function (show, valueMap, filepath, week) {
+generateTimesheets=async function (show, valueMap, filepath, week, filename) {
     // Set filepath and get timesheet template workbook
     let workbook=new ExcelJS.Workbook()
 
@@ -1282,6 +1282,7 @@ generateTimesheets=async function (show, valueMap, filepath, week) {
     }
 
     await workbook.xlsx.writeFile(filepath)
+    global.generatedTimesheets.push(filename)
 }
 
 

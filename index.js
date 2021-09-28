@@ -61,8 +61,8 @@ const contentSecurityPolicy={
 app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
 // Morgan logger
-const morgan=require('morgan');
-app.use(morgan('dev'));
+// const morgan=require('morgan');
+// app.use(morgan('dev'));
 
 // Session
 const secret=process.env.SECRET||'devsecret'
@@ -113,10 +113,24 @@ app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 
-// Download from uploads folder route
+// Check timesheets for file have been generated
+global.generatedTimesheets=[]
+app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
+    // Tell client if timesheets for :filename have been generated
+    if (global.generatedTimesheets.includes(req.params.filename)) {
+        res.send({ generated: true })
+    } else {
+        res.send({ generated: false })
+    }
+})
+
+// Download file from uploads folder route
 app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
     let filepath=path.join(__dirname, `uploads/${req.params.filename}`)
     const file=await fs.readFileSync(filepath)
+    if (!file) {
+        res.send()
+    }
     res.send(file)
 })
 
