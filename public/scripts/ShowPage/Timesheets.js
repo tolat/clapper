@@ -71,8 +71,9 @@ generateTimesheets=() => {
                     .then(responseData => {
                         // If timesheets generated then download the .xlsx file from server
                         if (responseData.generated) {
+                            toggleLoadingScreen(false)
                             toggleLoadingScreen(true, 'Done!')
-                            setTimeout(toggleLoadingScreen(false), 500)
+                            setTimeout(toggleLoadingScreen(false), 1000)
                             downloadTimesheets(downloadPath)
                             window.clearInterval(checkGenerationInterval)
                         }

@@ -128,10 +128,8 @@ app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
 app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
     let filepath=path.join(__dirname, `uploads/${req.params.filename}`)
     const file=await fs.readFileSync(filepath)
-    if (!file) {
-        res.send()
-    }
     res.send(file)
+    fs.unlinkSync(filepath)
 })
 
 // Logout route
