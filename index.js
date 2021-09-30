@@ -20,6 +20,7 @@ const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
 const MongoStore=require('connect-mongo')
 const fs=require('fs')
+const { allowAnyAccessOrigin }=require('./utils/customMiddleware')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -95,6 +96,9 @@ app.use((req, res, next) => {
     res.locals.currentUser=req.user
     next()
 })
+
+// Allow any access origin
+app.use(allowAnyAccessOrigin())
 
 // Routers
 const loginRoutes=require('./routes/login');

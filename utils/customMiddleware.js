@@ -22,3 +22,8 @@ module.exports.isShowOwner=async (req, res, next) => {
     }
     next()
 }
+
+module.exports.allowAnyAccessOrigin=(req, res, next) => {
+    req.set('Access-Control-Allow-Origin', '*')
+    next()
+}
