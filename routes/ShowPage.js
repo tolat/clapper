@@ -131,7 +131,12 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
         }
     }
 
-    // Do not await  - client will poll server to see if generation is complete
+    // vv QUEUE TIMESHSEET GENERATION TO REDIS SERVER IF IN PRODUCTION MODE vv
+    if (NODE_ENV=='develop_local') {
+        // process on this server
+    } else {
+        // queue for worker
+    }
     generateTimesheets(show, cellValueMap, filepath+'.xlsx', week, req.file.filename)
     res.send({ file: req.file, body: req.body })
 }))
@@ -1046,7 +1051,7 @@ updateCostReport=async function (body, showId) {
         await deleteWeek(body.deletedWeek, show, body.weeks)
     }
 
-    return { success: true }
+    return { messsage: 'testing response data reader...' }
 }
 
 // Update Timesheets
