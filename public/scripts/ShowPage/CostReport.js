@@ -241,9 +241,9 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
             }
         })
     })
-        .then(response => { return response.json(); })
+        .then(response => { console.log(response); return response.json(); })
         .then(responseData => {
-            console.log(responseData)
+
             if (reload) { location.reload() }
             else {
                 // Update saveStatus
