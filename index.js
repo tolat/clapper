@@ -75,11 +75,9 @@ const sessionConfig={
     //secure: true,
     secret: secret,
     resave: false,
-    proxy: true, // add this line
     saveUninitialized: true,
     expires: Date.now()+1000*60*60*24
 }
-app.enable('trust proxy'); // add this line
 app.use(session(sessionConfig));
 
 // Passport
