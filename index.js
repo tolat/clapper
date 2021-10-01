@@ -98,10 +98,7 @@ app.use((req, res, next) => {
     next()
 })
 
-// Allow any access origin
-// app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
-
-// Enable CORS
+// Enable CORS for all origins
 app.use(cors())
 
 // Routers
