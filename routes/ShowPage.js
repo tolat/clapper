@@ -104,7 +104,8 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
         // Sanitize incoming data
         req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
         let responseData=await global[`update${req.params.section}`](req.body, req.params.id);
-        res.json({ data: responseData })
+        console.log(`***********************************\n\n\n\n ${responseData.message} \n\n\n\n ************************************`)
+        res.send(responseData)
     }
     catch (e) {
         res.send({ message: `${e.message}\n\n${e.stack}` })
@@ -1051,7 +1052,7 @@ updateCostReport=async function (body, showId) {
         await deleteWeek(body.deletedWeek, show, body.weeks)
     }
 
-    return { messsage: 'testing response data reader...' }
+    return { message: 'testing response data reader...' }
 }
 
 // Update Timesheets
