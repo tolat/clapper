@@ -21,6 +21,7 @@ const dbUrl=process.env.DB_URL
 const MongoStore=require('connect-mongo')
 const fs=require('fs')
 const { allowAnyAccessOrigin }=require('./utils/customMiddleware')
+const cors=require('cors')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -98,7 +99,10 @@ app.use((req, res, next) => {
 })
 
 // Allow any access origin
-app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
+// app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
+
+// Enable CORS
+app.use(cors())
 
 // Routers
 const loginRoutes=require('./routes/login');
