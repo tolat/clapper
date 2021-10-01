@@ -3,7 +3,6 @@ const myCustomJoi=Joi.extend(require('joi-phone-number'));
 const ExpressError=require('../utils/ExpressError');
 
 module.exports.joiValidate=(schema) => {
-    console.log('in validation function');
     return (req, res, next) => {
         const { error }=schema.validate(req.body);
         if (error) {
