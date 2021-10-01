@@ -108,7 +108,6 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
         res.send(responseData)
     }
     catch (e) {
-        console.log("\n\n\nshow page response error\n\n\n")
         res.send({ message: `${e.message}\n\n${e.stack}` })
     }
 }))
