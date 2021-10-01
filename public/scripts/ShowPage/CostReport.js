@@ -239,7 +239,8 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
                 setHiddenColumns: getHiddenColumns(),
                 setFrozenColumns: _frozenColumns,
             }
-        })
+        }),
+        withCredentials: true
     })
         .then(response => { return response.text(); })
         .then(responseData => {
