@@ -216,7 +216,7 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
         return
     }
 
-    // Grey screen if reloading since the save can take some time
+    // Grey screen if reloading 
     if (reload) { toggleLoadingScreen(true) }
 
     // Post estimate data and version to server
