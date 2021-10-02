@@ -105,7 +105,7 @@ const corsOptions={
 }
 app.use(cors(corsOptions))
 
-app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
+//app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
 
 // Routers
 const loginRoutes=require('./routes/login');
