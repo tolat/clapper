@@ -79,8 +79,9 @@ generateTimesheets=() => {
                             setTimeout(toggleLoadingScreen(false), 1000)
                             downloadTimesheets(downloadPath)
                             window.clearInterval(checkGenerationInterval)
+                        } else {
+                            console.log("not ready...")
                         }
-                        console.log("note ready...")
                     })
             }, 1000);
         })
