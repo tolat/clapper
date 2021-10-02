@@ -18,7 +18,7 @@ const { isLoggedIn }=require('./utils/customMiddleware')
 const mongoSanitize=require('express-mongo-sanitize')
 const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
-const MongoStore=require('connect-mongo')
+const MongoStore=require("connect-mongo")
 const fs=require('fs')
 const { allowAnyAccessOrigin }=require('./utils/customMiddleware')
 const cors=require('cors')
@@ -66,19 +66,11 @@ app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 // const morgan=require('morgan');
 // app.use(morgan('dev'));
 
-
 // Session
 const secret=process.env.SECRET||'devsecret'
-
-// Create MongoStore
-const store=new MongoStore({
-    mongoUrl: dbUrl,
-    secret: secret,
-    touchAfter: 3600*24
-})
-
+console.log("\n\n\nCreating Mongo session store\n\n\n")
 const sessionConfig={
-    store,
+    store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 3600*24, secret: secret }),
     name: 'filmApp_session',
     httpOnly: true,
     //secure: true,
