@@ -122,11 +122,9 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     // Process timesheet generation job on server (local)
     if (process.env.NODE_ENV=='develop_local') {
         generateTimesheets(show, cellValueMap, filepath+'.xlsx', week, req.file.filename)
-        res.send({ file: req.file, body: req.body })
     }
     // Else queue it for a worker to process (production)
     else {
-        // Queue job to redis queue
         const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
         filepath=await path.join(__dirname, `/${req.file.path}.xlsx`)
         const job=await tsGenQueue.add({
@@ -137,6 +135,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             filename: req.file.filename
         })
     }
+
+    res.send({ file: req.file, body: req.body })
 }))
 
 module.exports=router;
