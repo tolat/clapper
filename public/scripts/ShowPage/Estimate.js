@@ -333,7 +333,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
     let currentVersion=document.getElementById('estimate-version-display').innerText.replace('.', '_');
 
     // Post estimate data and version to server
-    fetch(server+`shows/${_show._id}/Estimate`, {
+    fetch(server+`/shows/${_show._id}/Estimate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -197,7 +197,7 @@ saveData=(reload=false) => {
     }
 
     // Post estimate data and version to server
-    fetch(server+`shows/${_show._id}/Rentals`, {
+    fetch(server+`/shows/${_show._id}/Rentals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

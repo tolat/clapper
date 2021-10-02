@@ -220,7 +220,7 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
     if (reload) { toggleLoadingScreen(true) }
 
     // Post estimate data and version to server
-    fetch(server+`shows/${_show._id}/CostReport`, {
+    fetch(server+`/shows/${_show._id}/CostReport`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

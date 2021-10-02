@@ -58,7 +58,7 @@ generateTimesheets=() => {
     console.log('sending put request')
 
     // Post estimate data and version to server
-    fetch(server+`shows/${_show._id}/Timesheets`, {
+    fetch(server+`/shows/${_show._id}/Timesheets`, {
         method: 'PUT',
         body: data,
         credentials: 'include'
@@ -67,7 +67,7 @@ generateTimesheets=() => {
             downloadPath=responseData.file.path
             // Check evey 500 ms to see if generation is done
             checkGenerationInterval=setInterval(() => {
-                fetch(server+`checkgenerated/${responseData.file.filename}`, { method: 'GET', credentials: 'include' })
+                fetch(server+`/checkgenerated/${responseData.file.filename}`, { method: 'GET', credentials: 'include' })
                     .then(response => { return response.json() })
                     .then(responseData => {
                         // If timesheets generated then download the .xlsx file from server
@@ -131,7 +131,7 @@ saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteM
     statusElement.style.color='rgb(255, 193, 49)';
 
     // Post estimate data and version to server
-    fetch(server+`shows/${_show._id}/Timesheets`, {
+    fetch(server+`/shows/${_show._id}/Timesheets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
