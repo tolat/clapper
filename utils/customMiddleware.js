@@ -1,12 +1,10 @@
 const Show=require('../models/show')
 
 module.exports.isLoggedIn=(req, res, next) => {
-    console.log(req.session)
-    console.log(req.user)
     req.session.returnTo=req.originalUrl
     if (!req.isAuthenticated()) {
         req.flash('error', 'You must be logged in to view this page.')
-        console.log("\n\n\n NOT AUTHENTICATED \n\n\n")
+        console.log('\n\n\nNOT AUTHENTICATED \n\n\n')
         return res.redirect('/login')
     }
     next()
@@ -23,5 +21,11 @@ module.exports.isShowOwner=async (req, res, next) => {
             return res.redirect('/shows')
         }
     }
+    next()
+}
+
+module.exports.allowAnyAccessOrigin=(req, res, next) => {
+    res.set('Access-Control-Allow-Origin', 'http://filmapp-alpha.herokuapp.com')
+    res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
     next()
 }

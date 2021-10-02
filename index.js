@@ -68,7 +68,6 @@ app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
 // Session
 const secret=process.env.SECRET||'devsecret'
-console.log("\n\n\nCreating Mongo session store\n\n\n")
 const sessionConfig={
     store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 3600*24, secret: secret }),
     name: 'filmApp_session',
@@ -105,6 +104,8 @@ const corsOptions={
     optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions))
+
+app.use(allowAnyAccessOrigin)
 
 // Routers
 const loginRoutes=require('./routes/login');
