@@ -2,6 +2,7 @@ const Show=require('../models/show')
 
 module.exports.isLoggedIn=(req, res, next) => {
     console.log(req.session)
+    console.log(req.user)
     req.session.returnTo=req.originalUrl
     if (!req.isAuthenticated()) {
         req.flash('error', 'You must be logged in to view this page.')
