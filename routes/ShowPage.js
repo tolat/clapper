@@ -132,7 +132,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     }
 
     // vv QUEUE TIMESHSEET GENERATION TO REDIS SERVER IF IN PRODUCTION MODE vv
-    if (NODE_ENV=='develop_local') {
+    if (process.env.NODE_ENV=='develop_local') {
         // process on this server
     } else {
         // queue for worker
