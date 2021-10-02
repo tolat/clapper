@@ -100,7 +100,11 @@ app.use((req, res, next) => {
 
 // Enable CORS for the site
 app.use(cors({
-    origin: [process.env.SERVER, 'http://filmapp-alpha.herokuapp.com']
+    origin: [
+        process.env.SERVER,
+        'http://filmapp-alpha.herokuapp.com',
+        process.env.DB_URL
+    ]
 }))
 
 //app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
