@@ -100,7 +100,7 @@ app.use((req, res, next) => {
 })
 
 // Enable CORS for all origins
-app.use(cors())
+//app.use(cors())
 
 // Routers
 const loginRoutes=require('./routes/login');
