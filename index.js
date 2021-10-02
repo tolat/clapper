@@ -100,7 +100,11 @@ app.use((req, res, next) => {
 })
 
 // Enable CORS for all origins
-//app.use(cors())
+const corsOptions={
+    origin: 'filmapp-alpha.herokuapp.com',
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions))
 
 // Routers
 const loginRoutes=require('./routes/login');
