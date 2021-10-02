@@ -67,17 +67,20 @@ generateTimesheets=() => {
             downloadPath=responseData.file.path
             // Check evey 500 ms to see if generation is done
             checkGenerationInterval=setInterval(() => {
-                fetch(server+`checkgenerated/${responseData.file.filename}`, { method: 'GET' })
+                fetch(server+`checkgenerated/${responseData.file.filename}`, { method: 'GET', credentials: 'include' })
                     .then(response => { return response.json() })
                     .then(responseData => {
                         // If timesheets generated then download the .xlsx file from server
+                        console.log("polling for timesheets...")
                         if (responseData.generated) {
+                            console.log("Ready!")
                             toggleLoadingScreen(false)
                             toggleLoadingScreen(true, 'Done!')
                             setTimeout(toggleLoadingScreen(false), 1000)
                             downloadTimesheets(downloadPath)
                             window.clearInterval(checkGenerationInterval)
                         }
+                        console.log("note ready...")
                     })
             }, 1000);
         })
