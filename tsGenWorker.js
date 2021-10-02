@@ -14,8 +14,9 @@ tsGenQueue.process((job) => {
     let fileCreated=false
     while (!fileCreated) {
         try {
-            fs.readFileSync(job.data.filepath)
-            fileCreated=true
+            fs.readFile(job.data.filepath).then(function () {
+                fileCreated=true
+            })
         } catch (e) {
             continue
         }
