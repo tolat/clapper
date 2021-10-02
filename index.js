@@ -98,6 +98,13 @@ app.use((req, res, next) => {
     next()
 })
 
+// Enable CORS for the site
+app.use(cors({
+    origin: [process.env.SERVER]
+}))
+
+//app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
+
 // Routers
 const loginRoutes=require('./routes/login');
 const createAccountRoutes=require('./routes/createAccount');

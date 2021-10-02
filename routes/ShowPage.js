@@ -104,7 +104,6 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
         // Sanitize incoming data
         req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
         let responseData=await global[`update${req.params.section}`](req.body, req.params.id);
-        console.log(`***********************************\n\n\n\n ${responseData.message} \n\n\n\n ************************************`)
         res.send(responseData)
     }
     catch (e) {
