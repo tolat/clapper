@@ -8,11 +8,14 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process((job) => {
     console.log(`\n\n\nConsuming job: ${job.id}\n\n\n`)
+
+    console.log(`\n\n\nFilepath: ${job.data.filepath}\n\n\n`)
+
     // Make sure uploaded excel file exists before trying to generate timesheets
     let fileCreated=false
     while (!fileCreated) {
         try {
-            fs.readFileSync(filepath)
+            fs.readFileSync(job.data.filepath)
             fileCreated=true
         } catch (e) {
             continue
