@@ -23,9 +23,3 @@ module.exports.isShowOwner=async (req, res, next) => {
     }
     next()
 }
-
-module.exports.allowAnyAccessOrigin=(req, res, next) => {
-    res.set('Access-Control-Allow-Origin', 'http://filmapp-alpha.herokuapp.com')
-    res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-    next()
-}

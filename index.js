@@ -98,7 +98,7 @@ app.use((req, res, next) => {
     next()
 })
 
-// Enable CORS for the site
+// Enable CORS for the site (safari problem)
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -110,8 +110,6 @@ app.use(function (req, res, next) {
         next();
     }
 });
-
-//app.use((req, res, next) => { allowAnyAccessOrigin(req, res, next) })
 
 // Routers
 const loginRoutes=require('./routes/login');
