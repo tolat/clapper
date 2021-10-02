@@ -65,7 +65,7 @@ app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 // app.use(morgan('dev'));
 
 // Session
-const secret=process.env.SECRET||'devsecret'
+const secret=process.env.SECRET
 const sessionConfig={
     store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 3600*24, secret: secret }),
     name: 'filmApp_session',
