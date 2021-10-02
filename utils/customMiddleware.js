@@ -25,8 +25,10 @@ module.exports.isShowOwner=async (req, res, next) => {
 }
 
 module.exports.handleCORS=async (req, res, next) => {
+    console.log(`\n\n\nserver: ${process.env.SERVER}`)
+    console.log(`original: ${req.headers.origin}\n\n\n`)
     res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', process.env.SERVER);
+    res.header('Access-Control-Allow-Origin', [process.env.SERVER, 'http://filmapp-alpha.herokuapp.com']);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     // Send success if CORS checks options on pre-flight test
