@@ -240,6 +240,7 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
                 setFrozenColumns: _frozenColumns,
             }
         }),
+        credentials: "include"
     })
         .then(response => { return response.text(); })
         .then(responseData => {
