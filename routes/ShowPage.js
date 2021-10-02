@@ -126,7 +126,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     // Else queue it for a worker to process (production)
     else {
         const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
-        filepath=`/${req.file.path}.xlsx`
+        filepath=`${req.file.path}.xlsx`
+        console.log(`\n\n\n${filepath}\n\n\n`)
         const job=await tsGenQueue.add({
             show,
             valueMap: cellValueMap,
