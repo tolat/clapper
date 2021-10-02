@@ -25,6 +25,9 @@ module.exports.isShowOwner=async (req, res, next) => {
 }
 
 module.exports.handleCORS=async (req, res, next) => {
+    console.log(`\n\n\nSERVER: ${process.env.SERVER}`)
+    console.log(`\n\n\origin: ${req.headers.origin}\n\n\n`)
+
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', process.env.SERVER);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
