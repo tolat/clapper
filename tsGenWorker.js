@@ -15,7 +15,7 @@ tsGenQueue.process((job) => {
     let fileCreated=false
     while (!fileCreated) {
         try {
-            fs.readFileSync(job.data.filepath)
+            fs.readFileSync(`./uploads/${job.data.filename}.xlsx`)
             fileCreated=true
         } catch (e) {
             continue
