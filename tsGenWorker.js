@@ -7,18 +7,18 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
 tsGenQueue.process((job) => {
-    console.log(`consuming job: ${job.id}`)
+    console.log(`\n\n\nConsuming job: ${job.id}\n\n\n`)
     // Make sure uploaded excel file exists before trying to generate timesheets
     while (!fs.readFileSync(job.data.filepath)) { }
 
     // Generate timesheets
-    generateTimesheets(job.data.show, job.data.valueMap, job.data.filepath, job.data.week, job.data.filename)
+    generateTimesheets(job.data.show, job.data.valueMap, job.data.filepath, job.data.week)
 
     return true
 })
 
 // Generate timesheets using the file at filepath as the template workbook
-async function generateTimesheets(show, valueMap, filepath, week, filename) {
+async function generateTimesheets(show, valueMap, filepath, week) {
     // Set filepath and get timesheet template workbook
     let workbook=new ExcelJS.Workbook()
 

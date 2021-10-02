@@ -121,6 +121,7 @@ app.use('/shows/:id/:section', showPageRoutes);
 global.generatedTimesheets=[]
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 tsGenQueue.on('completed', (job, result) => {
+    console.log(`\n\n\n Job ${job.id} Complete!\n\n\n`)
     global.generatedTimesheets.push(job.data.filename)
 })
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
