@@ -130,50 +130,47 @@ saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteM
     statusElement.innerText='saving...';
     statusElement.style.color='rgb(255, 193, 49)';
 
-    try {
-        // Post estimate data and version to server
-        fetch(server+`shows/${_show._id}/Timesheets`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                data: dataView.getItems(),
-                newWeek: _newWeek,
-                weeks: _show.weeks,
-                deletedWeek: _deletedWeek,
-                newMapName: newMapName,
-                isNewMap: isNewMap,
-                openMap: openMap,
-                deleteMap: deleteMap,
-                copyCurrentMap: copyCurrentMap,
-                currentWeekDays: _currentWeekDays,
-                variables: _variables,
-                displaySettings: {
-                    groupBy: _groupedBy,
-                    setColumnWidths: getColumnWidths(),
-                    setHiddenColumns: getHiddenColumns(),
+    // Post estimate data and version to server
+    fetch(server+`shows/${_show._id}/Timesheets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            data: dataView.getItems(),
+            newWeek: _newWeek,
+            weeks: _show.weeks,
+            deletedWeek: _deletedWeek,
+            newMapName: newMapName,
+            isNewMap: isNewMap,
+            openMap: openMap,
+            deleteMap: deleteMap,
+            copyCurrentMap: copyCurrentMap,
+            currentWeekDays: _currentWeekDays,
+            variables: _variables,
+            displaySettings: {
+                groupBy: _groupedBy,
+                setColumnWidths: getColumnWidths(),
+                setHiddenColumns: getHiddenColumns(),
+            }
+        }),
+        credentials: 'include'
+    })
+        .then(response => { return response.json() })
+        .then(responseData => {
+            console.log(responseData.messages)
+            if (reload) { location.reload() }
+            // Update saveStatus
+            updateSaveStatus(true);
+            // Reflect the change in save point in the Undo/Redo buffer command queue
+            if (undoRedoBuffer.commandQueue[0]) {
+                for (cmd of undoRedoBuffer.commandQueue) { cmd.saveStatus=[false, false] }
+                if (undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr-1]) {
+                    undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr-1].saveStatus=[false, true];
                 }
-            })
+                if (undoRedoBuffer.commandCtr<undoRedoBuffer.commandQueue.length) {
+                    undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr].saveStatus=[true, false];
+                }
+            }
         })
-            .then(response => { return response.json() })
-            .then(responseData => {
-                console.log(responseData.messages)
-                if (reload) { location.reload() }
-                // Update saveStatus
-                updateSaveStatus(true);
-                // Reflect the change in save point in the Undo/Redo buffer command queue
-                if (undoRedoBuffer.commandQueue[0]) {
-                    for (cmd of undoRedoBuffer.commandQueue) { cmd.saveStatus=[false, false] }
-                    if (undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr-1]) {
-                        undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr-1].saveStatus=[false, true];
-                    }
-                    if (undoRedoBuffer.commandCtr<undoRedoBuffer.commandQueue.length) {
-                        undoRedoBuffer.commandQueue[undoRedoBuffer.commandCtr].saveStatus=[true, false];
-                    }
-                }
-            })
-    } catch (e) {
-        console.log(e)
-    }
 }
 
 // add variable picker to grid
