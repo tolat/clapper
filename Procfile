@@ -1,2 +1,2 @@
 web: npm start
-worker: node worker.js
+worker: node tsGenWorker.js

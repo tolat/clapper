@@ -8,17 +8,15 @@ const ExcelJS=require('exceljs')
 const fs=require('fs')
 const multer=require('multer')
 const upload=multer({ dest: 'uploads/' })
-
 const router=express.Router({ mergeParams: true })
-
 const { populateShow }=require('../utils/schemaUtils')
 const { genUniqueId }=require('../utils/numberUtils')
-
 const Show=require('../models/show')
 const User=require('../models/user')
 const Set=require('../models/set')
 const Purchase=require('../models/purchase')
 const Position=require('../models/position')
+const Queue=require('bull')
 
 // Load a Show Page section
 router.get('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
@@ -119,27 +117,26 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
 
     // Update filepath to correct path and give file .xlsx extension
     let filepath=await path.join(__dirname, `../${req.file.path}`)
-    await fs.rename(filepath, filepath+'.xlsx', (e) => { if (e) { console.log(e.message) } })
+    await fs.rename(filepath, filepath+'.xlsx', (e) => { })
 
-    // Make sure uploaded excel file exists before trying to generate timesheets
-    let fileCreated=false
-    while (!fileCreated) {
-        try {
-            await fs.readFileSync(filepath)
-            fileCreated=true
-        } catch (e) {
-            continue
-        }
-    }
-
-    // vv QUEUE TIMESHSEET GENERATION TO REDIS SERVER IF IN PRODUCTION MODE vv
+    // Process timesheet generation job on server (local)
     if (process.env.NODE_ENV=='develop_local') {
-        // process on this server
-    } else {
-        // queue for worker
+        generateTimesheets(show, cellValueMap, filepath+'.xlsx', week, req.file.filename)
+        res.send({ file: req.file, body: req.body })
     }
-    generateTimesheets(show, cellValueMap, filepath+'.xlsx', week, req.file.filename)
-    res.send({ file: req.file, body: req.body })
+    // Else queue it for a worker to process (production)
+    else {
+        // Queue job to redis queue
+        const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
+        filepath=await path.join(__dirname, `/${req.file.path}.xlsx`)
+        const job=await tsGenQueue.add({
+            show,
+            valueMap: cellValueMap,
+            filepath,
+            week,
+            filename: req.file.filename
+        })
+    }
 }))
 
 module.exports=router;
@@ -1153,6 +1150,18 @@ parseValueMap=(items) => {
 
 // Generate timesheets using the file at filepath as the template workbook
 generateTimesheets=async function (show, valueMap, filepath, week, filename) {
+
+    // Make sure uploaded excel file exists before trying to generate timesheets
+    let fileCreated=false
+    while (!fileCreated) {
+        try {
+            await fs.readFileSync(filepath)
+            fileCreated=true
+        } catch (e) {
+            continue
+        }
+    }
+
     // Set filepath and get timesheet template workbook
     let workbook=new ExcelJS.Workbook()
 

@@ -20,6 +20,7 @@ const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
 const MongoStore=require("connect-mongo")
 const fs=require('fs')
+const Queue=require('bull')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -116,8 +117,12 @@ app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 
-// Check timesheets for file have been generated
+// Check if timesheets for file have been generated
 global.generatedTimesheets=[]
+const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
+tsGenQueue.on('completed', (job, result) => {
+    global.generatedTimesheets.push(job.data.filename)
+})
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
     // Tell client if timesheets for :filename have been generated
     if (global.generatedTimesheets.includes(req.params.filename)) {
@@ -132,7 +137,6 @@ app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
     let filepath=path.join(__dirname, `uploads/${req.params.filename}`)
     const file=await fs.readFileSync(filepath)
     res.send(file)
-    //fs.unlinkSync(filepath)
 })
 
 // Logout route
