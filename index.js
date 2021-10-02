@@ -101,7 +101,7 @@ app.use((req, res, next) => {
 
 // Enable CORS for all origins
 const corsOptions={
-    origin: 'filmapp-alpha.herokuapp.com',
+    origin: 'http://filmapp-alpha.herokuapp.com',
     optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions))
