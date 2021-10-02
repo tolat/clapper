@@ -215,7 +215,8 @@ saveData=(reload=false) => {
                 setHiddenColumns: getHiddenColumns(),
                 setFrozenColumns: _frozenColumns,
             }
-        })
+        }),
+        credentials: 'include'
     })
         .then(response => { return response.json() })
         .then(responseData => {

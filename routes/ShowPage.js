@@ -117,6 +117,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
 
+    // Update filepath to correct path and give file .xlsx extension
     let filepath=await path.join(__dirname, `../${req.file.path}`)
     await fs.rename(filepath, filepath+'.xlsx', (e) => { if (e) { console.log(e.message) } })
 
