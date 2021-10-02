@@ -61,6 +61,7 @@ generateTimesheets=() => {
     fetch(server+`shows/${_show._id}/Timesheets`, {
         method: 'PUT',
         body: data,
+        credentials: 'include'
     }).then(response => { return response.json() })
         .then(responseData => {
             downloadPath=responseData.file.path
