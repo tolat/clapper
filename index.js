@@ -14,7 +14,7 @@ const passport=require('passport')
 const LocalStrategy=require('passport-local')
 const User=require('./models/user')
 const flash=require('connect-flash')
-const { isLoggedIn }=require('./utils/customMiddleware')
+const { isLoggedIn, handleCORS }=require('./utils/customMiddleware')
 const mongoSanitize=require('express-mongo-sanitize')
 const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
@@ -96,18 +96,8 @@ app.use((req, res, next) => {
     next()
 })
 
-// Enable CORS for the site (safari problem)
-app.use(function (req, res, next) {
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', 'http://filmapp-alpha.herokuapp.com');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-    if ('OPTIONS'==req.method) {
-        res.send(200);
-    } else {
-        next();
-    }
-});
+// Hnadle CORS
+app.use((req, res, next) => { handleCORS(req, res, next) });
 
 // Routers
 const loginRoutes=require('./routes/login');
@@ -171,5 +161,5 @@ app.use((err, req, res, next) => {
     })
 })
 
-// Open connection on port 3000 if in local mode
+// Open connection on environment-defined port
 app.listen(process.env.PORT);
