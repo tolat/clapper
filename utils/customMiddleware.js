@@ -25,10 +25,15 @@ module.exports.isShowOwner=async (req, res, next) => {
 }
 
 module.exports.handleCORS=async (req, res, next) => {
+    console.log(`\n\n\nPROCESS SERVER: ${process.env.SERVER}`)
+    console.log(`origin: ${req.headers.origin}`)
+
+    // allow requests from http version of secure origin
     let server=process.env.SERVER
     if (server.includes('https')) {
         server='http'+server.slice(5)
     }
+    console.log(`server: ${server}\n\n\n`)
 
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', server);
