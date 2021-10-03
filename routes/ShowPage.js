@@ -145,7 +145,6 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             // Give file .xlsx extension
             console.log('\ntrying to rename...\n')
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
-            console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
             console.log('\nRename successful!\n')
 
             // Queue generation job for worker
