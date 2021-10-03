@@ -118,6 +118,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
 
+    console.log(req.file)
+
     // Wait for file to be uploaded then generate (local)
     generateLocal=async () => {
         try {
@@ -142,7 +144,6 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
         try {
             // Give file .xlsx extension
             console.log('\ntrying to rename...\n')
-            console.log(uploadsPath)
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
             console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
             console.log('\nRename successful!\n')
