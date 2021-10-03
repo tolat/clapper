@@ -32,6 +32,9 @@ const db=mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => { console.log('Database connected') });
 
+const { GridFsStorage }=require('multer-gridfs-storage');
+global.storage=new GridFsStorage({ url: process.env.DB_URL });
+
 // Starting express
 const app=express();
 

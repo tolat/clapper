@@ -8,9 +8,7 @@ const ExcelJS=require('exceljs')
 const fs=require('fs')
 
 const multer=require('multer')
-const { GridFsStorage }=require('multer-gridfs-storage');
-const storage=new GridFsStorage({ url: process.env.DB_URL });
-const upload=multer({ storage })
+const upload=multer({ storage: global.storage })
 
 const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
@@ -119,13 +117,11 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
 
-    console.log(`\n\n\n${req.file}\n\n\n`)
+    console.log(`\n\n\n${Object.keys(req.file)}\n\n\n`)
 
     // Wait for file to be uploaded then generate (local)
     generateLocal=async () => {
         try {
-            console.log(uploadsPath)
-
             // Give file .xlsx extension
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
 
