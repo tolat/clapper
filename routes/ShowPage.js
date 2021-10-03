@@ -141,14 +141,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     generateProduction=async () => {
         try {
             console.log('\nTRACE 1\n')
-            console.log(req.file.path)
             // Give file .xlsx extension
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
-
-            console.log('\n\n')
-            console.log(fs.readdirSync(path.join(__dirname, '../uploads')))
-            console.log('\n\n')
-
             console.log('\nTRACE 2\n')
 
 
@@ -157,9 +151,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             const job=await tsGenQueue.add({
                 show,
                 valueMap: cellValueMap,
-                filepath: req.file.path+'.xlsx',
                 week,
-                filename: req.file.filename
+                file: req.file
             })
 
             console.log('\nTRACE 3\n')

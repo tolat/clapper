@@ -10,8 +10,14 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 tsGenQueue.process((job) => {
     console.log('\nTRACE 4\n')
 
+    await fs.writeFileSync(path.join(__dirname, '/uploads/'), job.data.file)
+
+    console.log('\nTRACE 4.5\n')
+
+    await fs.renameSync(job.data.file.path, job.data.file.path+'.xlsx')
+
     // Generate timesheets
-    generateTimesheets(job.data.show, job.data.valueMap, job.data.filepath, job.data.week)
+    generateTimesheets(job.data.show, job.data.valueMap, job.data.file.path+'.xlsx', job.data.week)
 })
 
 // Generate timesheets using the file at filepath as the template workbook
@@ -20,7 +26,6 @@ async function generateTimesheets(show, valueMap, filepath, week) {
     let workbook=new ExcelJS.Workbook()
 
     console.log('\nTRACE 5\n')
-
 
     console.log('\n\n')
     console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
