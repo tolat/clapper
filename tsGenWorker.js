@@ -10,6 +10,8 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 tsGenQueue.process((job) => {
     console.log('\nTRACE 4\n')
 
+    console.log(job.data.file)
+
     fs.writeFileSync(path.join(__dirname, '/uploads/'), job.data.file)
 
     console.log('\nTRACE 4.5\n')

@@ -145,6 +145,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
             console.log('\nTRACE 2\n')
 
+            const file=await fs.readFileSync(req.file.path+'.xlsx')
 
             // Queue generation job for worker
             const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
@@ -152,7 +153,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
                 show,
                 valueMap: cellValueMap,
                 week,
-                file: req.file
+                file: file
             })
 
             console.log('\nTRACE 3\n')
