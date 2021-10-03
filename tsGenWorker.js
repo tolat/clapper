@@ -1,6 +1,7 @@
 const Queue=require('bull')
 const ExcelJS=require('exceljs')
 const fs=require('fs')
+const path=require('path')
 
 // Create consumer queue
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
@@ -17,7 +18,7 @@ async function generateTimesheets(show, valueMap, filepath, week) {
     let workbook=new ExcelJS.Workbook()
 
     console.log('\n\n')
-    console.log(fs.readdirSync('../uploads'))
+    console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
     console.log('\n\n')
 
     await workbook.xlsx.readFile(filepath)
