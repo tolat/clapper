@@ -1,6 +1,5 @@
 const Queue=require('bull')
 const ExcelJS=require('exceljs')
-const fs=require('fs')
 
 // Create consumer queue
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
