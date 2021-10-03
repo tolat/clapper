@@ -124,8 +124,6 @@ global.generatedTimesheets=[]
 if (process.env.NODE_ENV=='production') {
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('completed', (job, result) => {
-        console.log('\nTRACE 10\n')
-
         console.log(`\n\n\n Job ${job.id} Complete!\n\n\n`)
         global.generatedTimesheets.push(job.data.filename)
     })

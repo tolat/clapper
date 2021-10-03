@@ -11,6 +11,7 @@ tsGenQueue.process((job) => {
     console.log('\nTRACE 4\n')
 
     console.log(job.data.file)
+    console.log(`\n\n ${file.path} \n\n`)
 
     fs.writeFileSync(path.join(__dirname, '/uploads/'), job.data.file)
 
