@@ -62,8 +62,8 @@ const contentSecurityPolicy={
 app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
 // Morgan logger
-// const morgan=require('morgan');
-// app.use(morgan('dev'));
+const morgan=require('morgan');
+app.use(morgan('dev'));
 
 // Session
 const secret=process.env.SECRET
@@ -119,21 +119,27 @@ app.use('/shows/:id/:section', showPageRoutes);
 
 // Check if timesheets for file have been generated
 global.generatedTimesheets=[]
-const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
-tsGenQueue.on('completed', (job, result) => {
-    console.log(`\n\n\n Job ${job.id} Complete!\n\n\n`)
-    global.generatedTimesheets.push(job.data.filename)
-})
+
+// Listen to Bull queue for completed timnesheet generation if in production mode
+if (process.env.NODE_ENV=='production') {
+    const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
+    tsGenQueue.on('completed', (job, result) => {
+        console.log(`\n\n\n Job ${job.id} Complete!\n\n\n`)
+        global.generatedTimesheets.push(job.data.filename)
+    })
+}
+
+// Check if timesheets ahve been generated for :filenamme template
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
     // Tell client if timesheets for :filename have been generated
     if (global.generatedTimesheets.includes(req.params.filename)) {
-        res.send({ generated: true })
+        res.send({ filename: req.params.filename })
     } else {
-        res.send({ generated: false })
+        res.send({ filename: false })
     }
 })
 
-// Download file from uploads folder route
+// Download :filename from uploads folder route
 app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
     let filepath=path.join(__dirname, `uploads/${req.params.filename}`)
     const file=await fs.readFileSync(filepath)

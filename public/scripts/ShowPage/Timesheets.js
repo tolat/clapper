@@ -72,15 +72,11 @@ generateTimesheets=() => {
                     .then(responseData => {
                         // If timesheets generated then download the .xlsx file from server
                         console.log("polling for timesheets...")
-                        if (responseData.generated) {
+                        if (responseData.filename) {
                             console.log("Ready!")
                             toggleLoadingScreen(false)
-                            toggleLoadingScreen(true, 'Done!')
-                            setTimeout(toggleLoadingScreen(false), 1000)
-                            downloadTimesheets(downloadPath)
+                            downloadTimesheets(responseData.filename)
                             window.clearInterval(checkGenerationInterval)
-                        } else {
-                            console.log("not ready...")
                         }
                     })
             }, 1000);
@@ -88,10 +84,10 @@ generateTimesheets=() => {
 }
 
 // Downlaod timesheets from server
-function downloadTimesheets(path) {
+function downloadTimesheets(filename) {
     let downloadElt=document.createElement('div')
     downloadElt.style.diplay='none'
-    downloadElt.innerHTML=`<a id="download-link" href="/${path}.xlsx" download></a>`
+    downloadElt.innerHTML=`<a id="download-link" href="/uploads/${filename}.xlsx" download></a>`
     document.body.appendChild(downloadElt)
     document.getElementById('download-link').click()
     downloadElt.parentElement.removeChild(downloadElt)

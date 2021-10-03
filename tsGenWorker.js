@@ -7,15 +7,9 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
 tsGenQueue.process((job) => {
-    console.log(`\n\n\nConsuming job: ${job.id}\n\n\n`)
-    console.log(`\n\n\nFilepath: ${job.data.filepath}\n\n\n`)
-
-    console.log(`\n\n\nFile created!\n\n\n`)
-
+    console.log(`\n\n\n ${job.data.filepath} \n\n\n`)
     // Generate timesheets
     generateTimesheets(job.data.show, job.data.valueMap, job.data.filepath, job.data.week)
-
-    return true
 })
 
 // Generate timesheets using the file at filepath as the template workbook
