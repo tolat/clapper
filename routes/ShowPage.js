@@ -141,8 +141,13 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     generateProduction=async () => {
         try {
             console.log('\nTRACE 1\n')
+            console.log(req.file.path)
             // Give file .xlsx extension
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
+
+            console.log('\n\n')
+            console.log(fs.readdirSync(path.join(__dirname, '../uploads')))
+            console.log('\n\n')
 
             console.log('\nTRACE 2\n')
 
