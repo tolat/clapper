@@ -7,8 +7,7 @@ const sanitizeHtml=require('sanitize-html')
 const ExcelJS=require('exceljs')
 const fs=require('fs')
 const multer=require('multer')
-const uploadsPath=path.join(__dirname, '../uploads/')
-const upload=multer({ dest: uploadsPath })
+const upload=multer({ dest: 'uploads/' })
 const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
 const { genUniqueId }=require('../utils/numberUtils')
@@ -138,7 +137,6 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
         try {
             // Give file .xlsx extension
             console.log('\ntrying to rename...\n')
-            console.log(uploadsPath)
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
             console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
             console.log('\nRename successful!\n')
