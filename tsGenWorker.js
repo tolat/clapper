@@ -6,17 +6,17 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
 tsGenQueue.process((job) => {
-    console.log(`\n\n\n ${job.data.filepath} \n\n\n`)
+    console.log(`\n\n\n ${job.data.file.name} \n\n\n`)
     // Generate timesheets
-    generateTimesheets(job.data.show, job.data.valueMap, job.data.filepath, job.data.week)
+    generateTimesheets(job.data.show, job.data.cellValueMap, job.data.week, job.data.file)
 })
 
-// Generate timesheets using the file at filepath as the template workbook
-async function generateTimesheets(show, valueMap, filepath, week) {
+// Generate timesheets using the file as the template workbook
+async function generateTimesheets(show, valueMap, week, file) {
     // Set filepath and get timesheet template workbook
     let workbook=new ExcelJS.Workbook()
 
-    await workbook.xlsx.readFile(filepath)
+    await workbook.xlsx.readFile(file)
     let sheet=workbook.worksheets[0]
     let currentWeekDays=getDaysOfWeekEnding(week.end)
     const oneDay=24*60*60*1000;
@@ -64,8 +64,8 @@ async function generateTimesheets(show, valueMap, filepath, week) {
     }
 
     // Reload workbook after saving worksheet copies
-    await workbook.xlsx.writeFile(filepath)
-    await workbook.xlsx.readFile(filepath)
+    await workbook.xlsx.writeFile(file)
+    await workbook.xlsx.readFile(file)
 
     // Populate worksheet copies with data
     for (user of week.crew.crewList) {
@@ -148,6 +148,6 @@ async function generateTimesheets(show, valueMap, filepath, week) {
     }
 
     // Write final workbook data to file 
-    await workbook.xlsx.writeFile(filepath)
+    await workbook.xlsx.writeFile(file)
 }
 

@@ -7,7 +7,8 @@ const sanitizeHtml=require('sanitize-html')
 const ExcelJS=require('exceljs')
 const fs=require('fs')
 const multer=require('multer')
-const upload=multer({ dest: 'uploads/' })
+const uploadsPath=path.join(__dirname, '../uploads/')
+const upload=multer({ dest: 'uploadsPath' })
 const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
 const { genUniqueId }=require('../utils/numberUtils')
@@ -118,6 +119,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     // Wait for file to be uploaded then generate (local)
     generateLocal=async () => {
         try {
+            console.log(uploadsPath)
+
             // Give file .xlsx extension
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
 
@@ -135,20 +138,15 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     // Wait for file to be uploaded then queue generation for worker (production)
     generateProduction=async () => {
         try {
-            // Give file .xlsx extension
-            console.log('\ntrying to rename...\n')
-            await fs.renameSync(req.file.path, req.file.path+'.xlsx')
-            console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
-            console.log('\nRename successful!\n')
+            req.file.name=req.file.name+'.xlsx'
 
             // Queue generation job for worker
             const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
             const job=await tsGenQueue.add({
                 show,
-                valueMap: cellValueMap,
-                filepath: req.file.path+'.xlsx',
+                cellValueMap,
                 week,
-                filename: req.file.filename
+                file,
             })
 
             // Send file info back
