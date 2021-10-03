@@ -136,7 +136,9 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     generateProduction=async () => {
         try {
             // Give file .xlsx extension
+            console.log('\ntrying to rename...\n')
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
+            console.log('\nRename successful!\n')
 
             // Queue generation job for worker
             const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
