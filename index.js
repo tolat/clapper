@@ -117,6 +117,7 @@ app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 
+
 // Check if timesheets for file have been generated
 global.generatedTimesheets=[]
 

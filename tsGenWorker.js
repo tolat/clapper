@@ -20,13 +20,7 @@ async function generateTimesheets(show, valueMap, filepath, week) {
     let workbook=new ExcelJS.Workbook()
 
     console.log('\nTRACE 5\n')
-
-    console.log('\n\n')
-    console.log(fs.readdirSync(path.join(__dirname, '/uploads')))
-    console.log('\n\n')
-
     console.log('\nTRACE 6\n')
-
 
     await workbook.xlsx.readFile(filepath)
     let sheet=workbook.worksheets[0]
