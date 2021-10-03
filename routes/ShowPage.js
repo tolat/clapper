@@ -143,9 +143,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     generateProduction=async () => {
         try {
             // Give file .xlsx extension
-            console.log('\ntrying to rename...\n')
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
-            console.log('\nRename successful!\n')
 
             // Queue generation job for worker
             const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
@@ -160,7 +158,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             // Send file info back
             res.send({ file: req.file, body: req.body })
         } catch (e) {
-            e.code=='ENOENT'? setTimeout(() => { generateProduction() }, 1000):res.send({ messages: e.message })
+            e.code=='ENOENT'? setTimeout(() => { console.log(e.message); generateProduction(); }, 1000):res.send({ messages: e.message })
         }
     }
 
