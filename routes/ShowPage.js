@@ -118,8 +118,6 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
 
-    console.log(req.file)
-
     // Wait for file to be uploaded then generate (local)
     generateLocal=async () => {
         try {
@@ -143,6 +141,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     generateProduction=async () => {
         try {
             // Give file .xlsx extension
+            console.log('renaming...')
+            await fs.readFileSync(req.file.path)
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
 
             // Queue generation job for worker
