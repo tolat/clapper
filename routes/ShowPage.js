@@ -141,19 +141,25 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     generateProduction=async () => {
         try {
             console.log('\nTRACE 1\n')
+            console.log(req.file.path)
             // Give file .xlsx extension
             await fs.renameSync(req.file.path, req.file.path+'.xlsx')
+
+            console.log('\n\n')
+            console.log(fs.readdirSync(path.join(__dirname, '../uploads')))
+            console.log('\n\n')
+
             console.log('\nTRACE 2\n')
 
-            const file=await fs.readFileSync(req.file.path+'.xlsx')
 
             // Queue generation job for worker
             const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
             const job=await tsGenQueue.add({
                 show,
                 valueMap: cellValueMap,
+                filepath: req.file.path+'.xlsx',
                 week,
-                file: file
+                filename: req.file.filename
             })
 
             console.log('\nTRACE 3\n')
