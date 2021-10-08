@@ -24,15 +24,24 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
+    console.log('1')
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
+    console.log('2')
 
+    // Stream completed timesheets to mongo 
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
     const readLocal=fs.createReadStream(filepath)
     const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid }).on('finish', () => {
+        console.log('5')
         done(JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+        console.log('6')
     })
+
+    console.log('3')
     await readLocal.pipe(writeDB)
+
+    console.log('4')
 
 })
 
