@@ -131,8 +131,8 @@ if (process.env.NODE_ENV=='production') {
     console.log(`\n\n Creating Completion Queue Listener\n\n`)
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', (job, result) => {
-        console.log(result)
         let resultObj=JSON.parse(result)
+        console.log(resultObj)
         console.log(`\n\n\n Job ${resultObj.filename} Complete!\n\n\n`)
         const filename=`${resultObj.filename}`.replaceAll('"', '')
         const fileid=`${resultObj.fileid}`.replaceAll('"', '')
