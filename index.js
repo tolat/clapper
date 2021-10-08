@@ -133,7 +133,7 @@ if (process.env.NODE_ENV=='production') {
     tsGenQueue.on('global:completed', (job, result) => {
         let resultObj=JSON.parse(result)
         console.log(resultObj)
-        console.log(`\n\n\n Job ${resultObj.filename} Complete!\n\n\n`)
+        console.log(`\n\n\n Job ${resultObj["filename"]} Complete!\n\n\n`)
         const filename=`${resultObj.filename}`.replaceAll('"', '')
         const fileid=`${resultObj.fileid}`.replaceAll('"', '')
 
