@@ -71,7 +71,6 @@ generateTimesheets=() => {
                     .then(response => { return response.json() })
                     .then(responseData => {
                         // If timesheets generated then download the .xlsx file from server
-                        console.log("polling for timesheets...")
                         if (responseData.filename) {
                             console.log("Ready!")
                             toggleLoadingScreen(false)
