@@ -127,6 +127,7 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
 
     // Queue timesheet generation for worker (production)
     generateProduction=async () => {
+        console.log('AA')
         // Queue generation job for worker
         const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
         await tsGenQueue.add({
@@ -136,6 +137,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             fileid: req.file.id,
             filename: req.file.filename
         })
+        console.log('BB')
+
     }
 
     // Process timesheet generation with appropriate function

@@ -25,7 +25,11 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Generate timesheets
+    console.log('1')
+
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
+
+    console.log('2')
 
     // Stream completed timesheets to mongo 
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
