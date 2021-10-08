@@ -132,7 +132,14 @@ if (process.env.NODE_ENV=='production') {
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', (job, result) => {
         console.log(`\n\n\n Job ${result} Complete!\n\n\n`)
-        global.generatedTimesheets.push(String(result).replaceAll('"', ''))
+        const filename=String(result).replaceAll('"', '')
+
+        // Get streams to read file from mongo
+        const readDB=global.gfs.createReadStream({ _id: fileid })
+        const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
+        const writeLocal=fs.createWriteStream(filepath).on('finish', () => { global.generatedTimesheets.push(filename) })
+        readDB.pipe(writeLocal)
+
     })
 }
 
