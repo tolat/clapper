@@ -27,9 +27,12 @@ tsGenQueue.process(async (job) => {
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
-    console.log('\n\n Done Generating \n\n')
-
-    return job.data.filename
+    const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
+    const readLocal=fs.createReadStream(filepath)
+    const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid }).on('finish', () => {
+        return job.data.filename
+    })
+    readLocal.pipe(writeDB)
 })
 
 // Returns array of dates representing the current week
