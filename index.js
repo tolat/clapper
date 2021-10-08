@@ -132,16 +132,14 @@ if (process.env.NODE_ENV=='production') {
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', (job, result) => {
         console.log(`\n\n\n Job ${result} Complete!\n\n\n`)
-        global.generatedTimesheets.push(result)
+        global.generatedTimesheets.push(result.replaceAll('"', ''))
     })
 }
 
 // Check if timesheets ahve been generated for :filenamme template
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
     // Tell client if timesheets for :filename have been generated
-    console.log(req.params.filename)
-    console.log(global.generatedTimesheets)
-    if (global.generatedTimesheets.includes(`"${req.params.filename}"`)) {
+    if (global.generatedTimesheets.includes(req.params.filename)) {
         res.send({ filename: req.params.filename })
     } else {
         res.send({ filename: false })
