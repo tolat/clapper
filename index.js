@@ -21,11 +21,8 @@ const dbUrl=process.env.DB_URL
 const MongoStore=require("connect-mongo")
 const fs=require('fs')
 const Queue=require('bull')
-
-const { GridFsStorage }=require('multer-gridfs-storage')
-global.storage=new GridFsStorage({ url: dbUrl, options: { useUnifiedTopology: true } })
 const GridStream=require('gridfs-stream')
-GridStream.mongo=mongoose.mongo
+
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
@@ -35,9 +32,9 @@ mongoose.connect(dbUrl, {
 global.db=mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-    console.log('Database connected')
+    console.log('Main process connected to database')
     // Initialize gridstrem on global variable so we can read and write files from mongodb gridfs
-    global.gfs=GridStream(db.db, GridStream.mongo)
+    global.gfs=GridStream(db.db, mongoose.mongo)
 });
 
 // Starting express

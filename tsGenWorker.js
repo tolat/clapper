@@ -2,6 +2,21 @@ const Queue=require('bull')
 const ExcelJS=require('exceljs')
 const fs=require('fs')
 const path=require('path')
+const GridStream=require('gridfs-stream')
+
+// Connect to the database and handle connection errors
+mongoose.connect(process.env.DB_URL, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+});
+let db=mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+    console.log('Timesheet worker process connected to database')
+    // Initialize gridstrem on global variable so we can read and write files from mongodb gridfs
+    global.gfs=GridStream(db.db, mongoose.mongo)
+});
 
 // Create consumer queue
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
@@ -156,7 +171,6 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
         }
 
         await workbook.xlsx.writeFile(filepath)
-        global.generatedTimesheets.push(filename)
     }
 }
 

@@ -9,7 +9,8 @@ const fs=require('fs')
 
 const multer=require('multer')
 const { GridFsStorage }=require('multer-gridfs-storage')
-const upload=multer({ storage: global.storage })
+const storage=new GridFsStorage({ url: process.env.DB_URL, options: { useUnifiedTopology: true } })
+const upload=multer({ storage })
 
 const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
