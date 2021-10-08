@@ -140,6 +140,7 @@ if (process.env.NODE_ENV=='production') {
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
     // Tell client if timesheets for :filename have been generated
     console.log(req.params.filename)
+    console.log(global.generatedTimesheets)
     if (global.generatedTimesheets.includes(req.params.filename)) {
         res.send({ filename: req.params.filename })
     } else {
