@@ -36,7 +36,7 @@ tsGenQueue.process(async (job, done) => {
     const readLocal=fs.createReadStream(filepath)
     const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => {
         console.log('5')
-        done(JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
         console.log('6')
     })
 
