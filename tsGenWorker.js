@@ -28,6 +28,7 @@ tsGenQueue.process(async (job) => {
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
     console.log('\n\n Done Generating \n\n')
+    console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
     return 'done'
 })
 
