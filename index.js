@@ -131,8 +131,9 @@ if (process.env.NODE_ENV=='production') {
     console.log(`\n\n Creating Completion Queue Listener\n\n`)
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', (job, result) => {
-        console.log(`\n\n\n Job ${result} Complete!\n\n\n`)
-        const filename=`${result}`.replaceAll('"', '')
+        console.log(`\n\n\n Job ${result.filename} Complete!\n\n\n`)
+        const filename=`${result.filename}`.replaceAll('"', '')
+        const fileid=`${result.fileid}`.replaceAll('"', '')
 
         // Get streams to read file from mongo
         const readDB=global.gfs.createReadStream({ _id: fileid })

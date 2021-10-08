@@ -32,7 +32,7 @@ tsGenQueue.process(async (job) => {
     const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid })
     await readLocal.pipe(writeDB)
 
-    return job.data.filename
+    return { filename: job.data.filename, fileid: job.data.fileid }
 })
 
 // Returns array of dates representing the current week
