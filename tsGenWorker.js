@@ -33,7 +33,7 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
     // Get streams to read file from mongo
     console.log(`\n\nFile ID: ${fileid}\n\n`)
     const readDB=global.gfs.createReadStream({ _id: fileid })
-    const filepath=`${path.join(__dirname, '../uploads')}/${filename}.xlsx`
+    const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
     const writeLocal=fs.createWriteStream(filepath).on('finish', () => { generate() })
     readDB.pipe(writeLocal)
 
