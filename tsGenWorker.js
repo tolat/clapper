@@ -23,13 +23,13 @@ db.once('open', () => {
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
-tsGenQueue.process(async (job, done) => {
+tsGenQueue.process(async (job) => {
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
     console.log('\n\n Done Generating \n\n')
 
-    done()
+    return job.data.filename
 })
 
 // Returns array of dates representing the current week

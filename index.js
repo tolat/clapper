@@ -132,7 +132,7 @@ if (process.env.NODE_ENV=='production') {
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', (job, result) => {
         console.log(`\n\n\n Job ${job.id} Complete!\n\n\n`)
-        console.log(job)
+        console.log(result)
         global.generatedTimesheets.push(job.data.filename)
     })
 }
