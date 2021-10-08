@@ -29,8 +29,9 @@ tsGenQueue.process(async (job, done) => {
 
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
     const readLocal=fs.createReadStream(filepath)
-    const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid }).on('finish',
-        done(JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid })))
+    const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid }).on('finish', () => {
+        done(JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+    })
     await readLocal.pipe(writeDB)
 
 })
