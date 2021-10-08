@@ -34,17 +34,11 @@ tsGenQueue.process(async (job, done) => {
     // Stream completed timesheets to mongo 
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
     const readLocal=fs.createReadStream(filepath)
-    const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => {
-        console.log('5')
-        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
-        console.log('6')
-    })
+    const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { console.log('\n\nDONE PIPING\n\n') })
 
-    console.log('3')
     await readLocal.pipe(writeDB)
-    console.log('4')
 
-
+    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 
 })
 
