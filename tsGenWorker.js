@@ -23,14 +23,13 @@ db.once('open', () => {
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
-tsGenQueue.process(async (job) => {
+tsGenQueue.process(async (job, done) => {
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
     console.log('\n\n Done Generating \n\n')
-    console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
 
-    return 'completed'
+    done()
 })
 
 // Returns array of dates representing the current week
@@ -52,9 +51,6 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
     const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
     const writeLocal=fs.createWriteStream(filepath).on('finish', () => { generate() })
     readDB.pipe(writeLocal)
-
-    console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
-
 
     // Callback to generate timesheets once file is uploaded from mongo to server uploads folder
     async function generate() {
@@ -193,8 +189,5 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
 
         await workbook.xlsx.writeFile(filepath)
     }
-
-    console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
-
 }
 
