@@ -135,10 +135,14 @@ if (process.env.NODE_ENV=='production') {
         console.log(`\n\n\n Job ${resultObj.filename} Complete!\n\n\n`)
 
         // Get streams to read file from mongo
+        console.log('7')
         const readDB=global.gfs.createReadStream({ _id: resultObj.fileid })
         const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`
         const writeLocal=fs.createWriteStream(filepath).on('finish', () => { global.generatedTimesheets.push(resultObj.filename) })
         readDB.pipe(writeLocal)
+
+        console.log('8')
+
 
     })
 }
