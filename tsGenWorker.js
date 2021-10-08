@@ -28,7 +28,9 @@ tsGenQueue.process(async (job) => {
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
     console.log('\n\n Done Generating \n\n')
-    return 'done'
+    console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
+
+    return 'completed'
 })
 
 // Returns array of dates representing the current week
@@ -191,5 +193,8 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
 
         await workbook.xlsx.writeFile(filepath)
     }
+
+    console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
+
 }
 
