@@ -36,6 +36,8 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
     const writeLocal=fs.createWriteStream(filepath).on('finish', () => { generate() })
     readDB.pipe(writeLocal)
 
+    console.log('Trace 1')
+
     // Callback to generate timesheets once file is uploaded from mongo to server uploads folder
     async function generate() {
         // Get timesheet template workbook
@@ -44,6 +46,8 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
         let sheet=workbook.worksheets[0]
         let currentWeekDays=getDaysOfWeekEnding(week.end)
         const oneDay=24*60*60*1000;
+        console.log('Trace 2')
+
 
         function isInCurrentWeek(day, user) {
             let dateMS=new Date(day).getTime()
@@ -54,6 +58,8 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
                 }
             }
         }
+
+        console.log('Trace 3')
 
         // Create worksheet copies
         for (user of week.crew.crewList) {
@@ -87,9 +93,13 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
             }
         }
 
+        console.log('Trace 4')
+
         // Reload workbook after saving worksheet copies
         await workbook.xlsx.writeFile(filepath)
         await workbook.xlsx.readFile(filepath)
+
+        console.log('Trace 5')
 
         // Populate worksheet copies with data
         for (user of week.crew.crewList) {
@@ -170,6 +180,8 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
                 }
             }
         }
+        console.log('Trace 6')
+
 
         await workbook.xlsx.writeFile(filepath)
     }
