@@ -131,7 +131,7 @@ if (process.env.NODE_ENV=='production') {
     console.log(`\n\n Creating Completion Queue Listener\n\n`)
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', (job, result) => {
-        console.log(`\n\n\n Job ${job} Complete!\n\n\n`)
+        console.log(`\n\n\n Job ${result} Complete!\n\n\n`)
         global.generatedTimesheets.push(result)
     })
 }
@@ -139,6 +139,7 @@ if (process.env.NODE_ENV=='production') {
 // Check if timesheets ahve been generated for :filenamme template
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
     // Tell client if timesheets for :filename have been generated
+    console.log(req.params.filename)
     if (global.generatedTimesheets.includes(req.params.filename)) {
         res.send({ filename: req.params.filename })
     } else {
