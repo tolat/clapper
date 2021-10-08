@@ -23,16 +23,16 @@ db.once('open', () => {
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Process tsGenQueue jobs
-tsGenQueue.process(async (job) => {
+tsGenQueue.process(async (job, done) => {
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
     const readLocal=fs.createReadStream(filepath)
-    const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid })
+    const writeDB=global.gfs.createWriteStream({ _id: job.data.fileid }).on('finish',
+        done(JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid })))
     await readLocal.pipe(writeDB)
 
-    return JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid })
 })
 
 // Returns array of dates representing the current week
