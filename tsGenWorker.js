@@ -28,6 +28,17 @@ tsGenQueue.process((job) => {
     generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 })
 
+// Returns array of dates representing the current week
+function getDaysOfWeekEnding(date) {
+    const oneDay=24*60*60*1000;
+    let day=new Date(date);
+    let days=[];
+    for (let i=0; i<7; i++) {
+        days.unshift(new Date(day-oneDay*i));
+    }
+    return days;
+}
+
 // Generate timesheets using the file at filepath as the template workbook
 generateTimesheets=async function (show, valueMap, week, fileid, filename) {
     // Get streams to read file from mongo
