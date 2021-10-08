@@ -133,13 +133,11 @@ if (process.env.NODE_ENV=='production') {
     tsGenQueue.on('global:completed', (job, result) => {
         const resultObj=JSON.parse(JSON.parse(result))
         console.log(`\n\n\n Job ${resultObj.filename} Complete!\n\n\n`)
-        const filename=resultObj.filename.toString().replaceAll('"', '')
-        const fileid=resultObj.fileid.toString().replaceAll('"', '')
 
         // Get streams to read file from mongo
-        const readDB=global.gfs.createReadStream({ _id: fileid })
-        const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
-        const writeLocal=fs.createWriteStream(filepath).on('finish', () => { global.generatedTimesheets.push(filename) })
+        const readDB=global.gfs.createReadStream({ _id: resultObj.fileid })
+        const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`
+        const writeLocal=fs.createWriteStream(filepath).on('finish', () => { global.generatedTimesheets.push(resultObj.filename) })
         readDB.pipe(writeLocal)
 
     })
