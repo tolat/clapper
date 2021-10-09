@@ -66,7 +66,7 @@ async function generateTimesheets(show, valueMap, week, fileid, filename) {
     // Callback to generate timesheets once file is uploaded from mongo to server uploads folder
     async function generate() {
         console.log(`\n\nFilename: ${filename}`)
-        console.log(`/uploads: ${fs.readdirSync(filepath)}\n\n`)
+        console.log(`/uploads: ${fs.readdirSync(path.join(__dirname, '/uploads/'))}\n\n`)
 
         // Get timesheet template workbook
         let workbook=new ExcelJS.Workbook()
