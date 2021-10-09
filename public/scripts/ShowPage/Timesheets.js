@@ -54,7 +54,6 @@ generateTimesheets=() => {
     toggleLoadingScreen(true, 'Generating...')
 
     let checkGenerationInterval
-    let downloadPath
     console.log('sending put request')
 
     // Post estimate data and version to server
@@ -64,7 +63,6 @@ generateTimesheets=() => {
         credentials: 'include'
     }).then(response => { return response.json() })
         .then(responseData => {
-            downloadPath=responseData.file.path
             // Check evey 500 ms to see if generation is done
             checkGenerationInterval=setInterval(() => {
                 fetch(server+`/checkgenerated/${responseData.file.filename}`, { method: 'GET', credentials: 'include' })
