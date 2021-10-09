@@ -29,7 +29,7 @@ tsGenQueue.process(async (job, done) => {
 
     // Generate timesheets
     console.log(`Job ${job.data.filename} started`)
-    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
+    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename)
     console.log(`Timesheets generated for job ${job.data.filename}`)
 
     // Write completed timesheets back to database
@@ -74,12 +74,12 @@ function getDaysOfWeekEnding(date) {
 }
 
 // Generate timesheets using the file at filepath as the template workbook
-async function generateTimesheets(show, valueMap, week, fileid, filename) {
+async function generateTimesheets(show, valueMap, week, filename) {
     console.log(`\n\nFilename: ${filename}`)
     console.log(`/uploads: ${fs.readdirSync(path.join(__dirname, '/uploads/'))}\n\n`)
 
     // Get timesheet template workbook
-    const filepath=`${path.join(__dirname, '/uploads')}/${fileid}.xlsx`
+    const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
     let workbook=new ExcelJS.Workbook()
     await workbook.xlsx.readFile(filepath)
     let sheet=workbook.worksheets[0]
