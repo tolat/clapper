@@ -38,7 +38,7 @@ tsGenQueue.process(async (job, done) => {
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 })
 
-function pipeCompletedTimesheetsToDb() {
+function pipeCompletedTimesheetsToDb(job) {
     return new Promise(function (resolve, reject) {
         // Stream completed timesheets to mongo 
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
@@ -50,11 +50,11 @@ function pipeCompletedTimesheetsToDb() {
     })
 }
 
-function pipeTemplateFromDb() {
+function pipeTemplateFromDb(job) {
     return new Promise(function (resolve, reject) {
         // Create streams and read file from mongo to local uploads directory and add .xlsx extension
-        const readDB=global.gfs.createReadStream({ _id: fileid })
-        const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
+        const readDB=global.gfs.createReadStream({ _id: job.data.fileid })
+        const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
         const writeLocal=fs.createWriteStream(filepath)
         writeLocal.on('finish', () => resolve())
         writeLocal.on('error', () => reject())
