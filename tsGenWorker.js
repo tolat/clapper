@@ -33,12 +33,12 @@ tsGenQueue.process(async (job, done) => {
     console.log(`Timesheets generated for job ${job.data.filename}`)
 
     // Write completed timesheets back to database
-    try {
-        await pipeCompletedTimesheetsToDb(job)
-    } catch (e) {
+    await pipeCompletedTimesheetsToDb(job).catch(error => {
         conosle.log('pipeCompletedTimesheetsToDb REJECTED')
-        console.log(e)
-    }
+        console.log(error.message)
+        console.log(error.stack)
+
+    })
 
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 })
@@ -50,7 +50,7 @@ function pipeCompletedTimesheetsToDb(job) {
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({ filename: job.data.filename })
         writeDB.on('finish', () => resolve())
-        writeDB.on('error', (e) => reject(e.message))
+        writeDB.on('error', (e) => reject(e))
         readLocal.pipe(writeDB)
     })
 }
