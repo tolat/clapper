@@ -35,11 +35,11 @@ tsGenQueue.process(async (job, done) => {
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
     console.log(filepath)
     const readLocal=fs.createReadStream(filepath)
-    const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { }})
+    const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { })
 
-//await readLocal.pipe(writeDB)
+    //await readLocal.pipe(writeDB)
 
-done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 
 })
 
