@@ -133,11 +133,22 @@ if (process.env.NODE_ENV=='production') {
         const resultObj=JSON.parse(JSON.parse(result))
         console.log(`Job ${resultObj.filename} Complete!`)
 
+        // Wait for completed timehseets file to be piped from db
+        await pipeCompetedTimesheetsFromDB(resultObj)
+
+        // Makr this file as completed
+        global.generatedTimesheets.push(resultObj.filename)
+    })
+}
+
+function pipeCompetedTimesheetsFromDB(resultObj) {
+    return new Promise(function (resolve, reject) {
         const readDB=global.gfs.createReadStream({ _id: resultObj.fileid })
         const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`
-        const writeLocal=fs.createWriteStream(filepath).on('finish', () => { global.generatedTimesheets.push(resultObj.filename) })
+        const writeLocal=fs.createWriteStream(filepath)
+        writeLocal.on('finish', () => resolve())
+        writeLocal.on('error', () => reject())
         readDB.pipe(writeLocal)
-
     })
 }
 
