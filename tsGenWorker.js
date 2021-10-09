@@ -34,7 +34,7 @@ tsGenQueue.process(async (job, done) => {
 
     // Write completed timesheets back to database
     await pipeCompletedTimesheetsToDb(job).catch(error => {
-        conosle.log('pipeCompletedTimesheetsToDb REJECTED')
+        console.log('pipeCompletedTimesheetsToDb REJECTED')
         console.log(error.message)
         console.log(error.stack)
 
