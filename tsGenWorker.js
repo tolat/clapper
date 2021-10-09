@@ -25,15 +25,12 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Generate timesheets
-    console.log('1')
 
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
 
-    console.log('2')
 
     // Stream completed timesheets to mongo 
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
-    console.log(filepath)
     const readLocal=fs.createReadStream(filepath)
     const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { })
 
@@ -87,6 +84,7 @@ async function generateTimesheets(show, valueMap, week, fileid, filename) {
 
         // Create worksheet copies
         for (user of week.crew.crewList) {
+            console.log(user.username)
             let record=user.showrecords.find(r => r.showid==show._id.toString())
             for (pos of record.positions) {
                 // Make sure sheet name is under 31 chars (excel limitation)
@@ -202,9 +200,6 @@ async function generateTimesheets(show, valueMap, week, fileid, filename) {
         }
 
         await workbook.xlsx.writeFile(filepath)
-
-        console.log(`\n\nFilename: ${filename}`)
-        console.log(`/uploads: ${fs.readdirSync(filepath)}\n\n`)
     }
 }
 
