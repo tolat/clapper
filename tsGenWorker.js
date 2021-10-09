@@ -26,7 +26,9 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 tsGenQueue.process(async (job, done) => {
     // Generate timesheets
 
+    console.log(`Job ${job.data.filename} started`)
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.fileid, job.data.filename)
+    console.log(`Timesheets generated for job ${job.data.filename}`)
 
 
     // Stream completed timesheets to mongo 
@@ -84,7 +86,6 @@ async function generateTimesheets(show, valueMap, week, fileid, filename) {
 
         // Create worksheet copies
         for (user of week.crew.crewList) {
-            console.log(user.username)
             let record=user.showrecords.find(r => r.showid==show._id.toString())
             for (pos of record.positions) {
                 // Make sure sheet name is under 31 chars (excel limitation)
@@ -200,6 +201,8 @@ async function generateTimesheets(show, valueMap, week, fileid, filename) {
         }
 
         await workbook.xlsx.writeFile(filepath)
+
+        console.log('At end of generation function')
     }
 }
 
