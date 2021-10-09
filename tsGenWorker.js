@@ -35,11 +35,11 @@ tsGenQueue.process(async (job, done) => {
     const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
     console.log(filepath)
     const readLocal=fs.createReadStream(filepath)
-    const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { console.log('\n\nDONE PIPING\n\n') })
+    const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { }})
 
-    //await readLocal.pipe(writeDB)
+//await readLocal.pipe(writeDB)
 
-    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 
 })
 
@@ -62,8 +62,12 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
     const writeLocal=fs.createWriteStream(filepath).on('finish', () => { generate() })
     readDB.pipe(writeLocal)
 
+
     // Callback to generate timesheets once file is uploaded from mongo to server uploads folder
     async function generate() {
+        console.log(`\n\nFilename: ${filename}`)
+        console.log(`/uploads: ${fs.readdirSync(filepath)}\n\n`)
+
         // Get timesheet template workbook
         let workbook=new ExcelJS.Workbook()
         await workbook.xlsx.readFile(filepath)
@@ -197,9 +201,10 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
             }
         }
 
-        console.log('writing final changes to timesheet..')
         await workbook.xlsx.writeFile(filepath)
-        console.log('Done writing final changes.')
+
+        console.log(`\n\nFilename: ${filename}`)
+        console.log(`/uploads: ${fs.readdirSync(filepath)}\n\n`)
     }
 }
 
