@@ -79,6 +79,7 @@ async function generateTimesheets(show, valueMap, week, fileid, filename) {
     console.log(`/uploads: ${fs.readdirSync(path.join(__dirname, '/uploads/'))}\n\n`)
 
     // Get timesheet template workbook
+    const filepath=`${path.join(__dirname, '/uploads')}/${fileid}.xlsx`
     let workbook=new ExcelJS.Workbook()
     await workbook.xlsx.readFile(filepath)
     let sheet=workbook.worksheets[0]
