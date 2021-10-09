@@ -49,7 +49,7 @@ function pipeCompletedTimesheetsToDb(job) {
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({ filename: job.data.filename })
         writeDB.on('finish', () => resolve())
-        writeDB.on('error', () => reject(e))
+        writeDB.on('error', (e) => reject(e))
         readLocal.pipe(writeDB)
     })
 }
