@@ -129,7 +129,7 @@ global.generatedTimesheets=[]
 // Listen to Bull queue for completed timnesheet generation if in production mode
 if (process.env.NODE_ENV=='production') {
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
-    tsGenQueue.on('global:completed', (job, result) => {
+    tsGenQueue.on('global:completed', async (job, result) => {
         const resultObj=JSON.parse(JSON.parse(result))
         console.log(`Job ${resultObj.filename} Complete!`)
 
