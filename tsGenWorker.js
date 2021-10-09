@@ -37,7 +37,7 @@ tsGenQueue.process(async (job, done) => {
     const readLocal=fs.createReadStream(filepath)
     const writeDB=global.gfs.createWriteStream({ filename: job.data.filename }).on('finish', () => { console.log('\n\nDONE PIPING\n\n') })
 
-    await readLocal.pipe(writeDB)
+    //await readLocal.pipe(writeDB)
 
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 
@@ -197,7 +197,9 @@ generateTimesheets=async function (show, valueMap, week, fileid, filename) {
             }
         }
 
+        console.log('writing final changes to timesheet..')
         await workbook.xlsx.writeFile(filepath)
+        console.log('Done writing final changes.')
     }
 }
 
