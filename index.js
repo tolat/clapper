@@ -23,13 +23,6 @@ const fs=require('fs')
 const Queue=require('bull')
 const GridStream=require('gridfs-stream')
 
-// Test redis conenction is working
-const redis=require('redis')
-let rConnection=redis.createClient()
-rConnection.on('connect', function () {
-    rConnection.set('jim', 'new')
-})
-
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
