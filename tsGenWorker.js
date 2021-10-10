@@ -59,7 +59,7 @@ function pipeCompletedTimesheetsToDb(job) {
         // Stream completed timesheets to mongo 
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({
-            filename: job.data.filename,
+            filename: job.data.filename+'999',
             content_type: job.data.contentType
         })
         writeDB.on('finish', () => resolve())
