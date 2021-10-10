@@ -62,7 +62,7 @@ function pipeCompletedTimesheetsToDb(job) {
             content_type: job.data.contentType
         })
         writeDB.on('finish', () => resolve())
-        writeDB.on('error', err => resolve(err))
+        writeDB.on('error', err => reject(err))
 
         readLocal.pipe(writeDB)
     })
