@@ -25,14 +25,18 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Wait for template to be piped form the database
+    console.log('piping from db')
     await pipeTemplateFromDb(job)
 
+    console.log('generating')
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename)
 
+    console.log('deleting old upload')
     // Delete old file from GridFS
     await removeTemplateFromDB(job.data.filename)
 
+    console.log('piping completed to db')
     // Write completed timesheets back to database
     await pipeCompletedTimesheetsToDb(job)
 
@@ -52,8 +56,7 @@ function pipeCompletedTimesheetsToDb(job) {
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({
             filename: job.data.filename,
-            content_type: job.data.contentType,
-            testfield: 'made it!'
+            content_type: job.data.contentType
         })
         writeDB.on('finish', () => resolve())
         writeDB.on('error', function (err) {
