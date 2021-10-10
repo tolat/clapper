@@ -52,11 +52,9 @@ function removeTemplateFromDB(filename) {
 function pipeCompletedTimesheetsToDb(job) {
     return new Promise(function (resolve, reject) {
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
-        const newPath=`${path.join(__dirname, '/uploads')}/${job.data.filename}`
-        fs.renameSync(filepath, newPath)
 
         // Stream completed timesheets to mongo 
-        const readLocal=fs.createReadStream(newPath)
+        const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({
             filename: job.data.filename,
             content_type: job.data.contentType

@@ -143,7 +143,7 @@ if (process.env.NODE_ENV=='production') {
 
 function pipeCompetedTimesheetsFromDB(resultObj) {
     return new Promise(function (resolve, reject) {
-        const readDB=global.gfs.createReadStream({ _id: resultObj.fileid })
+        const readDB=global.gfs.createReadStream({ filename: resultObj.filename })
         const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`
         const writeLocal=fs.createWriteStream(filepath)
         writeLocal.on('finish', () => resolve())
