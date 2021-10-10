@@ -58,12 +58,16 @@ function pipeCompletedTimesheetsToDb(job) {
             filename: job.data.filename,
             content_type: job.data.contentType
         })
+
         writeDB.on('finish', () => resolve())
         writeDB.on('error', function (err) {
             console.log(err)
             console.log('streaming error')
         })
-        //readLocal.pipe(writeDB)
+
+        readLocal.on('open', function () {
+            readLocal.pipe(writeDB)
+        })
     })
 }
 
