@@ -42,12 +42,17 @@ tsGenQueue.process(async (job, done) => {
     try {
         await pipeCompletedTimesheetsToDb(job)
         console.log('piping to db SUCCEEDED')
+
+        // Send done signal for this job
+        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
     } catch (e) {
         console.log('piping to db FAILED')
+
+        // Send done signal for this job
+        done(null, 'Saving to DB Failed')
     }
 
-    // Send done signal for this job
-    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+
 
 })
 
@@ -66,7 +71,7 @@ function pipeCompletedTimesheetsToDb(job) {
         // Stream completed timesheets to mongo 
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({
-            filename: job.data.filename+'_completed',
+            filename: job.data.filename,
             content_type: job.data.contentType
         })
         writeDB.on('close', () => resolve())
@@ -101,9 +106,6 @@ function getDaysOfWeekEnding(date) {
 
 // Generate timesheets using the file at filepath as the template workbook
 async function generateTimesheets(show, valueMap, week, filename) {
-    console.log(`\n\nFilename: ${filename}`)
-    console.log(`/uploads: ${fs.readdirSync(path.join(__dirname, '/uploads/'))}\n\n`)
-
     // Get timesheet template workbook
     const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
     let workbook=new ExcelJS.Workbook()

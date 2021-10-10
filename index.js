@@ -130,41 +130,26 @@ global.generatedTimesheets=[]
 if (process.env.NODE_ENV=='production') {
     global.tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', async (job, result) => {
+
+        if (result=='Saving to DB Failed') {
+            console.log(result)
+            return
+        }
+
         const resultObj=JSON.parse(JSON.parse(result))
-        resultObj.filename="c8d06913e9788261c59364f5376e415c"
         console.log(`Job ${resultObj.filename} Complete!`)
 
-        await checkFileExistsInDb(resultObj.filename+'_completed')
+        console.log('piping completed timesheets from db')
+        await pipeCompletedTimesheetsFromDB(resultObj)
 
-        // Wait for completed timehseets file to be piped from db
-        try {
-            console.log('piping completed timesheets from db')
-            await pipeCompletedTimesheetsFromDB(resultObj)
-            // Make this file as completed
-            global.generatedTimesheets.push(resultObj.filename)
-        } catch (e) {
-            console.log('pipe from db failed')
-        }
-    })
-}
-
-function checkFileExistsInDb(filename) {
-    return new Promise(function (resolve, reject) {
-        global.gfs.exist({ filename: filename }, function (err, found) {
-            if (found) {
-                console.log('File found!')
-                resolve()
-            } else {
-                console.log('File NOT found!')
-                resolve()
-            }
-        })
+        // Make this file as completed
+        global.generatedTimesheets.push(resultObj.filename)
     })
 }
 
 function pipeCompletedTimesheetsFromDB(resultObj) {
     return new Promise(function (resolve, reject) {
-        const readDB=global.gfs.createReadStream({ filename: resultObj.filename+'_completed' })
+        const readDB=global.gfs.createReadStream({ filename: resultObj.filename })
         const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`
         const writeLocal=fs.createWriteStream(filepath)
         writeLocal.on('finish', () => resolve())
