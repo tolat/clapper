@@ -45,13 +45,8 @@ function pipeCompletedTimesheetsToDb(job) {
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({ filename: job.data.filename })
         writeDB.on('finish', () => resolve())
-        writeDB.on('error', (err) => {
-            console.log('\n')
-            console.log('\n')
-            console.log(err)
-            console.log('\n')
-            console.log('\n')
-            resolve()
+        writeDB.on('error', function (err) {
+            console.log('\n\nAn error has occured!\n\n', err)
         })
         readLocal.pipe(writeDB)
     })
