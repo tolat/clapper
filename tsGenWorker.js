@@ -28,9 +28,10 @@ tsGenQueue.process(async (job, done) => {
     await pipeTemplateFromDb(job)
 
     // Generate timesheets
-    console.log(`Job ${job.data.filename} started`)
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename)
-    console.log(`Timesheets generated for job ${job.data.filename}`)
+
+    // Delete old file from GridFS
+    await removeTemplateFromDB(job.data.filename)
 
     // Write completed timesheets back to database
     await pipeCompletedTimesheetsToDb(job)
@@ -38,15 +39,25 @@ tsGenQueue.process(async (job, done) => {
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 })
 
+function removeTemplateFromDB(filename) {
+    return new Promise(function (resolve, reject) {
+        global.gfs.remove({ filename }, () => resolve())
+    })
+}
+
 function pipeCompletedTimesheetsToDb(job) {
     return new Promise(function (resolve, reject) {
         // Stream completed timesheets to mongo 
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
         const readLocal=fs.createReadStream(filepath)
-        const writeDB=global.gfs.createWriteStream({ filename: job.data.filename })
+        const writeDB=global.gfs.createWriteStream({
+            filename: job.data.filename,
+            contentType: job.data.contentType,
+            testfield: 'made it!'
+        })
         writeDB.on('finish', () => resolve())
         writeDB.on('error', function (err) {
-            console.log('\n\nAn error has occured!\n\n', err)
+            console.log('streaming error')
         })
         readLocal.pipe(writeDB)
     })

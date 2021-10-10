@@ -134,7 +134,8 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
             valueMap: cellValueMap,
             week,
             fileid: req.file.id,
-            filename: req.file.filename
+            filename: req.file.filename,
+            contentType: req.file.contentType
         })
     }
 
