@@ -148,6 +148,7 @@ if (process.env.NODE_ENV=='production') {
 }
 
 function checkFileExistsInDb(filename) {
+    console.log(global.gfs.list())
     return new Promise(function (resolve, reject) {
         global.gfs.exist({ filename: filename }, function (err, found) {
             if (found) {
