@@ -33,13 +33,14 @@ tsGenQueue.process(async (job, done) => {
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename)
 
     console.log('deleting old upload')
-    // Delete old file from GridFS
+    //Delete old file from GridFS
     await removeTemplateFromDB(job.data.filename)
 
     console.log('piping completed to db')
     // Write completed timesheets back to database
     await pipeCompletedTimesheetsToDb(job).catch(err => console.log(`STREAM ERROR: ${err}`))
 
+    // Send done signal for this job
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 })
 
@@ -52,6 +53,8 @@ function removeTemplateFromDB(filename) {
 function pipeCompletedTimesheetsToDb(job) {
     return new Promise(function (resolve, reject) {
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
+
+        console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
 
         // Stream completed timesheets to mongo 
         const readLocal=fs.createReadStream(filepath)
