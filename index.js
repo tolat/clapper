@@ -131,6 +131,7 @@ if (process.env.NODE_ENV=='production') {
     global.tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     tsGenQueue.on('global:completed', async (job, result) => {
         const resultObj=JSON.parse(JSON.parse(result))
+        resultObj.filename="c8d06913e9788261c59364f5376e415c"
         console.log(`Job ${resultObj.filename} Complete!`)
 
         await checkFileExistsInDb(resultObj.filename+'_completed')
