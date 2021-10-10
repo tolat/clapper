@@ -63,8 +63,7 @@ function pipeCompletedTimesheetsToDb(job) {
             console.log(err)
             console.log('streaming error')
         })
-        console.log(writeDB)
-        readLocal.pipe(writeDB)
+        //readLocal.pipe(writeDB)
     })
 }
 
