@@ -135,7 +135,8 @@ if (process.env.NODE_ENV=='production') {
 
         // Wait for completed timehseets file to be piped from db
         try {
-            await pipeCompetedTimesheetsFromDB(resultObj)
+            console.log('piping completed timesheets from db')
+            await pipeCompletedTimesheetsFromDB(resultObj)
             // Make this file as completed
             global.generatedTimesheets.push(resultObj.filename)
         } catch (e) {
@@ -144,7 +145,7 @@ if (process.env.NODE_ENV=='production') {
     })
 }
 
-function pipeCompetedTimesheetsFromDB(resultObj) {
+function pipeCompletedTimesheetsFromDB(resultObj) {
     return new Promise(function (resolve, reject) {
         const readDB=global.gfs.createReadStream({ filename: resultObj.filename+'_completed' })
         const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`

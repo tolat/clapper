@@ -25,6 +25,7 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Wait for template to be piped form the database
+    console.log("Worker picked up job..")
     console.log('piping from db')
     await pipeTemplateFromDb(job)
 
@@ -38,10 +39,16 @@ tsGenQueue.process(async (job, done) => {
 
     console.log('piping completed to db')
     // Write completed timesheets back to database
-    await pipeCompletedTimesheetsToDb(job).catch(err => console.log(`STREAM ERROR: ${err}`))
+    try {
+        await pipeCompletedTimesheetsToDb(job)
+        console.log('piping to db SUCCEEDED')
 
-    // Send done signal for this job
-    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+        // Send done signal for this job
+        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+    } catch (e) {
+        console.log('piping to db FAILED')
+    }
+
 })
 
 function removeTemplateFromDB(filename) {
@@ -62,7 +69,7 @@ function pipeCompletedTimesheetsToDb(job) {
             filename: job.data.filename+'_completed',
             content_type: job.data.contentType
         })
-        writeDB.on('finish', () => resolve())
+        writeDB.on('close', () => resolve())
         writeDB.on('error', err => reject(err))
 
         readLocal.pipe(writeDB)
