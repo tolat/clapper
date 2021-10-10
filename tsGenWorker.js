@@ -42,12 +42,12 @@ tsGenQueue.process(async (job, done) => {
     try {
         await pipeCompletedTimesheetsToDb(job)
         console.log('piping to db SUCCEEDED')
-
-        // Send done signal for this job
-        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
     } catch (e) {
         console.log('piping to db FAILED')
     }
+
+    // Send done signal for this job
+    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 
 })
 
