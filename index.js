@@ -133,7 +133,7 @@ if (process.env.NODE_ENV=='production') {
         const resultObj=JSON.parse(JSON.parse(result))
         console.log(`Job ${resultObj.filename} Complete!`)
 
-        global.gfs.exist({ filename: resultObj.filename }, function (err, found) {
+        await global.gfs.exist({ filename: resultObj.filename }, function (err, found) {
             found? console.log('File exists'):console.log('File does not exist');
         })
 
