@@ -52,9 +52,7 @@ generateTimesheets=() => {
     if (invalidCellsRemain()) { return }
 
     toggleLoadingScreen(true, 'Generating...')
-
     let checkGenerationInterval
-    console.log('sending put request')
 
     // Post estimate data and version to server
     fetch(server+`/shows/${_show._id}/Timesheets`, {
@@ -63,14 +61,13 @@ generateTimesheets=() => {
         credentials: 'include'
     }).then(response => { return response.json() })
         .then(responseData => {
-            // Check evey 500 ms to see if generation is done
+            // Check evey  1000 ms to see if generation is done
             checkGenerationInterval=setInterval(() => {
                 fetch(server+`/checkgenerated/${responseData.file.filename}`, { method: 'GET', credentials: 'include' })
                     .then(response => { return response.json() })
                     .then(responseData => {
                         // If timesheets generated then download the .xlsx file from server
                         if (responseData.filename) {
-                            console.log("Ready!")
                             toggleLoadingScreen(false)
                             downloadTimesheets(responseData.filename)
                             window.clearInterval(checkGenerationInterval)
