@@ -54,12 +54,16 @@ function pipeCompletedTimesheetsToDb(job) {
         // Stream completed timesheets to mongo 
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
         const readLocal=fs.createReadStream(filepath)
-        const writeDB=global.gfs.createWriteStream()
+        const writeDB=global.gfs.createWriteStream({
+            filename: job.data.filename,
+            content_type: job.data.contentType
+        })
         writeDB.on('finish', () => resolve())
         writeDB.on('error', function (err) {
             console.log(err)
             console.log('streaming error')
         })
+        console.log(writeDB)
         readLocal.pipe(writeDB)
     })
 }
