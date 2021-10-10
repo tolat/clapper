@@ -23,6 +23,13 @@ const fs=require('fs')
 const Queue=require('bull')
 const GridStream=require('gridfs-stream')
 
+// Test redis conenction is working
+const redis=require('redis')
+let rConnection=redis.createClient()
+rConnection.on('connect', function () {
+    rConnection.set('jim', 'new')
+})
+
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
@@ -50,6 +57,7 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize())
+
 
 // Helmet
 const contentSecurityPolicy={
@@ -123,30 +131,26 @@ app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 
 
-// Check if timesheets for file have been generated
+// global variables for timesheet generation
 global.generatedTimesheets=[]
+const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
-// Listen to Bull queue for completed timnesheet generation if in production mode
-if (process.env.NODE_ENV=='production') {
-    global.tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
-    tsGenQueue.on('global:completed', async (job, result) => {
-        console.log(`REsult: ${result}`)
+// Listen to Bull queue for completed timesheet generation 
+tsGenQueue.on('global:completed', async (job, result) => {
+    if (result=='"Saving to DB Failed"') {
+        console.log(result)
+        return
+    }
 
-        if (result=='"Saving to DB Failed"') {
-            console.log(result)
-            return
-        }
+    const resultObj=JSON.parse(JSON.parse(result))
+    console.log(`Job ${resultObj.filename} Complete!`)
 
-        const resultObj=JSON.parse(JSON.parse(result))
-        console.log(`Job ${resultObj.filename} Complete!`)
+    console.log('piping completed timesheets from db')
+    await pipeCompletedTimesheetsFromDB(resultObj)
 
-        console.log('piping completed timesheets from db')
-        await pipeCompletedTimesheetsFromDB(resultObj)
-
-        // Make this file as completed
-        global.generatedTimesheets.push(resultObj.filename)
-    })
-}
+    // Make this file as completed
+    global.generatedTimesheets.push(resultObj.filename)
+})
 
 function pipeCompletedTimesheetsFromDB(resultObj) {
     return new Promise(function (resolve, reject) {

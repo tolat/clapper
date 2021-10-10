@@ -119,32 +119,19 @@ router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, nex
     let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
     let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
 
-    // Generate timsheets (local)
-    generateLocal=async () => {
-        // Generate timesheets
-        generateTimesheets(show, cellValueMap, week, req.file.id, req.file.filename)
-    }
+    console.log('queueing job for worker')
+    // Queue generation job for worker
+    const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
-    // Queue timesheet generation for worker (production)
-    generateProduction=async () => {
-        console.log('queueing job for worker')
-        // Queue generation job for worker
-        const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
-        await tsGenQueue.add({
-            show,
-            valueMap: cellValueMap,
-            week,
-            fileid: req.file.id,
-            filename: req.file.filename,
-            contentType: req.file.contentType
-        })
-        console.log('DONE queueing job for worker')
-
-    }
-
-
-    // Process timesheet generation with appropriate function
-    process.env.NODE_ENV=='production'? generateProduction():generateLocal()
+    await tsGenQueue.add({
+        show,
+        valueMap: cellValueMap,
+        week,
+        fileid: req.file.id,
+        filename: req.file.filename,
+        contentType: req.file.contentType
+    })
+    console.log('DONE queueing job for worker')
 
     // Send file info back
     res.send({ file: req.file, body: req.body })

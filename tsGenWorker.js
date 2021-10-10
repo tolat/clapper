@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV!=='production') {
+    require('dotenv').config()
+}
+
 const Queue=require('bull')
 const ExcelJS=require('exceljs')
 const fs=require('fs')
@@ -51,9 +55,6 @@ tsGenQueue.process(async (job, done) => {
         // Send done signal for this job
         done(null, 'Saving to DB Failed')
     }
-
-
-
 })
 
 function removeTemplateFromDB(filename) {
@@ -66,18 +67,20 @@ function pipeCompletedTimesheetsToDb(job) {
     return new Promise(function (resolve, reject) {
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
 
-        console.log(fs.readdirSync(path.join(__dirname, '/uploads/')))
-
         // Stream completed timesheets to mongo 
         const readLocal=fs.createReadStream(filepath)
+
         const writeDB=global.gfs.createWriteStream({
             filename: job.data.filename,
             content_type: job.data.contentType
         })
-        writeDB.on('close', () => resolve())
-        writeDB.on('error', err => reject(err))
+        writeDB.on('finish', () => resolve())
+        //writeDB.on('error', err => { console.log(err), reject() })
 
-        readLocal.pipe(writeDB)
+        readLocal.on('open', function () {
+            console.log(`readstream open, piping...`)
+            readLocal.pipe(writeDB)
+        })
     })
 }
 
