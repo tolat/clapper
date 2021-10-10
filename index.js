@@ -132,7 +132,7 @@ if (process.env.NODE_ENV=='production') {
     tsGenQueue.on('global:completed', async (job, result) => {
         console.log(`REsult: ${result}`)
 
-        if (result=='Saving to DB Failed') {
+        if (result=='"Saving to DB Failed"') {
             console.log(result)
             return
         }
