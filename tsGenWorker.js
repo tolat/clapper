@@ -38,7 +38,7 @@ tsGenQueue.process(async (job, done) => {
 
     console.log('piping completed to db')
     // Write completed timesheets back to database
-    await pipeCompletedTimesheetsToDb(job)
+    await pipeCompletedTimesheetsToDb(job).catch(err => console.log(`STREAM ERROR: ${err}`))
 
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 })
@@ -62,7 +62,7 @@ function pipeCompletedTimesheetsToDb(job) {
             content_type: job.data.contentType
         })
         writeDB.on('finish', () => resolve())
-        writeDB.on('error', function (err) { console.log(`STREAM ERROR: ${err}`) })
+        writeDB.on('error', err => resolve(err))
 
         readLocal.pipe(writeDB)
     })
