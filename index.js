@@ -134,10 +134,13 @@ if (process.env.NODE_ENV=='production') {
         console.log(`Job ${resultObj.filename} Complete!`)
 
         // Wait for completed timehseets file to be piped from db
-        await pipeCompetedTimesheetsFromDB(resultObj)
-
-        // Makr this file as completed
-        global.generatedTimesheets.push(resultObj.filename)
+        try {
+            await pipeCompetedTimesheetsFromDB(resultObj)
+            // Make this file as completed
+            global.generatedTimesheets.push(resultObj.filename)
+        } catch (e) {
+            console.log('pipe from db failed')
+        }
     })
 }
 
@@ -152,7 +155,7 @@ function pipeCompetedTimesheetsFromDB(resultObj) {
     })
 }
 
-// Check if timesheets ahve been generated for :filenamme template
+// Check if timesheets have been generated for :filenamme template
 app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
     // Tell client if timesheets for :filename have been generated
     if (global.generatedTimesheets.includes(req.params.filename)) {
