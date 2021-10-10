@@ -29,32 +29,20 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Wait for template to be piped form the database
-    console.log("Worker picked up job..")
-    console.log('piping from db')
     await pipeTemplateFromDb(job)
 
-    console.log('generating')
     // Generate timesheets
     await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename)
 
-    console.log('deleting old upload')
     //Delete old file from GridFS
     await removeTemplateFromDB(job.data.filename)
 
-    console.log('piping completed to db')
     // Write completed timesheets back to database
-    try {
-        await pipeCompletedTimesheetsToDb(job)
-        console.log('piping to db SUCCEEDED')
+    await pipeCompletedTimesheetsToDb(job)
 
-        // Send done signal for this job
-        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
-    } catch (e) {
-        console.log('piping to db FAILED')
+    // Finish job 
+    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
 
-        // Send done signal for this job
-        done(null, 'Saving to DB Failed')
-    }
 })
 
 function removeTemplateFromDB(filename) {
@@ -69,18 +57,12 @@ function pipeCompletedTimesheetsToDb(job) {
 
         // Stream completed timesheets to mongo 
         const readLocal=fs.createReadStream(filepath)
-
         const writeDB=global.gfs.createWriteStream({
             filename: job.data.filename,
             content_type: job.data.contentType
         })
         writeDB.on('finish', () => resolve())
-        //writeDB.on('error', err => { console.log(err), reject() })
-
-        readLocal.on('open', function () {
-            console.log(`readstream open, piping...`)
-            readLocal.pipe(writeDB)
-        })
+        readLocal.on('open', function () { readLocal.pipe(writeDB) })
     })
 }
 

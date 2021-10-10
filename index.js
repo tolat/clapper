@@ -130,21 +130,16 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Listen to Bull queue for completed timesheet generation 
 tsGenQueue.on('global:completed', async (job, result) => {
-    if (result=='"Saving to DB Failed"') {
-        console.log(result)
-        return
-    }
-
     const resultObj=JSON.parse(JSON.parse(result))
-    console.log(`Job ${resultObj.filename} Complete!`)
 
-    console.log('piping completed timesheets from db')
+    // Pipe in completed timesheets form DB
     await pipeCompletedTimesheetsFromDB(resultObj)
 
     // Make this file as completed
     global.generatedTimesheets.push(resultObj.filename)
 })
 
+// Helper to return a promise that resolves when timesheets are piped in from db
 function pipeCompletedTimesheetsFromDB(resultObj) {
     return new Promise(function (resolve, reject) {
         const readDB=global.gfs.createReadStream({ filename: resultObj.filename })
