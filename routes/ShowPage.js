@@ -754,10 +754,18 @@ updateCrew=async function (body, showId) {
             let record=crew.showrecords.find(r => r.showid==show._id.toString())
             for (pos of record.positions) {
                 if (!body.data.find(item => item['username']==crew['username']&&item['Position']==pos.code)) {
+                    // Delete days worked in this week for this position
                     for (day of body.currentWeekDays) {
                         delete pos.daysWorked[day]
                     }
 
+                    // Delete this week's rentals for this position
+                    for (rental of show.weeks[_wk].rentals.rentalList) {
+                        if (rental.Supplier==crew.username&&rental.Code==pos.code) {
+                            show.weeks[_wk].rentals.rentalList=show.weeks[_wk].rentals.rentalList.filter(r => r!=rental)
+                        }
+                    }
+                    show.markModified('weeks.rentals')
                 }
             }
 
