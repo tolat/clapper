@@ -195,7 +195,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
                     let cell=`${col}:${row}`
                     let value=valueMap[col][row]
 
-                    // Load basic variables into spreadsheet
+                    // Load basic variables 
                     switch (value) {
                         case 'Show-Name':
                             sheet.getCell(cell).value=show.Name
@@ -214,11 +214,42 @@ async function generateTimesheets(show, valueMap, week, filename) {
                             break;
                     }
 
-                    // Load hour variable values into spreadsheet
+                    // Load hour variables 
                     if (Object.keys(mulHoursMap).includes(value)) {
                         let val=mulHoursMap[value]
                         if (isNaN(val)) { val=0 }
                         sheet.getCell(cell).value=val
+                    }
+
+                    // Load weekday date variables
+                    if (currentWeekDays.map(wd => wd.toString().slice(0, 3)+'-Date').includes(value)) {
+                        let dayStr=currentWeekDays.map(wd => wd.toString().slice(0, 3)).filter(d => value.includes(d))[0]
+                        let date=currentWeekDays.find(wd => wd.toString().includes(dayStr))
+                        sheet.getCell(cell).value=date.toLocaleDateString('en-US')
+                    }
+
+                    // Load extracolumn variables
+                    for (extraCol of week.crew.extraColumns) {
+                        if (value==extraCol) {
+                            try {
+                                sheet.getCell(cell).value=record.weeksWorked[week._id].extraColumnValues[pos.code][value]
+                            } catch (e) {
+                                // Do nothing if error - value does not exist in db
+                                console.log(e.message)
+                            }
+                        }
+                    }
+
+                    // Load tax column variables
+                    for (taxCol of week.crew.taxColumns) {
+                        if (value==taxCol) {
+                            try {
+                                sheet.getCell(cell).value=record.weeksWorked[week._id].taxColumnValues[pos.code][value]
+                            } catch (e) {
+                                // Do nothing if error - value does not exist in db
+                                console.log(e.message)
+                            }
+                        }
                     }
                 }
             }

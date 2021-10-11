@@ -171,9 +171,12 @@
 
                     // Load tax column values 
                     let taxColumnValues=record.weeksWorked[_week._id].taxColumnValues
-                    for (tax in taxColumnValues) {
-                        item[tax]=zeroNanToNull(taxColumnValues[tax])
+                    if (taxColumnValues[pos.code]) {
+                        for (tax in taxColumnValues[pos.code]) {
+                            item[tax]=zeroNanToNull(taxColumnValues[pos.code][tax])
+                        }
                     }
+
 
                     // Load hours and setscodes for each day of this week ending
                     item=loadUserHours(pos, item);
@@ -186,7 +189,9 @@
 
                     // Add extra column values
                     for (col of _week.crew.extraColumns) {
-                        item[col]=record.weeksWorked[_week._id].extraColumnValues[col];
+                        if (record.weeksWorked[_week._id].extraColumnValues[pos.code]) {
+                            item[col]=record.weeksWorked[_week._id].extraColumnValues[pos.code][col];
+                        }
                     }
 
                     data.push(item);

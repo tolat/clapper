@@ -268,30 +268,6 @@ autoFillUserData=(args) => {
                 item['Phone']=user['Phone']
                 item['Email']=user['Email']
                 item['Name']=user['Name']
-                item.userid=user._id
-                let record=user.showrecords.find(r => r.showid==_show._id)
-                if (record) {
-                    let itemPosition=item['Position']
-                    let recordPosition=record.positions.find(p => p.code==itemPosition)
-                    let position=false;
-                    if (recordPosition) {
-                        item=loadUserHours(recordPosition, item)
-                    } else {
-                        recordPosition=record.positions[0]
-                        if (recordPosition) {
-                            item=loadUserHours(recordPosition, item)
-                            position=_show.positions.positionList.find(p => p['Code']==recordPosition.code)
-                        } else if (item['Position']) {
-                            position=_show.positions.positionList.find(p => p['Code']==item['Position'])
-                        }
-                        if (position) {
-                            item['Department']=position['Department']
-                            item['Position']=position['Code']
-                        }
-                    }
-                } else {
-                    clearShowRecordFields(item)
-                }
             }
             // If no user, set up item as a new user
             else {
@@ -303,6 +279,7 @@ autoFillUserData=(args) => {
                     }
                 }
             }
+            clearShowRecordFields(item)
         }
         // Else use previous values to populate
         else { item=loadPrevItemFromCommand(item) }

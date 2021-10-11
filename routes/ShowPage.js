@@ -598,6 +598,10 @@ updateCrew=async function (body, showId) {
         show.markModified('weeks')
         await show.save()
 
+        // Map to keep track of which duplicate-sensitive values that are cleared on 
+        // each save and re-defined using grid data have been cleared on this save
+        let clearedWeeklyValuesMap={}
+
         // Add/update user for each item
         for (item of body.data) {
             if (item&&item['username']&&item['Position']) {
@@ -663,10 +667,21 @@ updateCrew=async function (body, showId) {
                 record.weeksWorked[_cw]['#']=item['#'];
 
                 // Update tax
-                record.weeksWorked[_cw].taxColumnValues={}
-                for (tax of show.weeks[_wk].crew.taxColumns) {
-                    record.weeksWorked[_cw].taxColumnValues[tax]=item[tax]
+                if (!clearedWeeklyValuesMap[user.username]) {
+                    clearedWeeklyValuesMap[user.username]={}
                 }
+                if (!clearedWeeklyValuesMap[user.username].taxColumnValues) {
+                    record.weeksWorked[_cw].taxColumnValues={}
+                    clearedWeeklyValuesMap[user.username].taxColumnValues=true
+                }
+                for (tax of show.weeks[_wk].crew.taxColumns) {
+                    if (!record.weeksWorked[_cw].taxColumnValues[item['Position']]) {
+                        record.weeksWorked[_cw].taxColumnValues[item['Position']]={}
+                    }
+                    record.weeksWorked[_cw].taxColumnValues[item['Position']][tax]=item[tax]
+                }
+
+                console.log(record.weeksWorked[_cw].taxColumnValues)
 
                 // Update date joined
                 let date=new Date(item['Date Joined']);
@@ -699,9 +714,16 @@ updateCrew=async function (body, showId) {
                 }
 
                 // Save extra column values
-                record.weeksWorked[_cw].extraColumnValues={}
+                if (!clearedWeeklyValuesMap[user.username]) {
+                    clearedWeeklyValuesMap[user.username]={}
+                }
+                if (!clearedWeeklyValuesMap[user.username].extraColumnValues) {
+                    record.weeksWorked[_cw].extraColumnValues={}
+                    clearedWeeklyValuesMap[user.username].extraColumnValues=true
+                }
                 for (key of body.extraColumns) {
-                    record.weeksWorked[_cw].extraColumnValues[key]=item[key];
+                    record.weeksWorked[_cw].extraColumnValues[item['Position']]={}
+                    record.weeksWorked[_cw].extraColumnValues[item['Position']][key]=item[key];
                 }
 
                 // If creating new week, copy week worked from appropriate week 
@@ -731,6 +753,7 @@ updateCrew=async function (body, showId) {
                     for (day of body.currentWeekDays) {
                         delete pos.daysWorked[day]
                     }
+
                 }
             }
 

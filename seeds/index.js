@@ -105,14 +105,14 @@ const seedShows=async () => {
             },
             timesheets: {
                 timesheetMaps: [{
-                    name: "Map1",
+                    name: "Sample",
                     cellValueMap: {
                         "C": {
                             "3": "Show-Name",
                             "5": "Crew-Name"
                         },
                         "P": {
-                            "5": "Crew-Name",
+                            "5": "Crew-Position",
                         },
                         "W": {
                             "4": "Crew-Position-Rate"
@@ -120,7 +120,7 @@ const seedShows=async () => {
                     },
                     displaySettings: {},
                 }],
-                currentMap: "Map1"
+                currentMap: "Sample"
             }
         })
 

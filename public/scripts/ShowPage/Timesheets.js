@@ -218,6 +218,12 @@ initializeVariables=() => {
     for (day of _currentWeekDays) {
         const dayAbbrv=day.toString().slice(0, 3)
         variables.push({
+            name: `${dayAbbrv}-Date`,
+            description: `Calendar date for ${dayAbbrv} of current week`,
+            type: 'weekday-date'
+        })
+
+        variables.push({
             name: `${dayAbbrv}-Hours-Total`,
             description: `Total hours worked on ${dayAbbrv} of current week`,
             type: 'total-hours'
@@ -237,6 +243,15 @@ initializeVariables=() => {
             name: `${col}`,
             description: `User added column from Crew page`,
             type: 'custom-column',
+            col: col
+        })
+    }
+
+    for (col of _week.crew.taxColumns) {
+        variables.push({
+            name: `${col}`,
+            description: `User added TAX column from Crew page`,
+            type: 'custom-tax-column',
             col: col
         })
     }
