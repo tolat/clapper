@@ -212,6 +212,9 @@ async function generateTimesheets(show, valueMap, week, filename) {
                         case 'Crew-Position-Rate':
                             sheet.getCell(cell).value=position.Rate
                             break;
+                        case 'Week-End':
+                            sheet.getCell(cell).value=new Date(week.end).toLocaleDateString('en-US')
+                            break;
                     }
 
                     // Load hour variables 

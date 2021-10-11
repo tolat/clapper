@@ -59,20 +59,20 @@ Fixes:
 
 BUGS
 * Cost report does not calculate to date properly when users deleted from crew list (does not delete them) (FIXED)
+* Rentals do not clear when user has been deleted from the week! (FIXED)
 
 
 
 TODO:
 
 * if required for save field is left blank in crew page and save clears the row, the clear is not pushed to the undoredo buffer!
-* Rentals do not clear when user has been deleted from the week!
 * Add validation for column naming
 
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
--   Add sort by field on page loading (saves sort column instead of loading and sorting by number always)
+-   Add sort by field on page loading (saves sort column instead of loading and sorting by number always) - default col is num col
 
-2. Timesheets
+2. Timesheets (90% DONE - could add more features)
     -   TODO: finish timesheet crud
     -   Finish timesheet cellValueMap parser to export values to template
     -   Block sort by column on timesheets cols
