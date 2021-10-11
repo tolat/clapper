@@ -68,7 +68,7 @@ toggleDeleteShowWarningModal=(show, del=false, showid=null) => {
 // Sends a delete request to the server to delete show 
 deleteShow=(showid) => {
     // Send Delete request to server
-    fetch(_args.server+`shows/${showid}`, { method: 'DELETE' })
+    fetch(_args.server+`/shows/${showid}`, { method: 'DELETE' })
         .then(response => { return response.json() })
         .then(responseData => { console.log(responseData) })
 

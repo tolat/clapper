@@ -6,7 +6,7 @@
 
     var _validators=[];
     var _totals={};
-    var _currentMap=_show.timesheets.currentMap
+    var _currentMap=_show.timesheets.currentMap||false
     var _currentMapObject=false
     if (_currentMap) {
         _currentMapObject=_show.timesheets.timesheetMaps.find(m => m.name==_currentMap)
@@ -55,7 +55,7 @@
         await createSlickGrid(data, columns, options, _show, _args);
 
         // Apply display settings
-        if (_currentMapObject.displaySettings) { applyDisplaySettings(_currentMapObject.displaySettings) }
+        if (_currentMapObject&&_currentMapObject.displaySettings) { applyDisplaySettings(_currentMapObject.displaySettings) }
 
         // Update Totals Row (use just to show week ending here)
         await updateTotalsRow()
@@ -63,6 +63,7 @@
         // Does nothing, here to placate my angry console
         grid.recalculate=function () { }
 
+        console.log(_currentMap)
         if (!_currentMap) {
             document.getElementById("copy-current-checkbox-container").style.display='none'
             document.getElementById("new-timesheet-map-modal-cancel").style.display='none'

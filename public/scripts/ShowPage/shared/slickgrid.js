@@ -2738,8 +2738,10 @@ validateModalInput=(e, type) => {
     if (type=='number'&&!navKeys.includes(e.key)) {
         if (e.key=='.'&&!e.target.value.includes('.')) { return }
         else if (e.key=='-'&&!e.target.value.includes('-')) { return }
-        else {
-            e.target.value=zeroNanToNull(parseFloat(e.target.value+e.key))||''
+        else if ('1234567890'.split("").includes(e.key)) {
+            e.target.value=e.target.value+e.key
+            e.preventDefault()
+        } else {
             e.preventDefault()
         }
     }

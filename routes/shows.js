@@ -57,7 +57,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
         }
     }
 
-    show.timesheets.currentMap=false
+    show.timesheets.currentMap=undefined
     show.weeks.push(newWeek)
     show.markModified('weeks')
     await show.save()

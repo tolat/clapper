@@ -285,7 +285,7 @@ updateVersionName=(isNewVersion=false) => {
 
 // Open estimate
 openEstimate=(version) => {
-    window.location=server+`shows/${_show._id}/Estimate?version=${version}`
+    window.location=server+`/shows/${_show._id}/Estimate?version=${version}`
 }
 
 // Delete estimate version
@@ -299,7 +299,7 @@ deleteVersion=() => {
     // Get current version from estimate-version-display. replace '.' with '_' to avoid database bson key problems
     let currentVersion=document.getElementById('estimate-version-display').innerText.replace('.', '_');
 
-    fetch(server+`shows/${_show._id}/Estimate`, {
+    fetch(server+`/shows/${_show._id}/Estimate`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -307,7 +307,7 @@ deleteVersion=() => {
         })
     })
         .then(response => { return response.json() })
-        .then(responseData => { window.location=server+`shows/${_show._id}/Estimate?version=${responseData.latestVersion}` })
+        .then(responseData => { window.location=server+`/shows/${_show._id}/Estimate?version=${responseData.latestVersion}` })
 }
 
 // Update estimate version
@@ -367,7 +367,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             updateTotalsRow()
             // If a new estimate was created or the version name was changed, navigate to new version page
             if (isNewVersion||currentVersion!=_version) {
-                window.location=server+`shows/${_show._id}/Estimate?version=${currentVersion}`;
+                window.location=server+`/shows/${_show._id}/Estimate?version=${currentVersion}`;
             } else {
                 // Update saveStatus
                 updateSaveStatus(true);
