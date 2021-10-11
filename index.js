@@ -103,7 +103,7 @@ app.use((req, res, next) => {
     next()
 })
 
-// Hnadle CORS
+// Handle CORS
 app.use((req, res, next) => { handleCORS(req, res, next) });
 
 // Routers

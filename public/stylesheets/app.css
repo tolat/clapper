@@ -562,6 +562,11 @@ input.department-input:focus{
     background-color: rgb(245, 245, 245);
 }
 
+.slick-group-totals{
+    font-weight: bold !important;
+    color: black !important;
+}
+
 .hours-column{
     background: rgb(236, 253, 243);
 }

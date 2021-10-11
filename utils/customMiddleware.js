@@ -5,6 +5,7 @@ module.exports.isLoggedIn=(req, res, next) => {
     if (!req.isAuthenticated()) {
         req.flash('error', 'You must be logged in to view this page.')
         console.log('\n\n\nNOT AUTHENTICATED \n\n\n')
+        console.trace()
         return res.redirect('/login')
     }
     next()

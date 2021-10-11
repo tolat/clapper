@@ -261,7 +261,5 @@ async function generateTimesheets(show, valueMap, week, filename) {
 
     // Write final workbook to local file
     await workbook.xlsx.writeFile(filepath)
-
-    console.log('At end of generation function')
 }
 

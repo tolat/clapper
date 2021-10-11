@@ -65,12 +65,12 @@ BUGS
 
 TODO:
 
-* if required for save field is left blank in crew page and save clears the row, the clear is not pushed to the undoredo buffer!
-* Add validation for column naming
-
 1. Grid Mechanics
 -   Auto save option (more like auto backup so if page is left without saving it has most recent verision. deleted when saved.)
 -   Add sort by field on page loading (saves sort column instead of loading and sorting by number always) - default col is num col
+-   if required for save field is left blank in crew page and save clears the row, the clear is not pushed to the undoredo buffer!
+-   Add validation for column naming
+-   Delete timesheets from db once they hvae been saved to local storage
 
 2. Timesheets (90% DONE - could add more features)
     -   TODO: finish timesheet crud
