@@ -57,10 +57,13 @@ Fixes:
 -   Man Days in cost report count days a crew member worked not amount of money spent/manday rate (DONE)
 -   Changed multipliers to be week-based (DONE)
 
+BUGS
+* Cost report does not calculate to date properly when users deleted from crew list (does not delete them) (FIXED)
+
+
 
 TODO:
 
-* Cost report does not calculate to date properly when users deleted from crew list (does not delete them)
 * if required for save field is left blank in crew page and save clears the row, the clear is not pushed to the undoredo buffer!
 * Rentals do not clear when user has been deleted from the week!
 * Add validation for column naming

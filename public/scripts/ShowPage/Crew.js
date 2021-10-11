@@ -190,8 +190,8 @@ calculateWeeklyTotal=(item) => {
 // Calculates weekly rental amounts for item if item has a userid. Otherwise returns 0.
 calculateWeeklyRentals=(item) => {
     let rentalAmount=0;
-    if (item['username']) {
-        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username'])
+    if (item['username']&&item['Position']) {
+        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Code']==item['Position'])
         for (rental of rentals) {
             let tax=0;
             for (t of _week.rentals.taxColumns) {

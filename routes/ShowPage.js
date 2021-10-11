@@ -681,8 +681,6 @@ updateCrew=async function (body, showId) {
                     record.weeksWorked[_cw].taxColumnValues[item['Position']][tax]=item[tax]
                 }
 
-                console.log(record.weeksWorked[_cw].taxColumnValues)
-
                 // Update date joined
                 let date=new Date(item['Date Joined']);
                 if (date!='Invalid Date') { record['Date Joined']=date }
@@ -744,6 +742,12 @@ updateCrew=async function (body, showId) {
             // Remove crew member from crew week's crew list if they aren't in the grid
             if (!body.data.find(item => item['username']==crew['username'])) {
                 show.weeks[_wk].crew.crewList=show.weeks[_wk].crew.crewList.filter(item => item['username']!=crew['username'])
+                for (rental of show.weeks[_wk].rentals.rentalList) {
+                    if (rental.Supplier==crew.username) {
+                        show.weeks[_wk].rentals.rentalList=show.weeks[_wk].rentals.rentalList.filter(r => r!=rental)
+                    }
+                }
+                show.markModified('weeks.rentals')
             }
 
             // Delete days worked for this week for any positions for this user that aren't active in the current week

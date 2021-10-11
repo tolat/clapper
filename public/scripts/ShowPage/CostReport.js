@@ -111,7 +111,9 @@ calculateCosts=(item) => {
                     let dayOfWeek=new Date(day).toString().slice(0, 3);
                     let tax=0
                     for (taxCol of week.crew.taxColumns) {
-                        tax+=record.weeksWorked[week._id].taxColumnValues[taxCol]||0
+                        if (record.weeksWorked[week._id].taxColumnValues[recordPosition.code]) {
+                            tax+=record.weeksWorked[week._id].taxColumnValues[recordPosition.code][taxCol]||0
+                        }
                     }
 
                     let cost=calculateDailyLaborCost(multipliers, hours, rate, dayOfWeek)*(tax/100+1);
