@@ -137,7 +137,17 @@ tsGenQueue.on('global:completed', async (job, result) => {
 
     // Make this file as completed
     global.generatedTimesheets.push(resultObj.filename)
+
+    // Clear generated timesheets from db (they were only uploaded for generation)
+    await removeGeneratedTimesheetsFromDB(resultObj.filename)
 })
+
+//Helper to clear generated timesheets from db 
+function removeGeneratedTimesheetsFromDB(filename) {
+    return new Promise(function (resolve, reject) {
+        global.gfs.remove({ filename }, () => resolve())
+    })
+}
 
 // Helper to return a promise that resolves when timesheets are piped in from db
 function pipeCompletedTimesheetsFromDB(resultObj) {
