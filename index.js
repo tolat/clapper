@@ -124,6 +124,8 @@ app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 
 
+/* Timesheet generation */
+
 // global variables for timesheet generation
 global.generatedTimesheets=[]
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
@@ -177,6 +179,8 @@ app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
     const file=await fs.readFileSync(filepath)
     res.send(file)
 })
+
+
 
 // Logout route
 app.get('/logout', isLoggedIn, (req, res) => {
