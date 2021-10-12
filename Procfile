@@ -1,2 +1,2 @@
 web: npm start
-worker: node tsGenWorker.js
+worker: node --max_old_space_size=512 tsGenWorker.js
