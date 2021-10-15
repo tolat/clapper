@@ -32,7 +32,7 @@ tsGenQueue.process(async (job, done) => {
     await pipeTemplateFromDb(job)
 
     // Generate timesheets
-    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename)
+    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename).catch(e => {/* return error */ })
 
     //Delete old file from GridFS
     await removeTemplateFromDB(job.data.filename)
@@ -130,7 +130,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
             pos.sheetName=sheetName
 
             // Copy base sheet fields that don't throw error
-            for (key of Object.keys(sheet)) {
+            for (key in sheet) {
                 try { Object.assign(newSheet[`${key}`], sheet[`${key}`]) } catch (e) { }
             }
 
