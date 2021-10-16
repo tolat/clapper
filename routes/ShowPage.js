@@ -109,7 +109,7 @@ router.post('/', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
         res.send(responseData)
     }
     catch (e) {
-        res.send({ message: `${e.message}\n\n${e.stack}` })
+        res.send({ message: `\n\n${e.message}\n\n${e.stack}\n\n` })
     }
 }))
 
@@ -1079,7 +1079,7 @@ updateCostReport=async function (body, showId) {
         await deleteWeek(body.deletedWeek, show, body.weeks)
     }
 
-    return { message: 'testing response data reader...' }
+    return { message: 'Success' }
 }
 
 // Update Timesheets

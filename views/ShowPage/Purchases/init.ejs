@@ -8,7 +8,11 @@
         {
             fields: ['Set Code'],
             isInvalid: function (args, field) {
-                return !_show.sets.find(s => s['Set Code']==args.item['Set Code'])&&args.item['Set Code']!='DELETED'
+                if (args.item[field]) {
+                    return !_show.sets.find(s => s['Set Code']==args.item['Set Code'])&&args.item['Set Code']!='DELETED'
+                } else {
+                    return false
+                }
             },
             validationHeader: 'Set Not Found!',
             validationMessage: "New sets can be added in the 'Estimates' page."
@@ -18,25 +22,30 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Department '${args.item[field]}' Not Found!`
                 this.validationMessage=`New departments can only be added in the 'Estimates' page.`
-                let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toString().toLowerCase());
-                let existsDep=false;
-                if (depIdx>=0) {
-                    args.item[field]=_show.departments[depIdx];
-                    dataView.updateItem(args.item.id, args.item);
-                    existsDep=true;
+                if (args.item[field]) {
+                    let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toString().toLowerCase());
+                    let existsDep=false;
+                    if (depIdx>=0) {
+                        args.item[field]=_show.departments[depIdx];
+                        dataView.updateItem(args.item.id, args.item);
+                        existsDep=true;
+                    }
+                    return !existsDep;
+                } else {
+                    return false
                 }
-                return !existsDep;
+
             }
         },
         {
             fields: ['Amount'],
-            isInvalid: function (args, field) { return isNaN(parseFloat(args.item['Amount'])) },
+            isInvalid: function (args, field) { return args.item[field]&&isNaN(parseFloat(args.item[field])) },
             validationHeader: 'Invalid Amount!',
             validationMessage: "Amount must only contain numbers and '.'"
         },
         {
             fields: ['PO Num'],
-            isInvalid: function (args, field) { return dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id) },
+            isInvalid: function (args, field) { return args.item[field]&&dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id) },
             validationHeader: 'Invalid Amount!',
             validationMessage: "Amount must only contain numbers and '.'"
         },

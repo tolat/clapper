@@ -189,7 +189,11 @@ createSlickGrid=(data, columns, options) => {
     grid.onActiveCellChanged.subscribe(function (e, args) {
         // Set context cell
         let activeCell=grid.getActiveCell()
-        _contextCell={ row: activeCell.row, cell: activeCell.cell }
+        if (activeCell) {
+            _contextCell={ row: activeCell.row, cell: activeCell.cell }
+        } else {
+            _contextCell={ row: 0, cell: 0 }
+        }
         grid.focus()
     });
 
