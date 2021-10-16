@@ -19,8 +19,6 @@ const mongoSanitize=require('express-mongo-sanitize')
 const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
 const MongoStore=require("connect-mongo")
-const fs=require('fs')
-const Queue=require('bull')
 const GridStream=require('gridfs-stream')
 
 // Connect to the database and handle connection errors
@@ -30,8 +28,8 @@ mongoose.connect(dbUrl, {
     useUnifiedTopology: true
 });
 global.db=mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
+global.db.on('error', console.error.bind(console, 'connection error:'));
+global.db.once('open', () => {
     console.log('Main process connected to database')
     // Initialize gridstrem on global variable so we can read and write files from mongodb gridfs
     global.gfs=GridStream(db.db, mongoose.mongo)
@@ -112,6 +110,7 @@ const createAccountRoutes=require('./routes/createAccount');
 const showsRoutes=require('./routes/shows');
 const profileRoutes=require('./routes/profile');
 const showPageRoutes=require('./routes/ShowPage');
+const timesheetRoutes=require('./routes/timesheets')
 
 // Begin Routes
 app.get('/', (req, res) => { res.redirect('/login') })
@@ -122,65 +121,10 @@ app.use('/createAccount', createAccountRoutes);
 app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
-
-
-/* Timesheet generation */
+app.use(timesheetRoutes)
 
 // global variables for timesheet generation
 global.generatedTimesheets=[]
-const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
-
-// Listen to Bull queue for completed timesheet generation 
-tsGenQueue.on('global:completed', async (job, result) => {
-    const resultObj=JSON.parse(JSON.parse(result))
-
-    // Pipe in completed timesheets form DB
-    await pipeCompletedTimesheetsFromDB(resultObj)
-
-    // Make this file as completed
-    global.generatedTimesheets.push(resultObj.filename)
-
-    // Clear generated timesheets from db (they were only uploaded for generation)
-    await removeGeneratedTimesheetsFromDB(resultObj.filename)
-})
-
-//Helper to clear generated timesheets from db 
-function removeGeneratedTimesheetsFromDB(filename) {
-    return new Promise(function (resolve, reject) {
-        global.gfs.remove({ filename }, () => resolve())
-    })
-}
-
-// Helper to return a promise that resolves when timesheets are piped in from db
-function pipeCompletedTimesheetsFromDB(resultObj) {
-    return new Promise(function (resolve, reject) {
-        const readDB=global.gfs.createReadStream({ filename: resultObj.filename })
-        const filepath=`${path.join(__dirname, '/uploads')}/${resultObj.filename}.xlsx`
-        const writeLocal=fs.createWriteStream(filepath)
-        writeLocal.on('finish', () => resolve())
-        writeLocal.on('error', () => reject())
-        readDB.pipe(writeLocal)
-    })
-}
-
-// Check if timesheets have been generated for :filenamme template
-app.get('/checkgenerated/:filename', isLoggedIn, (req, res) => {
-    // Tell client if timesheets for :filename have been generated
-    if (global.generatedTimesheets.includes(req.params.filename)) {
-        res.send({ filename: req.params.filename })
-    } else {
-        res.send({ filename: false })
-    }
-})
-
-// Download :filename from uploads folder route
-app.get('/uploads/:filename', isLoggedIn, async (req, res) => {
-    let filepath=path.join(__dirname, `uploads/${req.params.filename}`)
-    const file=await fs.readFileSync(filepath)
-    res.send(file)
-})
-
-
 
 // Logout route
 app.get('/logout', isLoggedIn, (req, res) => {

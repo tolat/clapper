@@ -8,6 +8,7 @@ const fs=require('fs')
 const path=require('path')
 const GridStream=require('gridfs-stream')
 const mongoose=require('mongoose')
+const Set=require('./models/set')
 
 // Connect to the database and handle connection errors
 mongoose.connect(process.env.DB_URL, {
@@ -29,16 +30,16 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Wait for template to be piped form the database
-    await pipeTemplateFromDb(job)
+    await pipeTemplateFromDb(job).catch(e => done(e))
 
     // Generate timesheets
-    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename).catch(e => {/* return error */ })
+    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename).catch(e => done(e))
 
     //Delete old file from GridFS
-    await removeTemplateFromDB(job.data.filename)
+    await removeTemplateFromDB(job.data.filename).catch(e => done(e))
 
     // Write completed timesheets back to database
-    await pipeCompletedTimesheetsToDb(job)
+    await pipeCompletedTimesheetsToDb(job).catch(e => done(e))
 
     // Finish job 
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
@@ -169,6 +170,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
             // Create map of all multiplier values to hours worked in that interval
             let mulHoursMap={}
             let hoursSetMap={}
+            let setEpisodeMap={}
             let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(dw, user))
             for (day of posDays) {
                 let weekDay=new Date(day).toDateString('en-US').slice(0, 3)
@@ -189,6 +191,9 @@ async function generateTimesheets(show, valueMap, week, filename) {
                 }
                 mulHoursMap[`${weekDay}-Hours-Total`]=hours
                 hoursSetMap[`${weekDay}-Set`]=pos.daysWorked[day].set
+
+                let set=await Set.find({ 'Set Code': pos.daysWorked[day].set })
+                setEpisodeMap[`${weekDay}-Episode`]=set.Episode||""
             }
 
             // Assign variable values to cells in spreadsheet
@@ -231,6 +236,13 @@ async function generateTimesheets(show, valueMap, week, filename) {
 
                     // Load set variables 
                     if (Object.keys(hoursSetMap).includes(value)) {
+                        let val=hoursSetMap[value]
+                        if (isNaN(val)) { val=0 }
+                        sheet.getCell(cell).value=val
+                    }
+
+                    // Load set episode variables 
+                    if (Object.keys(setEpisodeMap).includes(value)) {
                         let val=hoursSetMap[value]
                         if (isNaN(val)) { val=0 }
                         sheet.getCell(cell).value=val

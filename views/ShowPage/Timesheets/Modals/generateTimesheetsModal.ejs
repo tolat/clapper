@@ -1,6 +1,15 @@
 <div id="generate-timesheets-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
-    Choose .xlsx file to use as timesheet template:
     <input type="file" id="timesheet-template-selection">
+    <div style="font-size: 0.8rem; max-width: 20rem; padding: 5px;">
+        The template workbook must be a <b>.xlsx</b> file with a single template worksheet,
+        and have <b>no references to other sheets/workbooks.</b>
+        <br>
+        <br>
+        When selecting a timesheet template workbook, be sure the it is an <b>Excel Workbook</b> (.xlsx)
+        and not any other kind of workbook (.xls, .xlm, .xltx, etc.). Make sure workbooks with the extension
+        .xlsx are Excel Workbook files and not Strict Open XML Spreadsheet files, as they both use the .xlsx
+        extension. You must also make sure the template workbook references to other sheets/workbooks
+    </div>
     <div class="modal-button-container">
         <button id="generate-timesheets-modal-cancel" onclick="toggleGenerateTimesheetsModal(false)"
             style="color: black;">Cancel</button>

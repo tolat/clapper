@@ -235,6 +235,12 @@ initializeVariables=() => {
             type: 'hours-setcode'
         })
 
+        variables.push({
+            name: `${dayAbbrv}-Episode`,
+            description: `Episode for hours worked on ${dayAbbrv} of current week`,
+            type: 'set-episode'
+        })
+
         for (mul of _uniqueMuls) {
             variables.push({
                 name: `${dayAbbrv}-Hours-${mul}x`,
