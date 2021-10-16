@@ -215,7 +215,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
                             sheet.getCell(cell).value=position.Rate
                             break;
                         case 'Week-End':
-                            sheet.getCell(cell).value=new Date(week.end).toLocaleDateString('en-US').toString().slice(0, 15)
+                            sheet.getCell(cell).value=new Date(week.end).toString().slice(0, 15)
                             break;
                         case 'Crew-Position-Department':
                             sheet.getCell(cell).value=position.Department
@@ -240,7 +240,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
                     if (currentWeekDays.map(wd => wd.toString().slice(0, 3)+'-Date').includes(value)) {
                         let dayStr=currentWeekDays.map(wd => wd.toString().slice(0, 3)).filter(d => value.includes(d))[0]
                         let date=currentWeekDays.find(wd => wd.toString().includes(dayStr))
-                        sheet.getCell(cell).value=date.toLocaleDateString('en-US').toString().slice(0, 15)
+                        sheet.getCell(cell).value=date.toString().slice(0, 15)
                     }
 
                     // Load extracolumn variables
