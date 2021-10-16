@@ -229,6 +229,13 @@ async function generateTimesheets(show, valueMap, week, filename) {
                         sheet.getCell(cell).value=val
                     }
 
+                    // Load set variables 
+                    if (Object.keys(hoursSetMap).includes(value)) {
+                        let val=hoursSetMap[value]
+                        if (isNaN(val)) { val=0 }
+                        sheet.getCell(cell).value=val
+                    }
+
                     // Load weekday date variables
                     if (currentWeekDays.map(wd => wd.toString().slice(0, 3)+'-Date').includes(value)) {
                         let dayStr=currentWeekDays.map(wd => wd.toString().slice(0, 3)).filter(d => value.includes(d))[0]
