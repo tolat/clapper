@@ -880,8 +880,9 @@ updatePurchases=async function (body, showId) {
     await show.save()
 
     // Update Purchases
+    // ******** TRACK UPDATED PURCHASES VS EXISTING IN LIST AND DELETE ONES THAT WERE'T UPDATED 
     for (item of body.data) {
-        if (item&&item['Set Code']&&item['Department']&&item['PO Num']) {
+        if (item&&item['Set Code']&&item['Department']&&item['PO Num']&&item['Date']) {
             // Find existing purchase 
             let p=await Purchase.findOne({ 'PO Num': item['PO Num'], showId: show._id.toString() })
             if (!p) {
@@ -922,12 +923,6 @@ updatePurchases=async function (body, showId) {
         }
     }
 
-    // Delete purchases that do not exist ** FIX THIS **
-    for (p of show.purchases.purchaseList) {
-        if (!body.data.find(item => item['PO Num']==p['PO Num'])) {
-            await Purchase.findByIdAndDelete(p._id)
-        }
-    }
     show.markModified('purchases.purchaseList')
     await show.save()
 
