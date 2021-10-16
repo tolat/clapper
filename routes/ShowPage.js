@@ -882,15 +882,16 @@ updatePurchases=async function (body, showId) {
     // Update Purchases
     for (item of body.data) {
         if (item&&item['Set Code']&&item['Department']&&item['PO Num']) {
-            let p=await Purchase.findOne({ 'PO Num': item['PO Num'] })
             // Find existing purchase 
+            let p=await Purchase.findOne({ 'PO Num': item['PO Num'], showId: show._id.toString() })
             if (!p) {
                 let set=await Set.findOne({ 'Set Code': item['Set Code'], show: show })
                 p=await new Purchase({
                     extraColumnValues: {},
                     taxColumnValues: {},
                     set: set,
-                    weekId: body.weeks[0]._id.toString()
+                    weekId: body.weeks[0]._id.toString(),
+                    showId: show._id.toString()
                 })
                 await p.save()
                 await show.purchases.purchaseList.push(p)

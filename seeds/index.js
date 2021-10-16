@@ -320,6 +320,7 @@ const seedPurchases=async () => {
                     'Supplier': genSupplier(),
                     'Amount': randInt(0, 5000),
                     'Description': genSupplier(),
+                    showId: show._id.toString(),
                     weekId: firstWeekId,
                     extraColumnValues: {},
                     taxColumnValues: { GST: 5, PST: 7 }

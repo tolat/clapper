@@ -12,6 +12,7 @@ const PurchaseSchema=new Schema({
     'Supplier': Schema.Types.Mixed,
     'Description': String,
     'Amount': Number,
+    showId: String,
     weekId: String,
     extraColumnValues: Object,
     taxColumnValues: Object
