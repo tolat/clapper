@@ -168,6 +168,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
 
             // Create map of all multiplier values to hours worked in that interval
             let mulHoursMap={}
+            let hoursSetMap={}
             let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(dw, user))
             for (day of posDays) {
                 let weekDay=new Date(day).toDateString('en-US').slice(0, 3)
@@ -187,6 +188,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
                     mulHoursMap[`${weekDay}-Hours-${mul}x`]=mulHours
                 }
                 mulHoursMap[`${weekDay}-Hours-Total`]=hours
+                hoursSetMap[`${weekDay}-Set`]=pos.daysWorked[day].set
             }
 
             // Assign variable values to cells in spreadsheet
@@ -214,6 +216,9 @@ async function generateTimesheets(show, valueMap, week, filename) {
                             break;
                         case 'Week-End':
                             sheet.getCell(cell).value=new Date(week.end).toLocaleDateString('en-US')
+                            break;
+                        case 'Crew-Position-Department':
+                            sheet.getCell(cell).value=position.Department
                             break;
                     }
 
