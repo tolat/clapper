@@ -880,7 +880,8 @@ updatePurchases=async function (body, showId) {
     await show.save()
 
     // Update Purchases
-    // ******** TRACK UPDATED PURCHASES VS EXISTING IN LIST AND DELETE ONES THAT WERE'T UPDATED 
+    let deleteList=[...show.purchases.purchaseList]
+    show.purchases.purchaseList=[]
     for (item of body.data) {
         if (item&&item['Set Code']&&item['Department']&&item['PO Num']&&item['Date']) {
             // Find existing purchase 
@@ -895,9 +896,16 @@ updatePurchases=async function (body, showId) {
                     showId: show._id.toString()
                 })
                 await p.save()
-                await show.purchases.purchaseList.push(p)
-                show.markModified('purchases.purchaseList')
-                await show.save()
+            }
+            await show.purchases.purchaseList.push(p)
+            show.markModified('purchases.purchaseList')
+            await show.save()
+
+            // If deleteList contains 
+            let purch=deleteList.find(purch => purch['PO Num']==p['PO Num'])
+            if (purch) {
+                let idx=deleteList.indexOf(purch)
+                deleteList.splice(idx, 1)
             }
 
             // Save display key data
@@ -921,6 +929,11 @@ updatePurchases=async function (body, showId) {
 
             await p.save();
         }
+    }
+
+    // delete purchases on purchase list that weren't in grid
+    for (p of deleteList) {
+        await Purcahse.findByIdAndDelete(p._id)
     }
 
     show.markModified('purchases.purchaseList')
