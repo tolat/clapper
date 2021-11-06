@@ -11,7 +11,16 @@ const { genUniqueId }=require('../utils/numberUtils')
 
 // Shows Load
 router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
-    const shows=await Show.find({ owner: req.user.username });
+    const shows=await Show.find({
+        $or: [
+            {
+                owner: req.user.username
+            },
+            {
+                hasAccess: { $in: [req.user.username] }
+            }
+        ]
+    });
     res.render('shows', {
         title: 'Home',
         shows: shows,
@@ -19,7 +28,7 @@ router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
     })
 }))
 
-// Shows create new show 
+// Create new show 
 router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     const show=await new Show(req.body.show)
     show.departments=show.departments.filter(d => d!='')
@@ -28,6 +37,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.departmentColorMap={}
     show.owner=req.user.username
 
+    // Create first week
     let newWeek={
         _id: show.currentWeek,
         end: new Date(req.body.show.firstweekending+'T07:00'),
@@ -54,7 +64,48 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
             extraColumns: [],
             taxColumns: [],
             displaySettings: {}
-        }
+        },
+        accessProfiles: [
+            {
+                name: '__Owner',
+                'Cost Report': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                },
+                'Estimate': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                },
+                'Purchases': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                },
+                'Rentals': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                },
+                'Crew': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                },
+                'Rates': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                },
+                'Timesheets': {
+                    users: [req.user.username],
+                    columnFilter: [],
+                    dataFilter: {}
+                }
+
+            }
+        ]
     }
 
     show.timesheets.currentMap=undefined

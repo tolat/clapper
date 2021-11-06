@@ -112,7 +112,7 @@ calculateCosts=(item) => {
                     let tax=0
                     for (taxCol of week.crew.taxColumns) {
                         if (record.weeksWorked[week._id].taxColumnValues[recordPosition.code]) {
-                            tax+=record.weeksWorked[week._id].taxColumnValues[recordPosition.code][taxCol]||0
+                            tax+=parseFloat(record.weeksWorked[week._id].taxColumnValues[recordPosition.code][taxCol])||0
                         }
                     }
 

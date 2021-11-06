@@ -1,3 +1,13 @@
+Dev environment:
+Node
+Nodemon
+Redis
+Heroku
+Git
+
+
+
+
 
 Fixes:
 
@@ -72,9 +82,7 @@ TODO:
 -   Add validation for column naming
 -   Delete timesheets from db once they hvae been saved to local storage
 
-2. Timesheets (90% DONE - could add more features)
-    -   TODO: finish timesheet crud
-    -   Finish timesheet cellValueMap parser to export values to template
+2. Timesheets (99% DONE - could add more features)
     -   Block sort by column on timesheets cols
 
 3. Styling Toolbar (Get cell styles to presist through grouping events)
@@ -85,6 +93,13 @@ TODO:
         -   Attach styles to the item id not the row
 
 4. Permission based access
+    -   Creat access profiles for each show - can be defined by show owners, and users can be added to the profile
+        Then initialize grid data based on the access profile object for given use-show combo
+    -   Make access profiles NOT week based (can linit changing weeks in the profile itself) but have a week field for custom cols
+    -   Don't save display settings across access profiles for restricted columns
+    -   Could have map for access profiles instead of hasAccess, then profile itself has no users stored. 
+        Then it's easy to check if user has access by looking to see if they have a key in the access map
+
 
 5. Audit Page for Indivicual crew members -> rows are days worked, cols are show, set, hours, position
 

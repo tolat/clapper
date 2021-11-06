@@ -2277,7 +2277,7 @@ function executeHideColumns() {
         }
     } else {
         for (let i=this.range[0]; i<=this.range[1]; i++) {
-            if (cols[i].isHidden) {
+            if (cols[i].isHidden&&!cols[i].lockHidden) {
                 cols[i]=cols[i].colDef;
             }
         }
@@ -2307,7 +2307,8 @@ hideColumn=(hide, col=_contextCell) => {
         col.headerCssClass='hidden-column';
         col.isHidden=true;
         col.sortable=false;
-    } else {
+        col.editor=undefined
+    } else if (!col.lockHidden) {
         col=col.colDef;
     }
 

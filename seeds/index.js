@@ -34,6 +34,7 @@ const seedShows=async () => {
         const show=new Show({
             'Name': showNames[i],
             owner: 'torin.olat@gmail.com',
+            hasAccess: ['torin.olat@gmail.com', 'pigsinpajamas@yahoo.ca'],
             currentWeek: firstWeekId,
             departments: departmentNames,
             departmentColorMap: {},
@@ -63,7 +64,86 @@ const seedShows=async () => {
                     extraColumns: [],
                     taxColumns: ['GST', 'PST'],
                     rentalList: []
-                }
+                },
+                accessProfiles: [
+                    {
+                        name: 'Test Profile',
+                        'Cost Report': {
+                            users: [],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Estimate': {
+                            users: ['pigsinpyjamas@yahoo.ca'],
+                            columnFilter: ['Location', 'Notes'],
+                            dataFilter: { Episode: 200 }
+                        },
+                        'Purchases': {
+                            users: [],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Rentals': {
+                            users: [],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Crew': {
+                            users: [],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Rates': {
+                            users: [],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Timesheets': {
+                            users: [],
+                            columnFilter: [],
+                            dataFilter: {}
+                        }
+                    },
+                    {
+                        name: '__Owner',
+                        'Cost Report': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Estimate': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Purchases': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Rentals': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Crew': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Rates': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        },
+                        'Timesheets': {
+                            users: ['torin.olat@gmail.com'],
+                            columnFilter: [],
+                            dataFilter: {}
+                        }
+
+                    }
+                ]
             }],
             estimateVersions: {
                 '100': {
@@ -422,6 +502,16 @@ const seedDB=async () => {
         Phone: "6047235351"
     })
     await User.register(mUser, 'Password1')
+
+    // Create second user fore access profile testing
+    let ptUser=new User({
+        Name: "Kit Clark",
+        username: "pigsinpyjamas@yahoo.ca",
+        Email: "pigsinpyjamas@yahoo.ca",
+        Phone: "18004206969"
+    })
+    await User.register(ptUser, 'Password1')
+
 
     return;
 }

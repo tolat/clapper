@@ -2,18 +2,21 @@
     // Global variables
     var _show= <%- JSON.stringify(show)%>;
     var _args= <%- JSON.stringify(args)%>;
+    var _columnFilter= <%- JSON.stringify(columnFilter)%>
+    var _restrictedItems=<%- JSON.stringify(restrictedItems)%>
 
     var _version=_args.version;
     var _latestVersion=_args.latestVersion;
     var _extraColumns=[];
     var _fringes={};
     var _mandayRates={};
+
+    // If estimate versions exist, _version will be set to current version - load current version data
     if (_version) {
         _extraColumns=_show.estimateVersions[_version].extraColumns;
         _fringes=_show.estimateVersions[_version].fringes;
         _mandayRates=_show.estimateVersions[_version].mandayRates;
     }
-    var _deletedSets=[];
     var _validators=[
         {
             fields: ['Set Code'],
@@ -38,7 +41,7 @@
         var options=await initializeOptions();
 
         // Create grid data
-        var data=await initializeData(sets, _show, _args);
+        var data=<%- JSON.stringify(gridData)%>;
 
         // Create grid columns
         var columns=await initializeColumns(sets, _show, _args);
@@ -113,7 +116,6 @@
 
             // If manday rates are not set, open the manday rate modal to set them
             if (!Object.keys(_show.estimateVersions[_args.version].mandayRates)[0]) {
-                console.log('here')
                 toggleManDayRatesModal(true)
             }
         }
@@ -142,50 +144,6 @@
         }
         // If this is first estimate, prompt for first version name
         else { toggleEnterVersionModal(true, true) }
-
-
-    }
-
-    // Creates grid data 
-    function initializeData(sets, _show, _args) {
-        var data=[];
-
-        if (sets[0]) {
-            for (let i=0; i<sets.length; i++) {
-                let item={
-                    id: 'id_'+i,
-                    '#': sets[i]['#'],
-                    setid: sets[i]._id,
-                    // Core features
-                    'Set Code': sets[i]['Set Code'],
-                    'Episode': sets[i]['Episode'],
-                    'Name': sets[i]['Name'],
-                    departmentTotals: {}
-                }
-
-                // Version specific features
-                if (sets[i].estimates[_args.version]&&sets[i].estimates[_args.version].departmentValues) {
-                    // Add Department specific features
-                    for (key of Object.keys(sets[i].estimates[_args.version].departmentValues)) {
-                        item[key]=zeroNanToNull(parseFloat(sets[i].estimates[_args.version].departmentValues[key]).toFixed(2));
-                    }
-                    // Calculate department-specific labor
-                    for (d of _show.departments) {
-                        item[`${d} Labor`]=zeroNanToNull(parseFloat(item[`${d} Man Days`]*_show.estimateVersions[_version].mandayRates[d]).toFixed(2));
-                    }
-                    // Add Extra Column Values
-                    for (key of _show.estimateVersions[_args.version].extraColumns) {
-                        item[key]=sets[i].estimates[_args.version].extraColumnValues[key]
-                    }
-                }
-                data.push(item);
-            }
-        }
-
-        // Sort data by #
-        data=sortByNumber(data);
-
-        return data;
     }
 
     // Creates grid columns 
@@ -215,6 +173,21 @@
 
         // Department columns 
         for (d of _show.departments) { columns=columns.concat(addDepartment(d)) }
+
+        // Apply access profile column filter to hide restricted columns
+        for (col of columns) {
+            if (_columnFilter.includes(col.name)) {
+                if (_show.estimateVersions[_version]) {
+                    if (!_show.estimateVersions[_version].displaySettings.setHiddenColumns) {
+                        _show.estimateVersions[_version].displaySettings.setHiddenColumns=[col.name]
+                    } else {
+                        _show.estimateVersions[_version].displaySettings.setHiddenColumns.push(col.name)
+                    }
+                }
+                col.lockHidden=true
+            }
+        }
+
         return columns;
     }
 

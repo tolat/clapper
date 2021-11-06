@@ -60,7 +60,7 @@ toggleAddDepartmentModal=(show, addDep=false) => {
 }
 
 // Add a new department to the show
-addDepartment=(d, saveAll=false) => {
+addDepartment=(d) => {
     let mdKey=`${d} Man Days`;
     let lrKey=`${d} Labor`;
     let mtKey=`${d} Materials`;
@@ -348,6 +348,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             departmentColorMap: _show.departmentColorMap,
             isNewVersion: isNewVersion,
             isBlankVersion: isBlankVersion,
+            restrictedItems: _restrictedItems,
             displaySettings: {
                 groupBy: _groupedBy,
                 reorderColumns: getColumnOrder(),
