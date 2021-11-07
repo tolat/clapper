@@ -6,7 +6,6 @@ const ShowSchema=new Schema({
     'Name': String,
     'Production Company': String,
     owner: String,
-    hasAccess: [String],
     weeks: [{
         _id: String,
         number: Number,
@@ -60,7 +59,8 @@ const ShowSchema=new Schema({
         }],
         currentMap: String
     },
-    accessProfiles: [Object]
+    accessMap: Object,
+    accessProfiles: Object
 }, { minimize: false })
 
 ShowSchema.virtual('displayKeys').get(function () {

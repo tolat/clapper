@@ -27,7 +27,12 @@ module.exports.isShowOwner=async (req, res, next) => {
 module.exports.hasShowAccess=async (req, res, next) => {
     const showid=req.params.id
     let show=await Show.findById(showid)
-    if (show.owner!=req.user.username&&!show.hasAccess.includes(req.user.username)) {
+
+    // Convert . in username to _
+    let apName=req.user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+
+    if (!Object.keys(show.accessMap).includes(apName)) {
         req.flash('error', `You do not have access to the show: ${show.Name}`)
         if (!req.isAuthenticated()) {
             return res.redirect('/login')

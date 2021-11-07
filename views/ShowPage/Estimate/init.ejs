@@ -1,14 +1,15 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>;
-    var _args= <%- JSON.stringify(args)%>;
-    var _columnFilter= <%- JSON.stringify(columnFilter)%>
+    let _show= <%- JSON.stringify(show)%>;
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>
+        let _user= <%- JSON.stringify(user)%>
 
-    var _version=_args.version;
-    var _latestVersion=_args.latestVersion;
-    var _extraColumns=[];
-    var _fringes={};
-    var _mandayRates={};
+            let _version=_args.version;
+    let _latestVersion=_args.latestVersion;
+    let _extraColumns=[];
+    let _fringes={};
+    let _mandayRates={};
+
 
     // If estimate versions exist, _version will be set to current version - load current version data
     if (_version) {
@@ -16,7 +17,7 @@
         _fringes=_show.estimateVersions[_version].fringes;
         _mandayRates=_show.estimateVersions[_version].mandayRates;
     }
-    var _validators=[
+    let _validators=[
         {
             fields: ['Set Code'],
             isInvalid: function (args, field) {
@@ -26,24 +27,24 @@
             }
         },
     ];
-    var _totals={ Current: 'sum', Variance: 'sum' };
-    var _departmentTotals={}
+    let _totals={ Current: 'sum', Variance: 'sum' };
+    let _departmentTotals={}
 
-    var grid;
-    var dataView;
+    let grid;
+    let dataView;
 
     // Load the grid 
     async function onLoad() {
-        var sets=_show.sets;
+        let sets=_show.sets;
 
         // Create options
-        var options=await initializeOptions();
+        let options=await initializeOptions();
 
         // Create grid data
-        var data=<%- JSON.stringify(data)%>;
+        let data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
-        var columns=await initializeColumns(sets, _show, _args);
+        let columns=await initializeColumns(sets, _show, _args);
 
         // Create data grid
         await createSlickGrid(data, columns, options);
@@ -92,9 +93,9 @@
         });
 
         // Apply saved display settings
-        if (_show.estimateVersions[_version]&&_show.estimateVersions[_version].displaySettings) {
-            applyDisplaySettings(_show.estimateVersions[_version].displaySettings)
-        }
+        let displaySettings=false
+        try { displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version] } catch (e) { console.log(e) }
+        if (displaySettings) { applyDisplaySettings(displaySettings) }
 
         // Set estimate status to saved
         await updateSaveStatus(true);
@@ -129,7 +130,7 @@
         await addMissingCols(columns)
 
         // Create sortable departments bar
-        var departmentsBar=Sortable.create(document.getElementById('departments-bar'), {
+        let departmentsBar=Sortable.create(document.getElementById('departments-bar'), {
             onEnd: reorderDepartments
         });
 
@@ -175,12 +176,12 @@
 
         // Apply access profile column filter to hide restricted columns
         for (col of columns) {
-            if (_columnFilter.includes(col.name)) {
+            if (_accessProfile.columnFilter.includes(col.name)) {
                 if (_show.estimateVersions[_version]) {
-                    if (!_show.estimateVersions[_version].displaySettings.setHiddenColumns) {
-                        _show.estimateVersions[_version].displaySettings.setHiddenColumns=[col.name]
+                    if (!_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version].setHiddenColumns) {
+                        _accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version].setHiddenColumns=[col.name]
                     } else {
-                        _show.estimateVersions[_version].displaySettings.setHiddenColumns.push(col.name)
+                        _accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version].setHiddenColumns.push(col.name)
                     }
                 }
                 col.lockHidden=true

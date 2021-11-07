@@ -12,16 +12,10 @@ const { genUniqueId }=require('../utils/numberUtils')
 // Shows Load
 router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
     // Get shows that user has access to
-    const shows=await Show.find({
-        $or: [
-            {
-                owner: req.user.username
-            },
-            {
-                hasAccess: { $in: [req.user.username] }
-            }
-        ]
-    })
+    let shows=await Show.find({})
+    let uName=req.user.username
+    while (uName.includes(".")) { uName=uName.replace(".", "_") }
+    shows=await shows.filter(show => Object.keys(show.accessMap).includes(uName))
 
     // Render shows page (homepage)
     res.render('shows', {
@@ -38,48 +32,53 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.estimateVersions={}
     show.currentWeek=genUniqueId()
     show.departmentColorMap={}
-    show.owner=req.user.username
-    show.accessProfiles=[
-        {
-            name: '__Owner',
+
+    // Create accessProfiles and accessMap
+    let uName=req.user.username
+    while (uName.includes(".")) { uName=uName.replace(".", "_") }
+    show.accessProfiles={
+        __Owner: {
             'Cost Report': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             },
             'Estimate': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             },
             'Purchases': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             },
             'Rentals': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             },
             'Crew': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             },
             'Rates': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             },
             'Timesheets': {
-                users: [req.user.username],
                 columnFilter: [],
-                dataFilter: {}
+                dataFilter: {},
+                displaySettings: { [`${uName}`]: {} }
             }
 
         }
-    ]
+    }
+    show.accessMap={
+        [`${uName}`]: '__Owner'
+    }
 
     // Create first week
     let newWeek={

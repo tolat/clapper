@@ -24,9 +24,9 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     }
 
     // Initialize data for grid based on user access profile
-    let accessProfile=await show.accessProfiles.find(ap => ap[section].users.includes(user.username))
-    // Select access profile corresponding to section to be rendered
-    accessProfile=accessProfile[section]
+    let apName=user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
 
     // Initialize data for the grid, applying the access profile
     let data=await initializeData(show.sets, show, args, args.version, accessProfile)
@@ -38,8 +38,9 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         args,
         sharedModals,
         pageModals,
-        data: data,
-        columnFilter: accessProfile.columnFilter
+        data,
+        accessProfile,
+        user
     })
 }
 
@@ -72,7 +73,11 @@ module.exports.update=async function (body, showId, user) {
     let isNewVersion=body.isNewVersion;
     let isBlankVersion=body.isBlankVersion;
     let show=await Show.findById(showId).populate('sets');
-    let accessProfile=show.accessProfiles.find(ap => ap['Estimate'].users.includes(user.username))['Estimate']
+
+    // Get access profile
+    let apName=user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Estimate
 
     // First blank estimate case *** INITIALIZE REST OF SHOW OBJECTS ***
     if (!ov) {
@@ -110,13 +115,9 @@ module.exports.update=async function (body, showId, user) {
         return { latestVersion: getLatestVersion(show) };
     }
 
-    // Set the week ending for this estimate and save show
-    show.estimateVersions[ov].weekEnding=body.weekEnding;
-    show.markModified(`estimateVersions.${ov}.weekEnding`);
-
-    // Update estimate version display settings (column order, grouping, collapsed groups, etc)
-    show.estimateVersions[ov].displaySettings=body.displaySettings
-    show.markModified(`estimateVersions.${ov}.displaySettings`);
+    // Update estimate version display settings for this access profile (column order, grouping, collapsed groups, etc)
+    accessProfile.displaySettings[apName][`${ov}`]=body.displaySettings
+    show.markModified(`accessProfiles`);
 
     // Update Extra columns
     show.estimateVersions[ov].extraColumns=body.extraColumns;
@@ -262,9 +263,9 @@ module.exports.update=async function (body, showId, user) {
     show=await Show.findById(show._id).populate('sets')
 
     // Delete sets that are no longer present in grid and are not restricted by an access profile
-    let restrictedItems=getRestrictedItems()
+    let restrictedSets=getRestrictedSets(show.sets, accessProfile)
     for (set of show.sets) {
-        if (!items.find(item => item['Set Code']==set['Set Code'])&&!restrictedItems.includes(set['Set Code'])) {
+        if (!items.find(item => item['Set Code']==set['Set Code'])&&!restrictedSets.includes(set)) {
             await Set.findByIdAndDelete(set._id)
         }
     }
@@ -336,21 +337,34 @@ function initializeData(sets, _show, _args, _version, accessProfile) {
             }
         }
     }
-    let restrictedItems=getRestrictedItems(data, accessProfile)
-    data=data.filter(item => !restrictedItems.includes(item))
+    let restrictedItems=getRestrictedItems(data, accessProfile, 'Set Code')
+    data=data.filter(item => !restrictedItems.includes(item['Set Code']))
 
     return data;
 }
 
-function getRestrictedItems(data, accessProfile) {
+// Returns a list of grid items that are restricted based on the access profile
+function getRestrictedItems(data, accessProfile, itemIdentifier) {
     let restrictedItems=[]
     for (item of data) {
         for (column in accessProfile.dataFilter) {
             if (item[column]==accessProfile.dataFilter[column]) {
-                restrictedItems.push(item['Set Code'])
+                restrictedItems.push(item[`${itemIdentifier}`])
             }
         }
     }
     return restrictedItems
+}
+
+function getRestrictedSets(sets, accessProfile) {
+    let restrictedSets=[]
+    for (set of sets) {
+        for (column in accessProfile.dataFilter) {
+            if (set[column]==accessProfile.dataFilter[column]) {
+                restrictedSets.push(set)
+            }
+        }
+    }
+    return restrictedSets
 }
 

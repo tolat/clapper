@@ -13,14 +13,15 @@ const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
 const Queue=require('bull')
 
-const ShowPageCRUD={}
-ShowPageCRUD.Estimate=require('./ShowPageCRUD/Estimate')
-ShowPageCRUD.CostReport=require('./ShowPageCRUD/CostReport')
-ShowPageCRUD.Purchases=require('./ShowPageCRUD/Purchases')
-ShowPageCRUD.Rentals=require('./ShowPageCRUD/Rentals')
-ShowPageCRUD.Rates=require('./ShowPageCRUD/Rates')
-ShowPageCRUD.Crew=require('./ShowPageCRUD/Crew')
-ShowPageCRUD.Timesheets=require('./ShowPageCRUD/Timesheets')
+const ShowPageCRUD={
+    Estimate: require('./ShowPageCRUD/Estimate'),
+    CostReport: require('./ShowPageCRUD/CostReport'),
+    Purchases: require('./ShowPageCRUD/Purchases'),
+    Rentals: require('./ShowPageCRUD/Rentals'),
+    Rates: require('./ShowPageCRUD/Rates'),
+    Crew: require('./ShowPageCRUD/Crew'),
+    Timesheets: require('./ShowPageCRUD/Timesheets')
+}
 
 // Load a Show Page section
 router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
@@ -48,15 +49,10 @@ router.delete('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) =>
 
 // Post (update) route for ShowPage sections
 router.post('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
-    try {
-        // Sanitize incoming data
-        req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
-        let responseData=await ShowPageCRUD[sanitizeHtml(req.params.section)].update(req.body, req.params.id, req.user);
-        res.send(responseData)
-    }
-    catch (e) {
-        res.send({ message: `\n\n${e.message}\n\n${e.stack}\n\n` })
-    }
+    // Sanitize incoming data
+    req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
+    let responseData=await ShowPageCRUD[sanitizeHtml(req.params.section)].update(req.body, req.params.id, req.user);
+    res.send(responseData)
 }))
 
 // Put route for uploading new timesheet templates
