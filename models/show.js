@@ -24,7 +24,6 @@ const ShowSchema=new Schema({
             taxColumns: [String],
             rentalList: [Object],
         },
-        accessProfiles: [Object]
     }],
     purchases: {
         displaySettings: Object,
@@ -61,6 +60,7 @@ const ShowSchema=new Schema({
         }],
         currentMap: String
     },
+    accessProfiles: [Object]
 }, { minimize: false })
 
 ShowSchema.virtual('displayKeys').get(function () {

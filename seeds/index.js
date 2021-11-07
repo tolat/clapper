@@ -34,7 +34,86 @@ const seedShows=async () => {
         const show=new Show({
             'Name': showNames[i],
             owner: 'torin.olat@gmail.com',
-            hasAccess: ['torin.olat@gmail.com', 'pigsinpajamas@yahoo.ca'],
+            hasAccess: ['pigsinpyjamas@yahoo.ca'],
+            accessProfiles: [
+                {
+                    name: 'Test Profile',
+                    'Cost Report': {
+                        users: [],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Estimate': {
+                        users: ['pigsinpyjamas@yahoo.ca'],
+                        columnFilter: ['Location', 'Notes'],
+                        dataFilter: { Episode: 200 }
+                    },
+                    'Purchases': {
+                        users: [],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Rentals': {
+                        users: [],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Crew': {
+                        users: [],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Rates': {
+                        users: [],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Timesheets': {
+                        users: [],
+                        columnFilter: [],
+                        dataFilter: {}
+                    }
+                },
+                {
+                    name: '__Owner',
+                    'Cost Report': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Estimate': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Purchases': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Rentals': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Crew': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Rates': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    },
+                    'Timesheets': {
+                        users: ['torin.olat@gmail.com'],
+                        columnFilter: [],
+                        dataFilter: {}
+                    }
+
+                }
+            ],
             currentWeek: firstWeekId,
             departments: departmentNames,
             departmentColorMap: {},
@@ -64,86 +143,7 @@ const seedShows=async () => {
                     extraColumns: [],
                     taxColumns: ['GST', 'PST'],
                     rentalList: []
-                },
-                accessProfiles: [
-                    {
-                        name: 'Test Profile',
-                        'Cost Report': {
-                            users: [],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Estimate': {
-                            users: ['pigsinpyjamas@yahoo.ca'],
-                            columnFilter: ['Location', 'Notes'],
-                            dataFilter: { Episode: 200 }
-                        },
-                        'Purchases': {
-                            users: [],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Rentals': {
-                            users: [],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Crew': {
-                            users: [],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Rates': {
-                            users: [],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Timesheets': {
-                            users: [],
-                            columnFilter: [],
-                            dataFilter: {}
-                        }
-                    },
-                    {
-                        name: '__Owner',
-                        'Cost Report': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Estimate': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Purchases': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Rentals': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Crew': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Rates': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        },
-                        'Timesheets': {
-                            users: ['torin.olat@gmail.com'],
-                            columnFilter: [],
-                            dataFilter: {}
-                        }
-
-                    }
-                ]
+                }
             }],
             estimateVersions: {
                 '100': {

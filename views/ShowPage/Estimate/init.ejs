@@ -3,7 +3,6 @@
     var _show= <%- JSON.stringify(show)%>;
     var _args= <%- JSON.stringify(args)%>;
     var _columnFilter= <%- JSON.stringify(columnFilter)%>
-    var _restrictedItems=<%- JSON.stringify(restrictedItems)%>
 
     var _version=_args.version;
     var _latestVersion=_args.latestVersion;
@@ -41,7 +40,7 @@
         var options=await initializeOptions();
 
         // Create grid data
-        var data=<%- JSON.stringify(gridData)%>;
+        var data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
         var columns=await initializeColumns(sets, _show, _args);
@@ -150,9 +149,9 @@
     function initializeColumns(sets, _show, _args) {
         let columns=[
             // Core feature columns
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
-            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
-            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true, },
+            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0, columnGroup: 'Test' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save', columnGroup: 'Test' },
+            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true, columnGroup: 'Test' },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
         ];
 

@@ -11,6 +11,7 @@ const { genUniqueId }=require('../utils/numberUtils')
 
 // Shows Load
 router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
+    // Get shows that user has access to
     const shows=await Show.find({
         $or: [
             {
@@ -20,7 +21,9 @@ router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 hasAccess: { $in: [req.user.username] }
             }
         ]
-    });
+    })
+
+    // Render shows page (homepage)
     res.render('shows', {
         title: 'Home',
         shows: shows,
@@ -36,6 +39,47 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.currentWeek=genUniqueId()
     show.departmentColorMap={}
     show.owner=req.user.username
+    show.accessProfiles=[
+        {
+            name: '__Owner',
+            'Cost Report': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            },
+            'Estimate': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            },
+            'Purchases': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            },
+            'Rentals': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            },
+            'Crew': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            },
+            'Rates': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            },
+            'Timesheets': {
+                users: [req.user.username],
+                columnFilter: [],
+                dataFilter: {}
+            }
+
+        }
+    ]
 
     // Create first week
     let newWeek={
@@ -65,47 +109,6 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
             taxColumns: [],
             displaySettings: {}
         },
-        accessProfiles: [
-            {
-                name: '__Owner',
-                'Cost Report': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                },
-                'Estimate': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                },
-                'Purchases': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                },
-                'Rentals': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                },
-                'Crew': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                },
-                'Rates': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                },
-                'Timesheets': {
-                    users: [req.user.username],
-                    columnFilter: [],
-                    dataFilter: {}
-                }
-
-            }
-        ]
     }
 
     show.timesheets.currentMap=undefined

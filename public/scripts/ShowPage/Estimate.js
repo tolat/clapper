@@ -348,7 +348,6 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             departmentColorMap: _show.departmentColorMap,
             isNewVersion: isNewVersion,
             isBlankVersion: isBlankVersion,
-            restrictedItems: _restrictedItems,
             displaySettings: {
                 groupBy: _groupedBy,
                 reorderColumns: getColumnOrder(),
