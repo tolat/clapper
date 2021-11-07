@@ -5,11 +5,11 @@
         let _user= <%- JSON.stringify(user)%>
 
             let _version=_args.version;
+    let _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version]||{ setHiddenColumns: [] }
     let _latestVersion=_args.latestVersion;
     let _extraColumns=[];
     let _fringes={};
     let _mandayRates={};
-
 
     // If estimate versions exist, _version will be set to current version - load current version data
     if (_version) {
@@ -93,9 +93,7 @@
         });
 
         // Apply saved display settings
-        let displaySettings=false
-        try { displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version] } catch (e) { console.log(e) }
-        if (displaySettings) { applyDisplaySettings(displaySettings) }
+        applyDisplaySettings(_displaySettings)
 
         // Set estimate status to saved
         await updateSaveStatus(true);
@@ -178,11 +176,7 @@
         for (col of columns) {
             if (_accessProfile.columnFilter.includes(col.name)) {
                 if (_show.estimateVersions[_version]) {
-                    if (!_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version].setHiddenColumns) {
-                        _accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version].setHiddenColumns=[col.name]
-                    } else {
-                        _accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version].setHiddenColumns.push(col.name)
-                    }
+                    _displaySettings.setHiddenColumns.push(col.name)
                 }
                 col.lockHidden=true
             }

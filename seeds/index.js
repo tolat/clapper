@@ -67,7 +67,6 @@ const seedShows=async () => {
             estimateVersions: {
                 '100': {
                     extraColumns: ['Location', 'Notes'],
-                    displaySettings: {},
                     mandayRates: {
                         'Construction': 550,
                         'Paint': 300,
