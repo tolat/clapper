@@ -14,7 +14,18 @@ TASKS
 -   Finish access profiles (Torin)
 -   Get it to print nicely (Arthur)
 -   Optionally add basic styling to grid(Arthur)
+-   Improve general usability
 
+-   Structural changes 
+        1.   Sets can be removed from mongoose schema and just be an array of objects in estimate versions (different setlists across estimate versions)
+        2.   Make sheet not sort by number by default, but keep whatever sorting the page was saved on 
+             -   get rid of # column - should just be a user addable column
+        3.   Change weeks array to be indexed by the week number instead of having 'number' field
+        4.   Purchases, Positions can be just an array of objects in the show (not mongoose schema)
+        4.   current week should be moved to display settings for access profile
+        5.   Department color map can dictate the department order and color for each user. Move to display settings in access profile.
+        5.   show.departments should no longer be used to determine the order of the departments ^^
+        
 
 
 

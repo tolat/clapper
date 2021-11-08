@@ -79,7 +79,8 @@ const seedShows=async () => {
                         'Overtime': 2.5
                     },
                     weekEnding: false,
-                    dateCreated: firstWeekEnd
+                    dateCreated: firstWeekEnd,
+                    sets: []
                 }
             },
             purchases: {
