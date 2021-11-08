@@ -219,8 +219,8 @@ createSlickGrid=(data, columns, options) => {
     })
 
     // If shift click on a cell, select cells starting at active cell to clicked cell
-    grid.onClick.subscribe(function (e, args) {
-        let activeCell=grid.getActiveCell()
+    grid.onClick.subscribe(async function (e, args) {
+        let activeCell=await grid.getActiveCell()
         if (e.shiftKey&&activeCell) {
             let toRow=args.row;
             let toCell=args.cell;
@@ -241,8 +241,8 @@ createSlickGrid=(data, columns, options) => {
                 toCell=temp;
             }
 
-            let selectionModel=grid.getSelectionModel()
-            let ranges=selectionModel.getSelectedRanges()
+            let selectionModel=await grid.getSelectionModel()
+            let ranges=await selectionModel.getSelectedRanges()
 
             if (toCell&&toRow) {
                 ranges[0].fromCell=fromCell
@@ -251,14 +251,11 @@ createSlickGrid=(data, columns, options) => {
                 ranges[0].toRow=toRow
             }
 
-            setTimeout(function () {
-                grid.setActiveCell(originalFromRow, originalFromCell)
-                selectionModel.setSelectedRanges(ranges)
-                grid.setSelectionModel(selectionModel)
-                grid.invalidate()
-                grid.render()
-            }, 1)
-
+            await grid.setActiveCell(originalFromRow, originalFromCell)
+            await selectionModel.setSelectedRanges(ranges)
+            await grid.setSelectionModel(selectionModel)
+            await grid.invalidate()
+            await grid.render()
         }
     })
 

@@ -1,6 +1,0 @@
-trap "exit" INT TERM ERR
-trap "kill 0" EXIT
-
-cd "$(dirname "$0")"
-cd seeds
-node index.js

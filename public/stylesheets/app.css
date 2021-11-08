@@ -517,6 +517,13 @@ input.department-input:focus{
    cursor: text;
 }
 
+#week-ending-display{
+    background-color: rgb(255, 229, 81);
+    padding: 0 5px 0 5px;
+    margin-left: 0 !important;
+    border-right: 1px solid rgb(160, 160, 160);
+}
+
 #week-ending-display-container{
     overflow-x: scroll;
 }
@@ -555,7 +562,6 @@ input.department-input:focus{
     width: 100%;
     font-size: 0.8rem;
     font-weight: bold;
-    padding-left: 5px;
     background-color: rgb(231, 231, 231);
     overflow-x: scroll;
     text-transform: uppercase !important;

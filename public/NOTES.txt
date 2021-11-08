@@ -6,6 +6,15 @@ Heroku
 Git
 
 
+TASKS
+-   Preliminarily need to solve issues with working on pc
+
+-   Remove _show variable (Torin)
+-   Convert to SSL (Kit)
+-   Finish access profiles (Torin)
+-   Get it to print nicely (Arthur)
+-   Optionally add basic styling to grid(Arthur)
+
 
 
 
@@ -97,6 +106,7 @@ TODO:
     -   Figure out how to limit things like fringes, manday rate, multipliers
     -   Add access profile functionality to all pages
     -   Create interface for adding/editing access profiles
+    -   Estimate version needs to be part of access profiles as well
 
 
 5. Audit Page for Indivicual crew members -> rows are days worked, cols are show, set, hours, position
