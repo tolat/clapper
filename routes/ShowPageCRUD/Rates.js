@@ -32,23 +32,55 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     })
 }
 
-// Update rates
-module.exports.update=async function (body, showId) {
-    let show=await Show.findById(showId)
-        .populate('crew.crewList')
-        .populate('positions.positionList')
+// Update rates ******APPLY ACCESS PROFILES********
+module.exports.update=async function (body, showId, user) {
+    let show=await Show.findById(showId).populate('crew.crewList')
+    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
+
+    // Get access profile
+    let apName=user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Estimate
 
     // Save display settings to show
-    show.positions.displaySettings=body.displaySettings;
+    accessProfile.displaySettings[apName][week._id.toString()]=body.displaySettings;
     show.markModified('positions.displaySettings');
 
     // Save extra Columns to show
-    show.positions.extraColumns=body.extraColumns;
+    week.positions.extraColumns=body.extraColumns;
     show.markModified('positions.extraColumns');
 
     // Set multipliers
-    show.weeks.find(w => w._id.toString()==show.currentWeek).multipliers=body.multipliers;
+    week.multipliers=body.multipliers;
     show.markModified('weeks');
+
+    // Save items
+    for (item of body.data) {
+        if (item&&item['Name']&&item['Code']&&item['Department']&&item['Rate']) {
+            let pos=week.positions.positionList[item['Code']]||{}
+            week.positions.positionList[item['Code']]=pos
+
+            // Set core position values
+            for (key of ['Name', 'Department', 'Rate', 'Code']) {
+                pos[key]=item[key]
+            }
+
+            // Save extra column values
+            pos.extraColumnValues={}
+            for (key of body.extraColumns) {
+                pos.extraColumnValues[key]=item[key]
+            }
+        }
+    }
+
+    // Delete positions that aren't in the grid 
+    for (posCode in week.positions.positionList) {
+        if (!body.data.find(item => item['Code']==posCode)) {
+            delete week.positions.positionList[posCode]
+        }
+    }
+
+    await show.save();
 
     // Create new id if new week is being created
     const newWeekId=genUniqueId()
@@ -64,52 +96,6 @@ module.exports.update=async function (body, showId) {
     }
 
     await show.save();
-
-    // Save items
-    for (item of body.data) {
-        if (item&&item['Name']&&item['Code']&&item['Department']&&item['Rate']) {
-            let pos=await Position.findOne({ 'Code': item['Code'], showId: show._id.toString() })
-
-            // New position if pos not found
-            if (!pos) {
-                pos=new Position();
-                pos.extraColumnValues={};
-                pos.show=show;
-                pos.showId=show._id.toString()
-                await pos.save();
-                await show.positions.positionList.push(pos);
-                show.markModified('positions.positionList');
-                await show.save();
-            }
-
-            // Save position #
-            pos['#']=item['#']
-
-            // Set core position values
-            for (key of pos.displayKeys) {
-                pos[key]=item[key]
-            }
-
-            // Save extra column values
-            pos.extraColumnValues={}
-            for (key of body.extraColumns) {
-                pos.extraColumnValues[key]=item[key]
-            }
-
-            pos.markModified(`extraColumnValues`)
-
-            await pos.save();
-        }
-    }
-
-    show=await Show.findById(show._id).populate('positions.positionList')
-
-    // Delete positions that aren't in the grid
-    for (pos of show.positions.positionList) {
-        if (!body.data.find(item => item['Code']==pos['Code'])) {
-            await Position.findByIdAndDelete(pos._id)
-        }
-    }
 
     return {};
 }
