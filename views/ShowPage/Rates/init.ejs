@@ -1,12 +1,12 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>;
-    var _args= <%- JSON.stringify(args)%>;
+    let _show= <%- JSON.stringify(show)%>;
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    let _user= <%- JSON.stringify(user)%>;
     setWeekEnding()
 
-    var _extraColumns=_show.positions.extraColumns;
-    var _rentalColumns=_show.positions.rentalColumns;
-    var _validators=[
+    let _extraColumns=_week.positions.extraColumns;
+    let _validators=[
         {
             fields: ['Rate'],
             isInvalid: function (args, field) {
@@ -40,22 +40,23 @@
             validationMessage: "Position codes must be unique."
         }
     ];
-    var _totals={};
-    var _multipliers=_week.multipliers
-    var _dropdownNodes=initDropdownNodes()
+    let _totals={};
+    let _multipliers=_week.multipliers
+    let _dropdownNodes=initDropdownNodes()
+    let _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_week._id]||{}
 
     var grid;
     var dataView;
 
     // Load the grid 
     async function onLoad() {
-        var positions=_show.positions.positionList;
+        var positions=_week.positions.positionList;
 
         // Create options
         var options=await initializeOptions();
 
         // Create grid data
-        var data=await initializeData(positions, _show, _args);
+        let data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
         var columns=await initializeColumns(positions, _show, _args);
@@ -77,48 +78,15 @@
         document.getElementById('grid-footer-totals-container').style.display='none';
 
         // Apply display settings to grid
-        if (_show.positions.displaySettings) { applyDisplaySettings(_show.positions.displaySettings) }
+        applyDisplaySettings(_displaySettings)
 
         // Calcualte totals for totals footer row
         updateTotalsRow();
     }
 
-    // Creates grid data 
-    function initializeData(positions, _show, _args) {
-        let data=[];
-
-        for (let i=0; i<positions.length; i++) {
-            let item={
-                id: 'id_'+i,
-                '#': positions[i]['#'],
-                'Name': positions[i]['Name'],
-                'Code': positions[i]['Code'],
-                'Department': positions[i]['Department'],
-                'Rate': positions[i]['Rate'],
-                positionid: positions[i]._id
-            }
-
-            // Mark deleted departments
-            if (!_show.departments.includes(item['Department'])) { item['Department']+='\xa0(NOT FOUND)' }
-
-            // Add extra columns values
-            for (col of _show.positions.extraColumns) {
-                item[col]=positions[i].extraColumnValues[col];
-            }
-
-            data.push(item);
-        }
-
-        // Sort data by #
-        data=sortByNumber(data);
-
-        return data;
-    }
-
     // Creates grid columns 
     function initializeColumns(positions, _show, _args) {
         let columns=[
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Code", name: "Code", field: "Code", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 200, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
@@ -128,7 +96,6 @@
         // Add extra columns
         for (key of _extraColumns) {
             let column={ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true };
-            if (_rentalColumns.includes(key)) { column.cssClass='rental-column' }
             columns.push(column);
         }
 

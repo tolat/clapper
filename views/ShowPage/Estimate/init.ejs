@@ -1,11 +1,11 @@
 <script>
     // Global variables
     let _show= <%- JSON.stringify(show)%>;
-    let _accessProfile= <%- JSON.stringify(accessProfile)%>
-        let _user= <%- JSON.stringify(user)%>
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    let _user= <%- JSON.stringify(user)%>;
 
-            let _version=_args.version;
-    let _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version]||{ setHiddenColumns: [] }
+    let _version=_args.version;
+    let _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_version]||{}
     let _latestVersion=_args.latestVersion;
     let _extraColumns=[];
     let _fringes={};
@@ -148,7 +148,6 @@
     function initializeColumns(sets, _show, _args) {
         let columns=[
             // Core feature columns
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0, columnGroup: 'Test' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save', columnGroup: 'Test' },
             { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true, columnGroup: 'Test' },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
@@ -176,6 +175,7 @@
         for (col of columns) {
             if (_accessProfile.columnFilter.includes(col.name)) {
                 if (_show.estimateVersions[_version]) {
+                    if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
                     _displaySettings.setHiddenColumns.push(col.name)
                 }
                 col.lockHidden=true

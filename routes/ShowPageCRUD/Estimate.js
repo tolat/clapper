@@ -1,6 +1,5 @@
 const { populateShow }=require('../../utils/schemaUtils')
 const Show=require('../../models/show')
-const Set=require('../../models/set')
 const { sortByNumber, zeroNanToNull }=require('../../utils/numberUtils')
 
 // Render Estimate page
@@ -29,7 +28,10 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
 
     // Initialize data for the grid, applying the access profile
-    let data=await initializeData(show.sets, show, args, args.version, accessProfile)
+    let data=[]
+    if (args.version) {
+        data=await initializeData(show.estimateVersions[`${args.version}`].sets, show, args, args.version, accessProfile)
+    }
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
@@ -47,20 +49,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
 // Delete Estimate Version
 module.exports.delete=async function (body, showId) {
     let v=body.version;
-    let show=await Show.findById(showId).populate('sets');
+    let show=await Show.findById(showId)
 
     delete show.estimateVersions[v];
     show.markModified(`estimateVersions`);
     await show.save();
-
-    for (set of show.sets) {
-        let s=await Set.findById(set._id);
-        delete s.estimates[v];
-        delete s.estimateTotals[v];
-        s.markModified(`estimates`);
-        s.markModified(`estimateTotals`);
-        await s.save();
-    }
 
     return { latestVersion: getLatestVersion(show) }
 }
@@ -79,44 +72,24 @@ module.exports.update=async function (body, showId, user) {
     while (apName.includes(".")) { apName=apName.replace(".", "_") }
     let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Estimate
 
-    // First blank estimate case *** INITIALIZE REST OF SHOW OBJECTS ***
+    // First blank estimate case 
     if (!ov) {
         show.estimateVersions[v]={
             extraColumns: [],
             displaySettings: {},
             mandayRates: {},
             fringes: {},
-            dateCreated: new Date(Date.now())
+            dateCreated: new Date(Date.now()),
+            sets: []
         }
-        show.costReport={
-            displaySettings: {},
-            extraColumns: [],
-            estimateVersion: v,
-            setNumberMap: {},
-            setExtraColumnMap: {},
-        }
-        show.markModified('costReport.estimateVersion');
+
         show.markModified(`estimateVersions`);
         await show.save();
-
-        // Initialize first estimate for each set if ther are already sets (delete only estimate case)
-        for (set of show.sets) {
-            set.estimates={};
-            set.estimates[v]={
-                departmentValues: {},
-                extraColumnValues: {}
-            };
-            set.estimateTotals={}
-            set.estimateTotals[v]=0;
-            set.markModified('estimates');
-            set.markModified('estimateTotals');
-            await set.save();
-        }
         return { latestVersion: getLatestVersion(show) };
     }
 
     // Update estimate version display settings for this access profile (column order, grouping, collapsed groups, etc)
-    accessProfile.displaySettings[apName][`${ov}`]=body.displaySettings
+    accessProfile.displaySettings[apName][ov]=body.displaySettings
     show.markModified(`accessProfiles`);
 
     // Update Extra columns
@@ -137,16 +110,6 @@ module.exports.update=async function (body, showId, user) {
     // Update department colors
     show.departmentColorMap=body.departmentColorMap;
 
-    // Update the show's estimate version record
-    if (v!=ov) {
-        show=await Show.findById(showId).populate('sets');
-        show.estimateVersions[v]=show.estimateVersions[ov];
-        if (isBlankVersion) { show.estimateVersions[ov].displaySettings={} }
-        if (!isNewVersion) { delete show.estimateVersions[ov] }
-        else { show.estimateVersions[v].dateCreated=new Date(Date.now()) }
-        show.markModified(`estimateVersions`);
-    }
-
     // Set new cost report version based on estimate page version
     show.costReport.estimateVersion=v
 
@@ -154,33 +117,23 @@ module.exports.update=async function (body, showId, user) {
     await show.save();
 
     // Save Set Data
+    let sets=show.estimateVersions[`${ov}`].sets
     for (item of items) {
         if (item&&item['Set Code']) {
-            let set=show.sets.find(s => s['Set Code']==item['Set Code'])
+            let set=sets.find(s => s['Set Code']==item['Set Code'])
 
             // Create new set if item doesn't correspond to an existing set
             if (!set) {
-                set=await new Set();
-                set.show=show;
-                set.estimates={};
-                set.estimateTotals={};
-                for (ver of Object.keys(show.estimateVersions)) {
-                    set.estimates[ver]={
-                        departmentValues: {},
-                        extraColumnValues: {}
-                    }
-                    set.estimateTotals[ver]={ total: 0, departmentTotals: {} }
-                    for (d of show.departments) { set.estimateTotals[ver].departmentTotals[d]=0 }
+                set={
+                    departmentValues: {},
+                    extraColumnValues: {}
                 }
-                set.markModified('estimates');
-                set.markModified('estimateTotals');
-                await set.save();
-                await show.sets.push(set);
+                sets.push(set);
                 await show.save();
             }
 
             // Update unrestricted core display keys
-            for (key of set.displayKeys) {
+            for (key of ['Set Code', 'Episode', 'Name']) {
                 if (!accessProfile.columnFilter.includes(key)) {
                     set[key]=item[key];
                 }
@@ -191,84 +144,48 @@ module.exports.update=async function (body, showId, user) {
                 if (!accessProfile.columnFilter.includes(key)) {
                     let value=item[key];
                     if (isNaN(value)||value==0) { value=0 }
-                    set.estimates[ov].departmentValues[key]=value;
+                    set.departmentValues[key]=value;
                 }
             }
 
             // Update extra column keys, deleting values for columns that don't exist anymore
-            let previousValues=JSON.parse(JSON.stringify(set.estimates[ov].extraColumnValues))
-            set.estimates[ov].extraColumnValues={}
+            let previousValues=set.extraColumnValues
+            set.extraColumnValues={}
             for (key of body.extraColumns) {
                 // Set extra column value for this key if it isn't restricted. if it is, then set it to the previous values
-                if (!accessProfile.columnFilter.includes(key)) {
-                    set.estimates[ov].extraColumnValues[key]=item[key];
-                } else {
-                    set.estimates[ov].extraColumnValues[key]=previousValues[key];
-                }
+                !accessProfile.columnFilter.includes(key)? set.extraColumnValues[key]=item[key]:
+                    set.extraColumnValues[key]=previousValues[key];
             }
-
-            // Update estimate totals
-            // Only set this if there are no restricted columns
-            if (!accessProfile.columnFilter[0]) {
-                set.estimateTotals[ov]={
-                    total: item['Current']||0,
-                    departmentTotals: item.departmentTotals||{}
-                }
-            }
-
-
-            // Set all undefined department totals to 0
-            if (!accessProfile.columnFilter[0]) {
-                for (dep of show.departments) {
-                    if (!set.estimateTotals[ov].departmentTotals[dep]) {
-                        set.estimateTotals[ov].departmentTotals[dep]=0
-                    }
-                }
-            }
-
-            // Update estimate version and totals if this is a new version or a rename
-            if (ov!=v) {
-                set.estimates[v]=set.estimates[ov];
-                set.estimateTotals[v]=set.estimateTotals[ov];
-                // Set totals to 0 and estimate to blank if creating a blank version
-                if (isBlankVersion) {
-                    set.estimateTotals[v]={ total: 0, departmentTotals: {} }
-                    for (d of show.departments) { set.estimateTotals[v].departmentTotals[d]=0 }
-                    set.estimates[v]={
-                        departmentValues: {},
-                        extraColumnValues: {}
-                    }
-                    // Update Estimate specific keys
-                    for (key of getDepartmentKeys(show)) {
-                        set.estimates[v].departmentValues[key]=0;
-                    }
-                }
-                // Delete old version and totals if this is a rename
-                if (!isNewVersion) {
-                    delete set.estimates[ov];
-                    delete set.estimateTotals[ov];
-                }
-            }
-
-            set.markModified(`estimates.${v}`);
-            set.markModified(`estimates.${v}.extraColumnValues`);
-            set.markModified(`estimateTotals.${v}`);
-            set.markModified(`estimates.${ov}`);
-            set.markModified(`estimates.${ov}.extraColumnValues`);
-            set.markModified(`estimateTotals.${ov}`);
-            await set.save();
         }
     }
-
-    show=await Show.findById(show._id).populate('sets')
 
     // Delete sets that are no longer present in grid and are not restricted by an access profile
-    let restrictedSets=getRestrictedSets(show.sets, accessProfile)
-    for (set of show.sets) {
+    let restrictedSets=getRestrictedSets(show.estimateVersions[ov].sets, accessProfile)
+    for (set of show.estimateVersions[ov].sets) {
         if (!items.find(item => item['Set Code']==set['Set Code'])&&!restrictedSets.includes(set)) {
-            await Set.findByIdAndDelete(set._id)
+            delete set
         }
     }
+
+    // Handle new version or version rename
+    if (v!=ov) {
+        show.estimateVersions[v]=JSON.parse(JSON.stringify(show.estimateVersions[ov]))
+        if (isBlankVersion) {
+            accessProfile.displaySettings[apName][`${v}`]={}
+            for (set of show.estimateVersions[v].sets) {
+                for (key in set.departmentValues) {
+                    set.departmentValues[key]=null
+                }
+                set.extraColumnValues={}
+            }
+            show.estimateVersions[v].extraColumns=[]
+        }
+        if (!isNewVersion) { delete show.estimateVersions[ov] }
+        else { show.estimateVersions[v].dateCreated=new Date(Date.now()) }
+    }
+
+    await show.markModified('estimateVersions')
+    await show.save()
 
     // Get the most recent version (largest numbered version) and return it
     return { latestVersion: getLatestVersion(show) };
@@ -298,36 +215,28 @@ function initializeData(sets, _show, _args, _version, accessProfile) {
         for (let i=0; i<sets.length; i++) {
             let item={
                 id: 'id_'+i,
-                '#': sets[i]['#'],
-                setid: sets[i]._id,
                 // Core features
                 'Set Code': sets[i]['Set Code'],
                 'Episode': sets[i]['Episode'],
                 'Name': sets[i]['Name'],
-                departmentTotals: {}
             }
 
             // Version specific features
-            if (sets[i].estimates[_args.version]&&sets[i].estimates[_args.version].departmentValues) {
-                // Add Department specific features
-                for (key of Object.keys(sets[i].estimates[_args.version].departmentValues)) {
-                    item[key]=zeroNanToNull(parseFloat(sets[i].estimates[_args.version].departmentValues[key]).toFixed(2));
-                }
-                // Calculate department-specific labor
-                for (d of _show.departments) {
-                    item[`${d} Labor`]=zeroNanToNull(parseFloat(item[`${d} Man Days`]*_show.estimateVersions[_version].mandayRates[d]).toFixed(2));
-                }
-                // Add Extra Column Values
-                for (key of _show.estimateVersions[_args.version].extraColumns) {
-                    item[key]=sets[i].estimates[_args.version].extraColumnValues[key]
-                }
+            // Add Department specific features
+            for (key in sets[i].departmentValues) {
+                item[key]=zeroNanToNull(parseFloat(sets[i].departmentValues[key]).toFixed(2));
+            }
+            // Calculate department-specific labor
+            for (d of _show.departments) {
+                item[`${d} Labor`]=zeroNanToNull(parseFloat(item[`${d} Man Days`]*_show.estimateVersions[_version].mandayRates[d]).toFixed(2));
+            }
+            // Add Extra Column Values
+            for (key in sets[i].extraColumnValues) {
+                item[key]=sets[i].extraColumnValues[key]
             }
             data.push(item);
         }
     }
-
-    // Sort data by #
-    data=sortByNumber(data, _args);
 
     // Apply access profile to data removing restricted items and values from restricted columns
     for (item of data) {

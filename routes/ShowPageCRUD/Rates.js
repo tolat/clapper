@@ -2,22 +2,33 @@ const { populateShow }=require('../../utils/schemaUtils')
 const { genUniqueId }=require('../../utils/numberUtils')
 const Show=require('../../models/show')
 const User=require('../../models/user')
-const Set=require('../../models/set')
 const Purchase=require('../../models/purchase')
-const Position=require('../../models/position')
 const crudUtils=require('./utils')
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
     let show=await populateShow(id);
+
+    // Get accessProfile
+    let apName=user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
+
+    // Generate grid data
+    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
+    let data=initializeData(week.positions.positionList, show, args, week)
+
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
-        show: show,
-        section: section,
-        args: args,
-        sharedModals: sharedModals,
-        pageModals: pageModals
+        show,
+        section,
+        args,
+        sharedModals,
+        pageModals,
+        accessProfile,
+        data,
+        user
     })
 }
 
@@ -103,4 +114,30 @@ module.exports.update=async function (body, showId) {
     return {};
 }
 
+// Creates grid data 
+function initializeData(positions, _show, _args, _week) {
+    let data=[];
+    let posCodes=Object.keys(positions)
 
+    for (let i=0; i<posCodes.length; i++) {
+        let item={
+            id: 'id_'+i,
+            'Name': positions[posCodes[i]]['Name'],
+            'Code': posCodes[i],
+            'Department': positions[posCodes[i]]['Department'],
+            'Rate': positions[posCodes[i]]['Rate'],
+        }
+
+        // Mark deleted departments
+        if (!_show.departments.includes(item['Department'])) { item['Department']+='\xa0(NOT FOUND)' }
+
+        // Add extra columns values
+        for (col of _week.positions.extraColumns) {
+            item[col]=positions[posCodes[i]].extraColumnValues[col];
+        }
+
+        data.push(item);
+    }
+
+    return data;
+}

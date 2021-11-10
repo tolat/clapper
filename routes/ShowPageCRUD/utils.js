@@ -2,9 +2,7 @@ const { populateShow }=require('../../utils/schemaUtils')
 const { genUniqueId }=require('../../utils/numberUtils')
 const Show=require('../../models/show')
 const User=require('../../models/user')
-const Set=require('../../models/set')
 const Purchase=require('../../models/purchase')
-const Position=require('../../models/position')
 
 // Returns array of dates representing the current week
 module.exports.getDaysOfWeekEnding=(date) => {

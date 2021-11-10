@@ -1,4 +1,3 @@
-const { listenerCount }=require('../models/set');
 const numUtils=require('../utils/numberUtils');
 
 module.exports.firstnames=[

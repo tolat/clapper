@@ -3,8 +3,6 @@ const mongoose=require('mongoose');
 const Show=require('../models/show');
 const User=require('../models/user');
 const Purchase=require('../models/purchase');
-const Set=require('../models/set');
-const Position=require('../models/position');
 const { positions }=require('./positions');
 const { showNames, genStartDate, departmentNames, genDateBetween }=require('./shows');
 const { getDescription }=require('./sets');
@@ -62,6 +60,10 @@ const seedShows=async () => {
                     extraColumns: [],
                     taxColumns: ['GST', 'PST'],
                     rentalList: []
+                },
+                positions: {
+                    extraColumns: [],
+                    positionList: {}
                 }
             }],
             estimateVersions: {
@@ -88,12 +90,6 @@ const seedShows=async () => {
                 extraColumns: [],
                 taxColumns: ['GST', 'PST'],
                 purchaseList: []
-            },
-            positions: {
-                displaySettings: {},
-                extraColumns: [],
-                rentalColumns: [],
-                positionList: [],
             },
             costReport: {
                 displaySettings: {},
@@ -200,7 +196,11 @@ const seedShows=async () => {
                     'Rates': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin_olat@gmail_com': {} }
+                        displaySettings: {
+                            'torin_olat@gmail_com': {
+                                [`${firstWeekId}`]: {}
+                            }
+                        }
                     },
                     'Timesheets': {
                         columnFilter: [],
@@ -229,19 +229,16 @@ const seedPositions=async () => {
     const shows=await Show.find();
     for (show of shows) {
         for (position of positions) {
-            pos=new Position({
-                show: show,
-                showId: show._id.toString(),
+            pos={
                 'Name': position.title,
-                'Code': position.code,
                 'Department': position.department,
-                extraColumnValues: {},
                 'Rate': randInt(25, 55),
-            })
-            await pos.save();
-            await show.positions.positionList.push(pos);
-            await show.save();
+                extraColumnValues: {},
+            }
+            show.weeks[0].positions.positionList[position.code]=pos
         }
+        await show.markModified('weeks')
+        await show.save();
     }
 }
 
@@ -250,71 +247,39 @@ const seedSets=async () => {
     for (show of shows) {
         for (let i=1; i<6; i++) {
             for (let j=1; j<10; j++) {
-                let set=new Set({
-                    show: show,
+                let set={
                     'Set Code': `${i}0${j}`,
                     'Episode': `${i}00`,
                     'Name': getDescription(),
-                    estimates: {
-                        '100': {
-                            departmentValues: {
-                                'Construction Man Days': Math.floor(Math.random()*10),
-                                'Construction Materials': Math.floor(Math.random()*1000),
-                                'Construction Rentals': Math.floor(Math.random()*1000),
+                    departmentValues: {
+                        'Construction Man Days': Math.floor(Math.random()*10),
+                        'Construction Materials': Math.floor(Math.random()*1000),
+                        'Construction Rentals': Math.floor(Math.random()*1000),
 
-                                'Paint Man Days': Math.floor(Math.random()*10),
-                                'Paint Materials': Math.floor(Math.random()*1000),
-                                'Paint Rentals': Math.floor(Math.random()*1000),
+                        'Paint Man Days': Math.floor(Math.random()*10),
+                        'Paint Materials': Math.floor(Math.random()*1000),
+                        'Paint Rentals': Math.floor(Math.random()*1000),
 
-                                'Greens Man Days': Math.floor(Math.random()*10),
-                                'Greens Materials': Math.floor(Math.random()*1000),
-                                'Greens Rentals': Math.floor(Math.random()*1000),
+                        'Greens Man Days': Math.floor(Math.random()*10),
+                        'Greens Materials': Math.floor(Math.random()*1000),
+                        'Greens Rentals': Math.floor(Math.random()*1000),
 
-                                'Metal Fab Man Days': Math.floor(Math.random()*10),
-                                'Metal Fab Materials': Math.floor(Math.random()*1000),
-                                'Metal Fab Rentals': Math.floor(Math.random()*1000),
+                        'Metal Fab Man Days': Math.floor(Math.random()*10),
+                        'Metal Fab Materials': Math.floor(Math.random()*1000),
+                        'Metal Fab Rentals': Math.floor(Math.random()*1000),
 
-                                'Sculptors Man Days': Math.floor(Math.random()*10),
-                                'Sculptors Materials': Math.floor(Math.random()*1000),
-                                'Sculptors Rentals': Math.floor(Math.random()*1000),
-                            },
-                            extraColumnValues: {
-                                'Location': '',
-                                'Notes': '',
-                            }
-                        }
+                        'Sculptors Man Days': Math.floor(Math.random()*10),
+                        'Sculptors Materials': Math.floor(Math.random()*1000),
+                        'Sculptors Rentals': Math.floor(Math.random()*1000),
                     },
-                    estimateTotals: {
-                        '100': {
-                            total: 0,
-                            departmentTotals: {
-                                'Construction': 1,
-                                'Paint': 2,
-                                'Greens': 3,
-                                'Metal Fab': 4,
-                                'Sculptors': 5
-                            }
-                        }
+                    extraColumnValues: {
+                        'Location': '',
+                        'Notes': '',
                     }
-                })
-
-                // Calculate estimate department totals and overall total
-                let total=0;
-                for (d of show.departments) {
-                    let rate=show.estimateVersions['100'].mandayRates[d];
-                    let manDays=set.estimates['100'].departmentValues[`${d} Man Days`];
-                    let materials=set.estimates['100'].departmentValues[`${d} Materials`];
-                    let rentals=set.estimates['100'].departmentValues[`${d} Rentals`];
-                    let dTotal=(manDays*rate*1.075)+materials+rentals;
-                    set.estimateTotals['100'].departmentTotals[d]=dTotal;
-                    total+=dTotal;
                 }
 
-                set.estimateTotals['100'].total=total;
-                set.markModified('estimateTotals');
-
-                await set.save();
-                await show.sets.push(set);
+                await show.estimateVersions['100'].sets.push(set);
+                show.markModified('estimateVersions')
                 await show.save();
             }
         }
@@ -342,11 +307,12 @@ const seedUsers=async () => {
     let users=await User.find();
     const shows=await Show.find();
     for (s of shows) {
-        let show=await Show.findById(s._id).populate('positions.positionList').populate('sets');
+        let show=await Show.findById(s._id)
         let startIdx=randInt(0, users.length);
         for (let i=startIdx; i<startIdx+30; i++) {
             let user=users[i%users.length];
             let joinDate=genDateBetween(new Date(show.weeks[0].end.getTime()-(7*oneDay)), show.weeks[0].end);
+            let posCodes=Object.keys(show.weeks[0].positions.positionList)
 
             // Create record for this show
             let record={
@@ -357,7 +323,7 @@ const seedUsers=async () => {
                 weeksWorked: {},
                 // Each position has its own days worked 
                 positions: [{
-                    code: show.positions.positionList[randInt(0, show.positions.positionList.length)]['Code'],
+                    code: posCodes[randInt(0, posCodes.length)],
                     daysWorked: {}
                 }]
             }
@@ -371,12 +337,14 @@ const seedUsers=async () => {
                 },
             }
 
+            let sets=show.estimateVersions[`100`].sets
+
             // Add days worked for first/only seeded position
             for (let j=0; j<6; j++) {
                 let date=new Date(show.weeks[0].end.getTime()-(j*oneDay));
                 record.positions[0].daysWorked[date.toLocaleDateString('en-US')]={
                     hours: randInt(1, 12),
-                    set: show.sets[randInt(0, show.sets.length)]['Set Code'],
+                    set: sets[randInt(0, sets.length)]['Set Code'],
                 };
             }
 
@@ -394,7 +362,7 @@ const seedUsers=async () => {
 const seedPurchases=async () => {
     const shows=await Show.find().populate('sets');
     for (show of shows) {
-        const sets=show.sets;
+        const sets=show.estimateVersions['100'].sets;
         const depts=show.departments;
         for (set of sets) {
             for (let i=0; i<2; i++) {
@@ -440,9 +408,10 @@ const seedRentals=async () => {
             'CF',
         ];
         let crewList=show.weeks[0].crew.crewList;
+        let sets=show.estimateVersions['100'].sets
 
         for (let i=0; i<rentalNames.length; i++) {
-            let set=show.sets[randInt(0, show.sets.length)];
+            let set=sets[randInt(0, sets.length)];
 
             let rental={
                 'Set Code': set['Set Code'],
@@ -456,7 +425,7 @@ const seedRentals=async () => {
                 },
                 extraColumnValues: {}
             }
-            rental['Department']=show.positions.positionList.find(p => p['Code']==rental['Code'])['Department']
+            rental['Department']=show.weeks[0].positions.positionList[rental['Code']]['Department']
 
             for (user of crewList) {
                 let record=user.showrecords.find(r => r.showid==show._id.toString())
@@ -481,11 +450,9 @@ const seedDB=async () => {
     await seedShows();
     console.log('done shows..');
 
-    await Position.deleteMany({});
     await seedPositions();
     console.log('done positions..');
 
-    await Set.deleteMany({});
     await seedSets();
     console.log('done sets..');
 

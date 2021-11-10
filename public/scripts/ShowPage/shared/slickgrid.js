@@ -497,7 +497,7 @@ greyOutLink=(elt) => {
 // Restricts page selector dropdown in nav bar so that pages are filled out in correct order
 setNavRestrictions=() => {
     // If no rates exist, block access to crew and rates
-    if (!_show.positions.positionList[0]) {
+    if (!_week.positions.positionList[0]) {
         let crewDropdown=document.getElementById('crew-dropdown')
         let rentalsDropdown=document.getElementById('rentals-dropdown')
         crewDropdown.parentElement.replaceChild(greyOutLink(crewDropdown), crewDropdown)

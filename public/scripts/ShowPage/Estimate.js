@@ -387,58 +387,44 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
 
 // Update Math column data
 updateEstimateMathColumns=() => {
-    // Create an object with set id keys and corresponding previous version total values for each set.
-    let previousVersion=false;
-    let previousVersionSetTotals={};
-    if (_show.estimateVersions&&Object.keys(_show.estimateVersions).length>1) {
+    let items=dataView.getItems();
+    let prevVer=false
+
+    // Get previous version totals. save in 'prevTotals' object
+    let prevTotals={};
+    if (Object.keys(_show.estimateVersions).length>1) {
         let versions=Object.keys(_show.estimateVersions).sort((a, b) => {
             return (parseFloat(b.replace("_", "."))-parseFloat(a.replace("_", ".")));
-        });
-        previousVersion=versions[versions.indexOf(_version)+1];
-        for (set of _show.sets) {
-            if (previousVersion) {
-                previousVersionSetTotals[set._id]=set.estimateTotals[previousVersion].total;
+        })
+        prevVer=versions[versions.indexOf(_version)+1]||false
+        if (prevVer) {
+            for (set of _show.estimateVersions[_version].sets) {
+                let prevSet=_show.estimateVersions[prevVer].sets.find(s => s['Set Code']==set['Set Code'])
+                if (prevSet) {
+                    let prevFringes=_show.estimateVersions[prevVer].fringes
+                    let prevMandayRates=_show.estimateVersions[prevVer].mandayRates
+                    let prevDepartments=_show.departments
+                    let prevItem={}
+                    for (dep of prevDepartments) {
+                        prevItem[`${dep} Man Days`]=prevSet.departmentValues[`${dep} Man Days`]
+                        prevItem[`${dep} Materials`]=prevSet.departmentValues[`${dep} Materials`]
+                        prevItem[`${dep} Rentals`]=prevSet.departmentValues[`${dep} Rentals`]
+
+                    }
+                    calculateTotals(prevItem, prevFringes, prevDepartments, prevMandayRates)
+                    prevTotals[set['Set Code']]=prevItem['Current']
+
+                }
             }
         }
     }
 
-    let items=dataView.getItems();
+    // Calculate math totals for items
     for (item of items) {
-        let nofringes=0;
-        let current=0;
-        let vals=[];
-        let totalFringe=1;
-        if (Object.keys(_fringes)[0]) { totalFringe=Object.keys(_fringes).map(key => parseFloat(_fringes[key])).reduce((a, b) => a+b)/100+1 }
-
-        // Calculate NoFringes and Current cost. Rate and fringe applies only to mandays
-        for (dep of _show.departments) {
-            let rate=_mandayRates[dep];
-            let mandays=parseFloat(item[`${dep} Man Days`]);
-            let materials=parseFloat(item[`${dep} Materials`]);
-            let rentals=parseFloat(item[`${dep} Rentals`]);
-
-            // Set NaN values to 0
-            vals=[rate, mandays, materials, rentals];
-            for (let i=0; i<vals.length; i++) { if (isNaN(vals[i])) { vals[i]=0 } }
-
-            let noFringe=vals[0]*vals[1]+vals[2]+vals[3];
-            let curr=totalFringe*vals[0]*vals[1]+vals[2]+vals[3];
-
-            // Update running totals
-            nofringes+=noFringe;
-            current+=curr;
-
-            // Save department total
-            if (!item.departmentTotals) { item.departmentTotals={} }
-            item.departmentTotals[dep]=curr;
-
-        }
-        item['No Fringes']=zeroNanToNull(nofringes.toFixed(2));
-        item['Current']=zeroNanToNull(current.toFixed(2));
-
+        calculateTotals(item, _fringes, _show.departments, _mandayRates)
         // Set Previous version cost if there is a previous version
-        if (previousVersion&&item.setid) {
-            item['Previous']=zeroNanToNull(previousVersionSetTotals[item.setid]);
+        if (prevVer&&item['Set Code']) {
+            item['Previous']=zeroNanToNull(prevTotals[item['Set Code']]);
             item['Variance']=zeroNanToNull((item['Current']-item['Previous']).toFixed(2));
         }
     }
@@ -448,6 +434,36 @@ updateEstimateMathColumns=() => {
     grid.setData(dataView);
     grid.render();
 
+}
+
+// Calculates Math column totals for a grid item 
+function calculateTotals(item, fringes, departments, mandayRates) {
+    let nofringes=0;
+    let current=0;
+    let vals=[];
+    let totalFringe=1;
+    if (Object.keys(fringes)[0]) { totalFringe=Object.keys(fringes).map(key => parseFloat(fringes[key])).reduce((a, b) => a+b)/100+1 }
+
+    // Calculate NoFringes and Current cost. Rate and fringe applies only to mandays
+    for (dep of departments) {
+        let rate=mandayRates[dep];
+        let mandays=parseFloat(item[`${dep} Man Days`]);
+        let materials=parseFloat(item[`${dep} Materials`]);
+        let rentals=parseFloat(item[`${dep} Rentals`]);
+
+        // Set NaN values to 0
+        vals=[rate, mandays, materials, rentals];
+        for (let i=0; i<vals.length; i++) { if (isNaN(vals[i])) { vals[i]=0 } }
+
+        let noFringe=vals[0]*vals[1]+vals[2]+vals[3];
+        let curr=totalFringe*vals[0]*vals[1]+vals[2]+vals[3];
+
+        // Update running totals
+        nofringes+=noFringe;
+        current+=curr;
+    }
+    item['No Fringes']=zeroNanToNull(nofringes.toFixed(2));
+    item['Current']=zeroNanToNull(current.toFixed(2));
 }
 
 // Returns true if key is a department key e.g. 

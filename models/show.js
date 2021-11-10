@@ -23,6 +23,10 @@ const ShowSchema=new Schema({
             taxColumns: [String],
             rentalList: [Object],
         },
+        positions: {
+            extraColumns: [String],
+            positionList: Object
+        },
     }],
     purchases: {
         displaySettings: Object,
@@ -32,15 +36,8 @@ const ShowSchema=new Schema({
     },
     currentWeek: String,
     estimateVersions: Object,
-    sets: [{ type: Schema.Types.ObjectId, ref: 'Set' }],
     departments: [String],
     departmentColorMap: Object,
-    positions: {
-        displaySettings: Object,
-        extraColumns: [String],
-        positionList: [{ type: Schema.Types.ObjectId, ref: 'Position' }],
-        rentalColumns: [String]
-    },
     costReport: {
         displaySettings: Object,
         extraColumns: [String],

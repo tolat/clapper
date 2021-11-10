@@ -17,15 +17,23 @@ TASKS
 -   Improve general usability
 
 -   Structural changes 
-        1.   Sets can be removed from mongoose schema and just be an array of objects in estimate versions (different setlists across estimate versions)
-        2.   Make sheet not sort by number by default, but keep whatever sorting the page was saved on 
-             -   get rid of # column - should just be a user addable column
-        3.   Change weeks array to be indexed by the week number instead of having 'number' field
-        4.   Purchases, Positions can be just an array of objects in the show (not mongoose schema)
-        4.   current week should be moved to display settings for access profile
-        5.   Department color map can dictate the department order and color for each user. Move to display settings in access profile.
-        5.   show.departments should no longer be used to determine the order of the departments ^^
-        
+        1.  Sets can be removed from mongoose schema and just be an array of objects in estimate versions (different setlists across estimate versions)
+        2.  Make sheet not sort by number by default, but keep whatever sorting the page was saved on 
+            -   get rid of # column - should just be a user addable column
+        3.  Change weeks array to be indexed by the week number instead of having 'number' field
+        4.  Purchases, Positions can be just an array of objects in the show (not mongoose schema)
+        4.  current week should be moved to display settings for access profile
+        5.  Department color map can dictate the department order and color for each user. Move to display settings in access profile.
+        5.  show.departments should no longer be used to determine the order of the departments ^^
+        6.  Comparison version for estimate and cost report should be in access profiles for estimate and cost report (keep updated same)
+        7.  Add option to be able to choose directly the comparison version (instead of 'previous version'). allow alpha-numeric 
+            estimate version names and default to previous version (by date created) if no comparison is specified
+    
+-   NOTES FOR THIS BRANCH (restructure-models):
+        -   Deleted estimate totals - create util function to calculate estimate totals (DONE)
+        -   Moved sets to the estimateVersions field of show - because set is only in version now, 
+            the department Values and extra col values are not under a version map for the set (DONE)
+        -   Change it so 
 
 
 
