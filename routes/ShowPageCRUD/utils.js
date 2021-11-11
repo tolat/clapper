@@ -201,6 +201,7 @@ module.exports.getAllCrewUsers=async function (IDlist) {
     return userList
 }
 
+// Returns an array of identifiers corresponding to items that are restricted by accessProfile (itemIdentifier key is user defined as )
 module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier) {
     let restrictedItems=[]
     for (item of data) {
@@ -213,3 +214,11 @@ module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier)
     return restrictedItems
 }
 
+// Checks if item has valid required-for-save fields filled
+module.exports.isValidItem=function (item, RFSkeys, _accessProfile) {
+    for (key of RFSkeys) {
+        if (!item[key]&&!_accessProfile.columnFilter.includes(key))
+            return false
+    }
+    return true
+}

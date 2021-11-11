@@ -103,8 +103,12 @@
         for (col of columns) {
             if (_accessProfile.columnFilter.includes(col.name)) {
                 if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
+                // Hide column
                 _displaySettings.setHiddenColumns.push(col.name)
+                // Lock coumn as hidden
                 col.lockHidden=true
+                // Remove required for save class from column
+                col.cssClass=col.cssClass.replaceAll("required-for-save", "")
             }
         }
 

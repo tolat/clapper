@@ -1669,19 +1669,22 @@ runValidators=(validators, args) => {
 validateEdit=(validator, args) => {
     let cols=grid.getColumns()
     for (field of validator.fields) {
-        if (cols[args.cell].field==field) {
-            if (validator.isInvalid(args, field)) {
-                // Mark invalid cell red
-                let invalidCells=grid.getCellCssStyles('invalidCells')||{}
-                if (!invalidCells[args.row]) { invalidCells[args.row]={} }
-                invalidCells[args.row][grid.getColumns()[args.cell].field]='invalid-cell'
-                grid.setCellCssStyles('invalidCells', invalidCells)
-                // Scroll to invalid cell
-                grid.scrollCellIntoView(args.row, args.cell)
-                // If invalid, show validation modal
-                toggleValidationModal(true, validator);
-            } else {
-                clearInvalidCellMarker(args)
+        // Only validate field if it is not restricted by _accessProfile
+        if (!_accessProfile.columnFilter.includes(field)) {
+            if (cols[args.cell].field==field) {
+                if (validator.isInvalid(args, field)) {
+                    // Mark invalid cell red
+                    let invalidCells=grid.getCellCssStyles('invalidCells')||{}
+                    if (!invalidCells[args.row]) { invalidCells[args.row]={} }
+                    invalidCells[args.row][grid.getColumns()[args.cell].field]='invalid-cell'
+                    grid.setCellCssStyles('invalidCells', invalidCells)
+                    // Scroll to invalid cell
+                    grid.scrollCellIntoView(args.row, args.cell)
+                    // If invalid, show validation modal
+                    toggleValidationModal(true, validator);
+                } else {
+                    clearInvalidCellMarker(args)
+                }
             }
         }
     }
@@ -1873,7 +1876,7 @@ toggleWeekEndingModal=(show) => {
 
 changeWeek=async (weekNum, weekEnd=false, isNewWeek=false, copyCrewFrom='current') => {
     if (weekNum==_week.number&&!isNewWeek&&_deletedWeek!=_week._id) { return }
-    if (['Crew', 'Rentals', 'CostReport', 'Purchases', 'Rates', 'Timesheets'].includes(_args.section)) {
+    if (_args.section!='Estimate') {
         _newWeek={ number: weekNum, end: weekEnd, isNewWeek: isNewWeek, copyCrewFrom: copyCrewFrom }
 
         console.log(`changing to week ${weekNum}`)
@@ -2630,14 +2633,17 @@ runAllValidators=() => {
             for (v of _validators) {
                 if (!v.skipOnSave) {
                     for (field of v.fields) {
-                        let args={ item: item }
-                        let row=dataView.getRowByItem(item)
-                        if (v.isInvalid(args, field)) {
-                            if (!invalidCells[row]) { invalidCells[row]={} }
-                            invalidCells[row][field]='invalid-cell'
-                            scrollToCell={ row: row, cell: cols.indexOf(cols.find(c => c.field==field)) }
-                        } else if (invalidCells[row]&&invalidCells[row][field]&&invalidCells[row][field].includes('invalid-cell')) {
-                            delete invalidCells[row][field]
+                        // Only validate field if it is not restricted by _accessProfile
+                        if (!_accessProfile.columnFilter.includes(field)) {
+                            let args={ item: item }
+                            let row=dataView.getRowByItem(item)
+                            if (v.isInvalid(args, field)) {
+                                if (!invalidCells[row]) { invalidCells[row]={} }
+                                invalidCells[row][field]='invalid-cell'
+                                scrollToCell={ row: row, cell: cols.indexOf(cols.find(c => c.field==field)) }
+                            } else if (invalidCells[row]&&invalidCells[row][field]&&invalidCells[row][field].includes('invalid-cell')) {
+                                delete invalidCells[row][field]
+                            }
                         }
                     }
                 }

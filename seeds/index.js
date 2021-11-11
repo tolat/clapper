@@ -153,9 +153,13 @@ const seedShows=async () => {
                         displaySettings: {}
                     },
                     'Rates': {
-                        columnFilter: [],
-                        dataFilter: {},
-                        displaySettings: {}
+                        columnFilter: ['Rate'],
+                        dataFilter: { Department: 'Construction' },
+                        displaySettings: {
+                            'pigsinpyjamas@yahoo_ca': {
+                                [`${firstWeekId}`]: {}
+                            }
+                        }
                     },
                     'Timesheets': {
                         columnFilter: [],

@@ -14,7 +14,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
 
     // Generate grid data
     let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
-    let data=initializeData(week.positions.positionList, show, args, week)
+    let data=initializeData(week.positions.positionList, show, args, week, accessProfile)
 
 
     res.render('ShowPage/Template', {
@@ -30,7 +30,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     })
 }
 
-// Update rates ******APPLY ACCESS PROFILES********
+// Update rates 
 module.exports.update=async function (body, showId, user) {
     let show=await Show.findById(showId).populate('crew.crewList')
     let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
@@ -40,21 +40,22 @@ module.exports.update=async function (body, showId, user) {
     while (apName.includes(".")) { apName=apName.replace(".", "_") }
     let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Rates
 
-    // Save display settings to show
+    // Save display settings to access profile
     accessProfile.displaySettings[apName][week._id.toString()]=body.displaySettings;
     show.markModified('accessProfiles');
 
-    // Save extra Columns to show
+    // Save extra Columns to week
     week.positions.extraColumns=body.extraColumns;
     show.markModified('positions.extraColumns');
 
-    // Set multipliers
+    // Save multipliers to week
     week.multipliers=body.multipliers;
     show.markModified('weeks');
 
     // Save items
     for (item of body.data) {
-        if (item&&item['Name']&&item['Code']&&item['Department']&&item['Rate']) {
+        const RFSkeys=['Name', 'Department', 'Code', 'Rate']
+        if (item&&crudUtils.isValidItem(item, RFSkeys, accessProfile)) {
             let pos=week.positions.positionList[item['Code']]||{}
             week.positions.positionList[item['Code']]=pos
 
@@ -75,11 +76,12 @@ module.exports.update=async function (body, showId, user) {
         }
     }
 
-    // Delete positions that aren't in the grid 
-    let restrictedItems=crudUtils.getRestrictedItems(Object.keys(week.positions.positionList)
-        .map(pCode => week.positions.positionList[pCode]), accessProfile, 'Code')
+    // Delete positions that aren't in the grid
+    let positionItems=await Object.keys(week.positions.positionList)
+        .map(pCode => { let p=week.positions.positionList[pCode]; p.Code=pCode; return p })
+    let restrictedItems=await crudUtils.getRestrictedItems(positionItems, accessProfile, 'Code')
     for (posCode in week.positions.positionList) {
-        if (!body.data.find(item => item['Code']==posCode&&!restrictedItems.includes(posCode))) {
+        if (!body.data.find(item => item['Code']==posCode)&&!restrictedItems.includes(posCode)) {
             delete week.positions.positionList[posCode]
         }
     }
@@ -105,7 +107,7 @@ module.exports.update=async function (body, showId, user) {
 }
 
 // Creates grid data 
-function initializeData(positions, _show, _args, _week) {
+function initializeData(positions, _show, _args, _week, accessProfile) {
     let data=[];
     let posCodes=Object.keys(positions)
 
@@ -128,6 +130,17 @@ function initializeData(positions, _show, _args, _week) {
 
         data.push(item);
     }
+
+    // Apply access profile to data removing restricted items and values from restricted columns
+    for (item of data) {
+        for (column of accessProfile.columnFilter) {
+            if (item[column]) {
+                item[column]=undefined
+            }
+        }
+    }
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'Code')
+    data=data.filter(item => !restrictedItems.includes(item['Code']))
 
     return data;
 }
