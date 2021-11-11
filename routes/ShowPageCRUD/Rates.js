@@ -1,8 +1,6 @@
 const { populateShow }=require('../../utils/schemaUtils')
 const { genUniqueId }=require('../../utils/numberUtils')
 const Show=require('../../models/show')
-const User=require('../../models/user')
-const Purchase=require('../../models/purchase')
 const crudUtils=require('./utils')
 
 // Render ShowPage section
@@ -40,11 +38,11 @@ module.exports.update=async function (body, showId, user) {
     // Get access profile
     let apName=user.username
     while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Estimate
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Rates
 
     // Save display settings to show
     accessProfile.displaySettings[apName][week._id.toString()]=body.displaySettings;
-    show.markModified('positions.displaySettings');
+    show.markModified('accessProfiles');
 
     // Save extra Columns to show
     week.positions.extraColumns=body.extraColumns;
@@ -62,20 +60,26 @@ module.exports.update=async function (body, showId, user) {
 
             // Set core position values
             for (key of ['Name', 'Department', 'Rate', 'Code']) {
-                pos[key]=item[key]
+                if (!accessProfile.columnFilter.includes(key)) {
+                    pos[key]=item[key]
+                }
             }
 
-            // Save extra column values
+            // Save extra column values, deferring to previous value if this column in restricted
+            let previousValues=pos.extraColumnValues
             pos.extraColumnValues={}
             for (key of body.extraColumns) {
-                pos.extraColumnValues[key]=item[key]
+                !accessProfile.columnFilter.includes(key)? pos.extraColumnValues[key]=item[key]:
+                    pos.extraColumnValues[key]=previousValues[key]
             }
         }
     }
 
     // Delete positions that aren't in the grid 
+    let restrictedItems=crudUtils.getRestrictedItems(Object.keys(week.positions.positionList)
+        .map(pCode => week.positions.positionList[pCode]), accessProfile, 'Code')
     for (posCode in week.positions.positionList) {
-        if (!body.data.find(item => item['Code']==posCode)) {
+        if (!body.data.find(item => item['Code']==posCode&&!restrictedItems.includes(posCode))) {
             delete week.positions.positionList[posCode]
         }
     }

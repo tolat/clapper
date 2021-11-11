@@ -1,6 +1,7 @@
 const { populateShow }=require('../../utils/schemaUtils')
 const Show=require('../../models/show')
 const { sortByNumber, zeroNanToNull }=require('../../utils/numberUtils')
+const crudUtils=require('./utils')
 
 // Render Estimate page
 module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
@@ -160,9 +161,9 @@ module.exports.update=async function (body, showId, user) {
     }
 
     // Delete sets that are no longer present in grid and are not restricted by an access profile
-    let restrictedSets=getRestrictedSets(show.estimateVersions[ov].sets, accessProfile)
+    let restrictedItems=crudUtils.getRestrictedItems(show.estimateVersions[ov].sets, accessProfile, 'Set Code')
     for (set of show.estimateVersions[ov].sets) {
-        if (!items.find(item => item['Set Code']==set['Set Code'])&&!restrictedSets.includes(set)) {
+        if (!items.find(item => item['Set Code']==set['Set Code'])&&!restrictedItems.includes(set['Set Code'])) {
             delete set
         }
     }
@@ -246,34 +247,9 @@ function initializeData(sets, _show, _args, _version, accessProfile) {
             }
         }
     }
-    let restrictedItems=getRestrictedItems(data, accessProfile, 'Set Code')
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'Set Code')
     data=data.filter(item => !restrictedItems.includes(item['Set Code']))
 
     return data;
-}
-
-// Returns a list of grid items that are restricted based on the access profile
-function getRestrictedItems(data, accessProfile, itemIdentifier) {
-    let restrictedItems=[]
-    for (item of data) {
-        for (column in accessProfile.dataFilter) {
-            if (item[column]==accessProfile.dataFilter[column]) {
-                restrictedItems.push(item[`${itemIdentifier}`])
-            }
-        }
-    }
-    return restrictedItems
-}
-
-function getRestrictedSets(sets, accessProfile) {
-    let restrictedSets=[]
-    for (set of sets) {
-        for (column in accessProfile.dataFilter) {
-            if (set[column]==accessProfile.dataFilter[column]) {
-                restrictedSets.push(set)
-            }
-        }
-    }
-    return restrictedSets
 }
 

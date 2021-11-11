@@ -140,6 +140,7 @@
                 toggleManDayRatesModal(true)
             }
         }
+
         // If this is first estimate, prompt for first version name
         else { toggleEnterVersionModal(true, true) }
     }
@@ -148,8 +149,8 @@
     function initializeColumns(sets, _show, _args) {
         let columns=[
             // Core feature columns
-            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save', columnGroup: 'Test' },
-            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true, columnGroup: 'Test' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
         ];
 

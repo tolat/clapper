@@ -29,8 +29,6 @@ module.exports.deleteWeek=async function (weekId, show, newWeeks) {
         user.markModified('showrecords')
         await user.save()
     }
-
-
 }
 
 // Creates a new week for the show
@@ -202,3 +200,16 @@ module.exports.getAllCrewUsers=async function (IDlist) {
 
     return userList
 }
+
+module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier) {
+    let restrictedItems=[]
+    for (item of data) {
+        for (column in accessProfile.dataFilter) {
+            if (item[column]==accessProfile.dataFilter[column]) {
+                restrictedItems.push(item[`${itemIdentifier}`])
+            }
+        }
+    }
+    return restrictedItems
+}
+

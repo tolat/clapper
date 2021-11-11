@@ -99,6 +99,15 @@
             columns.push(column);
         }
 
+        // Apply access profile column filter to hide restricted columns
+        for (col of columns) {
+            if (_accessProfile.columnFilter.includes(col.name)) {
+                if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
+                _displaySettings.setHiddenColumns.push(col.name)
+                col.lockHidden=true
+            }
+        }
+
         return columns;
     }
 
