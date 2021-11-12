@@ -2,7 +2,6 @@ const { populateShow }=require('../../utils/schemaUtils')
 const { genUniqueId }=require('../../utils/numberUtils')
 const Show=require('../../models/show')
 const User=require('../../models/user')
-const Purchase=require('../../models/purchase')
 const crudUtils=require('./utils')
 
 // Render ShowPage section

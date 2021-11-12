@@ -2,7 +2,6 @@
 const mongoose=require('mongoose');
 const Show=require('../models/show');
 const User=require('../models/user');
-const Purchase=require('../models/purchase');
 const { positions }=require('./positions');
 const { showNames, genStartDate, departmentNames, genDateBetween }=require('./shows');
 const { getDescription }=require('./sets');
@@ -85,7 +84,6 @@ const seedShows=async () => {
                 }
             },
             purchases: {
-                displaySettings: {},
                 extraColumns: [],
                 taxColumns: ['GST', 'PST'],
                 purchaseList: []
@@ -137,9 +135,13 @@ const seedShows=async () => {
                         }
                     },
                     'Purchases': {
-                        columnFilter: [],
-                        dataFilter: {},
-                        displaySettings: {}
+                        columnFilter: ['Invoice Num'],
+                        dataFilter: { 'Set Code': '103' },
+                        displaySettings: {
+                            'pigsinpyjamas@yahoo_ca': {
+                                [`${firstWeekId}`]: {}
+                            }
+                        }
                     },
                     'Rentals': {
                         columnFilter: [],
@@ -184,7 +186,11 @@ const seedShows=async () => {
                     'Purchases': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin_olat@gmail_com': {} }
+                        displaySettings: {
+                            'torin_olat@gmail_com': {
+                                [`${firstWeekId}`]: {}
+                            }
+                        }
                     },
                     'Rentals': {
                         columnFilter: [],
@@ -363,14 +369,14 @@ const seedUsers=async () => {
 }
 
 const seedPurchases=async () => {
-    const shows=await Show.find().populate('sets');
+    const shows=await Show.find()
     for (show of shows) {
         const sets=show.estimateVersions['100'].sets;
         const depts=show.departments;
         for (set of sets) {
             for (let i=0; i<2; i++) {
                 let purchDate=genDateBetween(new Date(show.weeks[0].end.getTime()-(7*oneDay)), show.weeks[0].end);
-                const purch=new Purchase({
+                const purch={
                     'Set Code': set['Set Code'],
                     'Department': depts[randInt(0, depts.length)],
                     'Date': purchDate,
@@ -379,12 +385,10 @@ const seedPurchases=async () => {
                     'Supplier': genSupplier(),
                     'Amount': randInt(0, 5000),
                     'Description': genSupplier(),
-                    showId: show._id.toString(),
                     weekId: firstWeekId,
                     extraColumnValues: {},
                     taxColumnValues: { GST: 5, PST: 7 }
-                })
-                await purch.save();
+                }
                 await show.purchases.purchaseList.push(purch);
                 await show.save();
             }
@@ -463,7 +467,6 @@ const seedDB=async () => {
     await seedUsers();
     console.log('done users..');
 
-    await Purchase.deleteMany({});
     await seedPurchases();
     console.log('done purchases..');
 

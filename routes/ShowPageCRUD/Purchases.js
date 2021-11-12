@@ -1,39 +1,51 @@
-const { populateShow }=require('../../utils/schemaUtils')
 const { genUniqueId }=require('../../utils/numberUtils')
 const Show=require('../../models/show')
-const User=require('../../models/user')
-const Purchase=require('../../models/purchase')
 const crudUtils=require('./utils')
+const numberUtils=require('../../utils/numberUtils')
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
     show=await Show.findById(id)
-        .populate('sets')
-        .populate('purchases')
-        .populate({
-            path: 'purchases.purchaseList',
-            populate: { path: 'set' }
-        });
+
+    // Get accessProfile
+    let apName=user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
+
+    // Generate grid data
+    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
+    let data=initializeData(show.purchases.purchaseList, show, args, week, accessProfile)
+
+    // Generate array of all set codes in current estimate version
+    let allSetCodes=show.estimateVersions[show.costReport.estimateVersion].sets.map(s => s['Set Code'])
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
-        show: show,
-        section: section,
-        args: args,
-        sharedModals: sharedModals,
-        pageModals: pageModals
+        show,
+        section,
+        args,
+        sharedModals,
+        pageModals,
+        data,
+        accessProfile,
+        user,
+        allSetCodes
     })
 }
 
 // Update purchases
-module.exports.update=async function (body, showId) {
-    let show=await Show.findById(showId)
-        .populate('weeks.crew.crewList')
-        .populate('purchases.purchaseList')
+module.exports.update=async function (body, showId, user) {
+    let show=await Show.findById(showId).populate('weeks.crew.crewList')
+    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
 
-    // Save display settings
-    show.purchases.displaySettings=body.displaySettings
-    show.markModified('purchases.displaySettings')
+    // Get access profile
+    let apName=user.username
+    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Purchases
+
+    // Save display settings to access profile
+    accessProfile.displaySettings[apName][week._id.toString()]=body.displaySettings;
+    show.markModified('accessProfiles');
 
     // Save extra Columns 
     show.purchases.extraColumns=body.extraColumns
@@ -43,66 +55,57 @@ module.exports.update=async function (body, showId) {
     show.purchases.taxColumns=body.taxColumns
     show.markModified('purchases.taxColumns')
 
-    await show.save()
-
     // Update Purchases
-    let deleteList=[...show.purchases.purchaseList]
-    show.purchases.purchaseList=[]
     for (item of body.data) {
-        if (item&&item['Set Code']&&item['Department']&&item['PO Num']&&item['Date']) {
+        const RFSkeys=['Set Code', 'Department', 'PO Num', 'Date']
+        if (item&&crudUtils.isValidItem(item, RFSkeys, accessProfile)) {
             // Find existing purchase 
-            let p=await Purchase.findOne({ 'PO Num': item['PO Num'], showId: show._id.toString() })
+            let p=await show.purchases.purchaseList.find(purch => purch['PO Num']==item['PO Num'])
+
+            // Create new purchase if non exists
             if (!p) {
-                let set=await Set.findOne({ 'Set Code': item['Set Code'], show: show })
-                p=await new Purchase({
+                p={
                     extraColumnValues: {},
                     taxColumnValues: {},
-                    set: set,
                     weekId: body.weeks[0]._id.toString(),
-                    showId: show._id.toString()
-                })
-                await p.save()
-            }
-            await show.purchases.purchaseList.push(p)
-            show.markModified('purchases.purchaseList')
-            await show.save()
-
-            // If deleteList contains 
-            let purch=deleteList.find(purch => purch['PO Num']==p['PO Num'])
-            if (purch) {
-                let idx=deleteList.indexOf(purch)
-                deleteList.splice(idx, 1)
+                }
+                show.purchases.purchaseList.push(p)
             }
 
             // Save display key data
-            for (key of p.displayKeys) {
-                p[key]=item[key];
+            let displayKeys=['Set Code', 'Department', 'Date', 'PO Num', 'Invoice Num', 'Supplier', 'Amount', 'Description']
+            for (key of displayKeys) {
+                if (!accessProfile.columnFilter.includes(key))
+                    p[key]=item[key];
             }
 
             // Save extra column values
+            let previousValues=p.extraColumnValues
             p.extraColumnValues={};
-            for (col of body.extraColumns) {
-                p.extraColumnValues[col]=item[col]
+            for (key of body.extraColumns) {
+                !accessProfile.columnFilter.includes(key)? p.extraColumnValues[key]=item[key]:
+                    p.extraColumnValues[key]=previousValues[key]
             }
-            p.markModified('extraColumnValues')
 
             // Save tax column values
+            previousValues=p.extraColumnValues
             p.taxColumnValues={}
-            for (taxCol of show.purchases.taxColumns) {
-                p.taxColumnValues[taxCol]=item[taxCol]
+            for (key of show.purchases.taxColumns) {
+                !accessProfile.columnFilter.includes(key)? p.taxColumnValues[key]=item[key]:
+                    p.taxColumnValues[key]=previousValues[key]
             }
-            p.markModified('taxColumnValues')
-
-            await p.save();
         }
     }
 
-    // delete purchases on purchase list that weren't in grid
-    for (p of deleteList) {
-        await Purcahse.findByIdAndDelete(p._id)
+    // Delete purchases that aren't in the grid
+    let restrictedItems=await crudUtils.getRestrictedItems(show.purchases.purchaseList, accessProfile, 'PO Num')
+    for (purchase of show.purchases.purchaseList) {
+        if (!body.data.find(item => item['PO Num']==purchase['PO Num'])&&!restrictedItems.includes(purchase['PO Num'])) {
+            delete await show.purchases.purchaseList.find(p => p['PO Num']==purchase['PO Num'])
+        }
     }
 
-    show.markModified('purchases.purchaseList')
+    show.markModified('purchases')
     await show.save()
 
     // Create new week if required
@@ -116,4 +119,79 @@ module.exports.update=async function (body, showId) {
     }
 
     return {}
+}
+
+// Creates grid data 
+function initializeData(purchases, _show, _args, week, accessProfile) {
+    let _taxColumns=_show.purchases.taxColumns
+    let data=[];
+
+    // Load purchases into items for the grid
+    for (let i=0; i<purchases.length; i++) {
+        let item={
+            id: 'id_'+i,
+            'Department': purchases[i]['Department'],
+            'PO Num': purchases[i]['PO Num'],
+            'Invoice Num': purchases[i]['Invoice Num'],
+            'Supplier': purchases[i]['Supplier'],
+            'Description': purchases[i]['Description'],
+            'Amount': parseFloat((numberUtils.zeroNanToNull(purchases[i]['Amount'])||0)).toFixed(2),
+        }
+
+        // Add tax column values
+        for (taxCol of _taxColumns) {
+            item[taxCol]=numberUtils.zeroNanToNull(parseFloat(purchases[i].taxColumnValues[taxCol]))
+        }
+
+        // ** BASE THIS ON DATE NOT ON WEEK ***
+        let week=_show.weeks.find(w => w._id==purchases[i].weekId)
+        week? item['Week']=week.number:item['Week']=undefined
+
+        // Initialize the purchase total (Tax + Amount)
+        item=updatePurchaseTotal(item, _taxColumns);
+
+        // Load set data into purchase
+        let set=_show.estimateVersions[_show.costReport.estimateVersion].sets.find(s => s['Set Code']==purchases[i]['Set Code'])
+        if (set) {
+            item['Set Code']=set['Set Code'];
+            item['Episode']=set['Episode'];
+        } else {
+            item['Set Code']='DELETED'
+        }
+
+        // Add date value or none if there is no date
+        !purchases[i]['Date']? item['Date']='':
+            item['Date']=(new Date(purchases[i]['Date'])).toLocaleDateString('en-US');
+
+        // Add extra column values
+        for (col of _show.purchases.extraColumns) {
+            item[col]=purchases[i].extraColumnValues[col];
+        }
+
+        data.push(item);
+    }
+
+    // Apply access profile to data removing restricted items and values from restricted columns
+    for (item of data) {
+        for (column of accessProfile.columnFilter) {
+            if (item[column]) {
+                item[column]=undefined
+            }
+        }
+    }
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'PO Num')
+    data=data.filter(item => !restrictedItems.includes(item['PO Num']))
+
+    return data;
+}
+
+// Update the total for this purchase
+function updatePurchaseTotal(item, _taxColumns) {
+    let tax=0
+    for (taxCol of _taxColumns) {
+        tax+=item[taxCol]||0
+    }
+
+    item['Total']=numberUtils.zeroNanToNull((parseFloat(item['Amount'])*(tax/100+1)).toFixed(2))||0;
+    return item;
 }

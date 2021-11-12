@@ -29,10 +29,9 @@ const ShowSchema=new Schema({
         },
     }],
     purchases: {
-        displaySettings: Object,
         extraColumns: [String],
         taxColumns: [],
-        purchaseList: [{ type: Schema.Types.ObjectId, ref: 'Purchase' }]
+        purchaseList: [Object]
     },
     currentWeek: String,
     estimateVersions: Object,

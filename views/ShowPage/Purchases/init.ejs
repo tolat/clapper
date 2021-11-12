@@ -1,21 +1,25 @@
 <script>
     // Global variables
     var _show= <%- JSON.stringify(show)%>;
-    var _args= <%- JSON.stringify(args)%>;
+    var _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    var _user= <%- JSON.stringify(user)%>;
+    var _allSetCodes= <%- JSON.stringify(allSetCodes)%>;
+    setWeekEnding()
 
+    var _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_week._id]||{}
     var _extraColumns=_show.purchases.extraColumns;
     var _validators=[
         {
             fields: ['Set Code'],
             isInvalid: function (args, field) {
+                this.validationHeader='Set Not Found!'
+                this.validationMessage="New sets can be added in the 'Estimates' page."
                 if (args.item[field]) {
-                    return !_show.sets.find(s => s['Set Code']==args.item['Set Code'])&&args.item['Set Code']!='DELETED'
+                    return !_allSetCodes.includes(args.item[field])&&args.item[field]!='DELETED'
                 } else {
                     return false
                 }
             },
-            validationHeader: 'Set Not Found!',
-            validationMessage: "New sets can be added in the 'Estimates' page."
         },
         {
             fields: ['Department'],
@@ -45,9 +49,9 @@
         },
         {
             fields: ['PO Num'],
-            isInvalid: function (args, field) { return args.item[field]&&dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id) },
-            validationHeader: 'Invalid Amount!',
-            validationMessage: "Amount must only contain numbers and '.'"
+            isInvalid: function (args, field) { return !args.item[field]||dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id) },
+            validationHeader: 'Invalid PO Num!',
+            validationMessage: "PO Num already exists."
         },
     ];
     var _totals={ Total: 'sum' };
@@ -68,7 +72,7 @@
         var options=await initializeOptions();
 
         // Create grid data
-        var data=await initializeData(purchases, _show, _args);
+        var data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
         var columns=await initializeColumns(purchases, _show, _args);
@@ -98,82 +102,18 @@
         })
 
         // Apply display settings
-        if (_show.purchases.displaySettings) { applyDisplaySettings(_show.purchases.displaySettings) }
+        applyDisplaySettings(_displaySettings)
 
         // Calcualte totals for totals footer row
         updateTotalsRow();
     }
 
-    // Creates grid data 
-    function initializeData(purchases, _show, _args) {
-        let data=[];
-        // Load purchases into items for the grid
-        for (let i=0; i<purchases.length; i++) {
-            let item={
-                id: 'id_'+i,
-                purchaseid: purchases[i]._id,
-                '#': purchases[i]['#'],
-                'Department': purchases[i]['Department'],
-                'PO Num': purchases[i]['PO Num'],
-                'Invoice Num': purchases[i]['Invoice Num'],
-                'Supplier': purchases[i]['Supplier'],
-                'Description': purchases[i]['Description'],
-                'Amount': (zeroNanToNull(purchases[i]['Amount'])||0).toFixed(2),
-            }
-
-            // Add tax column values
-            for (taxCol of _taxColumns) {
-                item[taxCol]=zeroNanToNull(parseFloat(purchases[i].taxColumnValues[taxCol]))
-            }
-
-            // ** BASE THIS ON DATE NOT ON WEEK ***
-            let week=_show.weeks.find(w => w._id==purchases[i].weekId)
-            if (week) {
-                item['Week']=week.number
-            } else {
-                item['Week']=undefined
-            }
-
-
-            // Initialize the purchase total (Tax + Amount)
-            item=updatePurchaseTotal(item);
-
-            // Load set data into purchase
-            let set=_show.sets.find(s => s['Set Code']==purchases[i]['Set Code'])
-            if (set) {
-                item['Set Code']=set['Set Code'];
-                item['Episode']=set['Episode'];
-            } else {
-                item['Set Code']='DELETED'
-            }
-
-            // Add date value or none if there is no date
-            if (!purchases[i]['Date']) {
-                item['Date']='';
-            } else {
-                item['Date']=(new Date(purchases[i]['Date'])).toLocaleDateString('en-US');
-            }
-
-            // Add extra column values
-            for (col of _show.purchases.extraColumns) {
-                item[col]=purchases[i].extraColumnValues[col];
-            }
-            data.push(item);
-        }
-
-        // Sort data by #
-        data=sortByNumber(data);
-
-        return data;
-    }
-
     // Creates grid columns 
     function initializeColumns(purchases, _show, _args) {
         let columns=[
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
             { id: "Date", name: "Date", field: "Date", width: 100, editor: Slick.Editors.Date, sortable: true, cssClass: 'required-for-save' },
             { id: "PO Num", name: "PO Num", field: "PO Num", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
-            { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: AutoCompleteEditor, dataSource: _show.sets.map(s => s['Set Code']), sortable: true, cssClass: 'required-for-save' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: AutoCompleteEditor, dataSource: _allSetCodes, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 100, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
             { id: "Episode", name: "Episode", field: "Episode", width: 75, sortable: true, cssClass: 'uneditable' },
             { id: "Amount", name: "Amount", field: "Amount", width: 100, editor: Slick.Editors.Text, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency' },
@@ -195,6 +135,21 @@
 
         for (key of _extraColumns) {
             columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true })
+        }
+
+        // Apply access profile column filter to hide restricted columns
+        for (col of columns) {
+            if (_accessProfile.columnFilter.includes(col.name)) {
+                if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
+                // Hide column
+                _displaySettings.setHiddenColumns.push(col.name)
+                // Lock coumn as hidden
+                col.lockHidden=true
+                // Remove required for save class from column
+                if (col.cssClass) {
+                    col.cssClass=col.cssClass.replaceAll("required-for-save", "")
+                }
+            }
         }
 
         return columns;

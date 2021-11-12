@@ -16,7 +16,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
     let data=initializeData(week.positions.positionList, show, args, week, accessProfile)
 
-
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show,

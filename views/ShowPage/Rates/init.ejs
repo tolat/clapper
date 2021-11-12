@@ -108,10 +108,11 @@
                 // Lock coumn as hidden
                 col.lockHidden=true
                 // Remove required for save class from column
-                col.cssClass=col.cssClass.replaceAll("required-for-save", "")
+                if (col.cssClass) {
+                    col.cssClass=col.cssClass.replaceAll("required-for-save", "")
+                }
             }
         }
-
         return columns;
     }
 
