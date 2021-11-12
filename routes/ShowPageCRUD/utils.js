@@ -126,6 +126,7 @@ module.exports.createWeek=async function (body, show, newWeekId) {
     await show.save()
 }
 
+// Find first week in weeks that precedes weekEnd
 function findPrecedingWeek(weekEnd, weeks) {
     let endTime=(new Date(weekEnd)).getTime()
     for (week of weeks) {
