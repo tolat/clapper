@@ -1783,14 +1783,14 @@ setWeekEnding=() => {
         toggleEnterVersionModal(true, true, false)
         return
     }
-    _week=_show.weeks.find(w => w._id==_show.currentWeek)
+    _week=_args.week
     let weekEnd=new Date(_week.end)
-    let weekEndingText=`Week ${_week.number} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
+    let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
     if (_args.section=='Estimate') {
         weekEndingText=`Date Created: ${new Date(_show.estimateVersions[_version].dateCreated).toLocaleDateString('en-US')}`
         document.getElementById('week-ending-display-container').classList.add('no-hover-style')
     } else {
-        if (_week.number==_show.weeks[0].number) {
+        if (_args.weekList[0]._id==_week._id) {
             document.getElementById('week-ending-latest-indicator').style.display='flex'
         }
     }
@@ -1807,20 +1807,16 @@ toggleDeleteWeekWarningModal=(show, weekNum, weekId, deleteWeek=false) => {
             weekNum=parseFloat(document.getElementById('delete-week-warning-modal-number').innerText)
             weekId=document.getElementById('delete-week-warning-modal-storage').innerText
             _deletedWeek=weekId
-            original_weekNum=_week.number
 
-            // Delete week and shift week numbers
-            _show.weeks.splice(_show.weeks.indexOf(_show.weeks.find(w => w._id==weekId)), 1)
-            for (week of _show.weeks) {
-                if (week.number>weekNum) {
-                    week.number--
-                }
-            }
+            // Save original week number
+            let currentWeekNum=parseInt(_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id)))+1
+
+            // Delete week from weeklist
+            _args.weekList.splice(_args.weekList.indexOf(_args.weekList.find(w => w._id==weekId)), 1)
 
             // If deleting current week, delete on server immediately and reload page to most recent week
-            if (weekNum==original_weekNum) {
-                console.log('deleting current week')
-                changeWeek(_show.weeks[0].number)
+            if (weekNum==currentWeekNum) {
+                changeWeek(_weekList[_weekList.length-1]._id)
             } else {
                 // Update grid to reflect week deletion
                 updateSaveStatus(false)
@@ -1857,29 +1853,34 @@ toggleWeekEndingModal=(show) => {
 
         let wemWC=document.getElementById('week-ending-modal-weeks-container');
         wemWC.innerHTML=null;
-        for (week of _show.weeks) {
-            let weekDivStyle=null
-            if (week.number==_week.number) { weekDivStyle='text-decoration: underline;' }
-            wemWC.innerHTML+=`
-            <div class="week-ending-modal-week" onclick="changeWeek('${week.number}')" style="${weekDivStyle}">
-                Week ${week.number} (Ending: ${new Date(week.end).toLocaleDateString('en-US')})
-            </div>`
 
-            if (_show.weeks.length>1) {
-                wemWC.innerHTML+=`
-                <button style='color: red' onclick='toggleDeleteWeekWarningModal(true, ${week.number}, "${week._id}")'>Delete</button>`
+        for (i in _args.weekList) {
+            let week=_args.weekList[i]
+            let weekDivStyle=null
+
+            // Underline if week is the current weeks
+            if (week._id==_week._id) { weekDivStyle='text-decoration: underline;' }
+
+            // Add delete button to weeks if there is more than one week
+            let deleteButton=''
+            if (_args.weekList.length>1) {
+                deleteButton=`<button style='color: red' onclick='toggleDeleteWeekWarningModal(true, ${parseInt(i)+1}, "${week._id}")'>Delete</button>`
             }
+
+            wemWC.innerHTML=`
+            <div class="week-ending-modal-week" onclick="changeWeek('${week._id}')" style="${weekDivStyle}">
+                Week ${parseInt(i)+1} (Ending: ${new Date(week.end).toLocaleDateString('en-US')})
+            </div>` +deleteButton+wemWC.innerHTML
+
         }
 
     }
 }
 
-changeWeek=async (weekNum, weekEnd=false, isNewWeek=false, copyCrewFrom='current') => {
-    if (weekNum==_week.number&&!isNewWeek&&_deletedWeek!=_week._id) { return }
+changeWeek=async (weekId, weekEnd=false, isNewWeek=false, copyCrewFrom='current') => {
+    if (weekId==_week._id&&_deletedWeek!=_week._id) { return }
     if (_args.section!='Estimate') {
-        _newWeek={ number: weekNum, end: weekEnd, isNewWeek: isNewWeek, copyCrewFrom: copyCrewFrom }
-
-        console.log(`changing to week ${weekNum}`)
+        _newWeek={ weekId, end: weekEnd, isNewWeek, copyCrewFrom }
         await toggleAddWeekModal(false)
         await toggleWeekEndingModal(false)
         await saveData(true)
@@ -1900,15 +1901,7 @@ toggleAddWeekModal=(show, update) => {
             if (document.getElementById('add-week-radio-preceding').checked) { copyCrewFrom='preceding' }
             if (document.getElementById('add-week-radio-blank').checked) { copyCrewFrom='blank' }
 
-            let newWeekNumber=1;
-            for (week of _show.weeks) {
-                if (weekEnd.getTime()>new Date(week.end).getTime()) {
-                    newWeekNumber=parseFloat(week.number)+1
-                    break
-                }
-            }
-
-            changeWeek(newWeekNumber, weekEnd, true, copyCrewFrom)
+            changeWeek(false, weekEnd, true, copyCrewFrom)
         }
         document.getElementById('add-week-modal-input-warning').style.display='none'
         document.getElementById('add-week-modal').style.display=null

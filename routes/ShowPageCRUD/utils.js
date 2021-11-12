@@ -18,7 +18,7 @@ module.exports.getDaysOfWeekEnding=(date) => {
 // Deletes all records of a week in all show's User showrecords
 module.exports.deleteWeek=async function (weekId, show, newWeeks) {
     // Update show weeks 
-    show.weeks=JSON.parse(JSON.stringify(newWeeks))
+    show.weeks.splice(show.weeks.indexOf(show.weeks.find(w => w._id==weekId)), 1)
     await show.save()
 
     // Remove week from crew weeksWorked records
@@ -35,15 +35,8 @@ module.exports.deleteWeek=async function (weekId, show, newWeeks) {
 module.exports.createWeek=async function (body, show, newWeekId) {
     // Just update show's current week if not creating a new week
     if (!body.newWeek.isNewWeek) {
-        show.currentWeek=show.weeks.find(w => w.number==body.newWeek.number)._id
+        show.currentWeek=body.newWeek.weekId
     } else {
-        // Shift other weeks up if new week is inserted before end of weeks
-        if (show.weeks.find(w => w.number==body.newWeek.number)) {
-            for (wk of show.weeks.filter(w => w.number>=body.newWeek.number)) {
-                wk.number++
-            }
-        }
-
         // Create a new week for the show
         let newWeek={
             crew: {
@@ -57,6 +50,21 @@ module.exports.createWeek=async function (body, show, newWeekId) {
                 extraColumns: [],
                 taxColumns: [],
                 rentalList: []
+            },
+            positions: {
+                extracolumns: [],
+                positionList: {}
+            },
+            multipliers: {
+                0: {
+                    Fri: 1,
+                    Mon: 1,
+                    Sat: 1,
+                    Sun: 1,
+                    Thu: 1,
+                    Tue: 1,
+                    Wed: 1
+                }
             }
         }
 
@@ -65,12 +73,12 @@ module.exports.createWeek=async function (body, show, newWeekId) {
             let oldWeek;
             // Copy week data over from preceding week
             if (body.newWeek.copyCrewFrom=='preceding') {
-                let precedingWeekNum=body.newWeek.number-1
-                if (precedingWeekNum<1) { precedingWeekNum=1 }
-                oldWeek=await show.weeks.find(w => w.number==precedingWeekNum)
+                oldWeek=await show.weeks.find(w => w._id==findPrecedingWeek(body.newWeek.weekEnd, show.weeks))
             }
             // Else copy week data over from current week
-            else { oldWeek=await show.weeks.find(w => w._id==show.currentWeek) }
+            else {
+                oldWeek=await show.weeks.find(w => w._id==show.currentWeek)
+            }
 
             newWeek=await JSON.parse(JSON.stringify(oldWeek))
         }
@@ -84,11 +92,8 @@ module.exports.createWeek=async function (body, show, newWeekId) {
         for (crew of newWeek.crew.crewList) {
             // copy user week data from specified other week record, or blank
             let user;
-            if (!crew['username']) {
-                user=await User.findById(crew.toString())
-            } else {
+            !crew['username']? user=await User.findById(crew.toString()):
                 user=await User.findOne({ username: crew['username'] })
-            }
 
             let record=user.showrecords.find(r => r.showid==show._id.toString())
             let activeInNewWeek=await this.copyWeekFromRecord(body, show, record, newWeekId, user)
@@ -112,24 +117,23 @@ module.exports.createWeek=async function (body, show, newWeekId) {
         newWeek._id=newWeekId
         newWeek.number=body.newWeek.number
         newWeek.end=body.newWeek.end
-        newWeek.multipliers={
-            0: {
-                Mon: 1,
-                Tue: 1,
-                Wed: 1,
-                Thu: 1,
-                Fri: 1,
-                Sat: 1,
-                Sun: 1
-            }
-        }
 
         show.currentWeek=newWeekId
         await show.weeks.push(newWeek)
-        await show.weeks.sort((a, b) => new Date(a.end).getTime()<new Date(b.end).getTime()? 1:-1)
-        show.markModified('weeks')
+        await show.weeks.sort((a, b) => new Date(a.end).getTime()<new Date(b.end).getTime()? -1:1)
+        await show.markModified('weeks')
     }
     await show.save()
+}
+
+function findPrecedingWeek(weekEnd, weeks) {
+    let endTime=(new Date(weekEnd)).getTime()
+    for (week of weeks) {
+        let time=(new Date(week.end)).getTime()
+        if (time<endTime) {
+            return week._id
+        }
+    }
 }
 
 module.exports.copyWeekFromRecord=async function (body, show, record, newWeekId, user) {

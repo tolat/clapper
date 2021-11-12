@@ -36,7 +36,6 @@ const seedShows=async () => {
             departmentColorMap: {},
             weeks: [{
                 _id: firstWeekId,
-                number: 1,
                 end: firstWeekEnd,
                 multipliers: {
                     0: {

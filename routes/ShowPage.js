@@ -12,6 +12,7 @@ const upload=multer({ storage })
 const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
 const Queue=require('bull')
+const Show=require('../models/show')
 
 const ShowPageCRUD={
     Estimate: require('./ShowPageCRUD/Estimate'),
@@ -27,7 +28,13 @@ const ShowPageCRUD={
 router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     const { id, section }=req.params;
     const query=req.query;
-    let args={ section: section, server: req.app.get('server') };
+    let show=await Show.findById(id)
+    let args={
+        section: section,
+        server: req.app.get('server'),
+        weekList: show.weeks.map(w => { return { _id: w._id.toString(), end: w.end } }),
+        week: show.weeks.find(w => w._id.toString()==show.currentWeek)
+    };
 
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error
     let sharedModals=[]
