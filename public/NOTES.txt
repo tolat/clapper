@@ -29,6 +29,7 @@ ARTHUR:
         4.  Purchases, Positions can be just an array of objects in the show (not mongoose schema) (DONE)
         4.  current week should be moved to display settings for access profile (DONE)
         6.  Comparison version for estimate and cost report should be in access map (DONE)
+        8.  add item order for displaySettings of each page (use an identifier key)
         7.  Add option to be able to choose directly the comparison version (instead of 'previous version'). allow alpha-numeric 
             estimate version names and default to previous version (by date created) if no comparison is specified
 

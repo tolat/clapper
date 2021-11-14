@@ -653,6 +653,10 @@ tbody tr{
    background-color: rgb(255, 234, 234);
 }
 
+.identifier{
+    font-weight: bold;
+}
+
 .uneditable{
     font-style: italic;
     color: rgb(99, 99, 99);

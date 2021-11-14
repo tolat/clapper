@@ -120,7 +120,7 @@
         let columns=[
             { id: "__spacer", width: 0, sortable: false, draggable: false },
             { id: "Date", name: "Date", field: "Date", width: 100, editor: Slick.Editors.Date, sortable: true, cssClass: 'required-for-save' },
-            { id: "PO Num", name: "PO Num", field: "PO Num", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
+            { id: "PO Num", name: "PO Num", field: "PO Num", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: AutoCompleteEditor, dataSource: _allSetCodes, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 100, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
             { id: "Episode", name: "Episode", field: "Episode", width: 75, sortable: true, cssClass: 'uneditable' },

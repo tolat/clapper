@@ -175,7 +175,7 @@ module.exports.update=async function (body, showId, user) {
     // Add old values for restricted items to the updated List
     let restrictedItems=await crudUtils.getRestrictedItems(show.estimateVersions[ov].sets, accessProfile, 'Set Code')
     for (item of restrictedItems) {
-        updatedList.push(item)
+        updatedList.push(show.estimateVersions[ov].sets.find(s => s['Set Code']==item))
     }
 
     show.estimateVersions[ov].sets=updatedList
