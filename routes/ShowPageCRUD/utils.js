@@ -31,10 +31,12 @@ module.exports.deleteWeek=async function (weekId, show, newWeeks) {
 }
 
 // Creates a new week for the show
-module.exports.createWeek=async function (body, show, newWeekId) {
+module.exports.createWeek=async function (body, show, newWeekId, apName) {
+    show=await Show.findById(show._id)
+    let currentWeekId=show.accessMap[apName].currentWeek
     // Just update show's current week if not creating a new week
     if (!body.newWeek.isNewWeek) {
-        show.currentWeek=body.newWeek.weekId
+        show.accessMap[apName].currentWeek=body.newWeek.weekId
     } else {
         // Create a new week for the show
         let newWeek={
@@ -76,7 +78,7 @@ module.exports.createWeek=async function (body, show, newWeekId) {
             }
             // Else copy week data over from current week
             else {
-                oldWeek=await show.weeks.find(w => w._id==show.currentWeek)
+                oldWeek=await show.weeks.find(w => w._id==currentWeekId)
             }
 
             newWeek=await JSON.parse(JSON.stringify(oldWeek))
@@ -95,7 +97,7 @@ module.exports.createWeek=async function (body, show, newWeekId) {
                 user=await User.findOne({ username: crew['username'] })
 
             let record=user.showrecords.find(r => r.showid==show._id.toString())
-            let activeInNewWeek=await this.copyWeekFromRecord(body, show, record, newWeekId, user)
+            let activeInNewWeek=await this.copyWeekFromRecord(body, show, record, newWeekId, user, currentWeekId)
 
             // Add days worked for new week to each position of the record
             for (pos of record.positions) {
@@ -117,11 +119,12 @@ module.exports.createWeek=async function (body, show, newWeekId) {
         newWeek.number=body.newWeek.number
         newWeek.end=body.newWeek.end
 
-        show.currentWeek=newWeekId
+        show.accessMap[apName].currentWeek=newWeekId
         await show.weeks.push(newWeek)
         await show.weeks.sort((a, b) => new Date(a.end).getTime()<new Date(b.end).getTime()? -1:1)
         await show.markModified('weeks')
     }
+    show.markModified('accessMap')
     await show.save()
 }
 
@@ -136,12 +139,13 @@ function findPrecedingWeek(weekEnd, weeks) {
     }
 }
 
-module.exports.copyWeekFromRecord=async function (body, show, record, newWeekId, user) {
+module.exports.copyWeekFromRecord=async function (body, show, record, newWeekId, user, currentWeekId) {
     let activeInNewWeek=[]
     let newWeekRecord={
         extraColumnValues: {},
         taxColumnValues: {}
     }
+
     // Copy crew week worked over from preceding week
     if (body.newWeek.copyCrewFrom=='preceding') {
         let precedingWeekNum=body.newWeek.number-1
@@ -162,9 +166,9 @@ module.exports.copyWeekFromRecord=async function (body, show, record, newWeekId,
     }
     // Else copy crew week worked over from current week
     else if (body.newWeek.copyCrewFrom=='current') {
-        newWeekRecord=record.weeksWorked[show.currentWeek]
+        newWeekRecord=record.weeksWorked[currentWeekId]
 
-        for (day of this.getDaysOfWeekEnding(show.weeks.find(w => w._id.toString()==show.currentWeek).end)) {
+        for (day of this.getDaysOfWeekEnding(show.weeks.find(w => w._id.toString()==currentWeekId).end)) {
             let dateKey=new Date(day).toLocaleDateString('en-US')
             for (pos of record.positions) {
                 if (pos.daysWorked[dateKey]&&!activeInNewWeek.includes(pos)) {
@@ -225,4 +229,33 @@ module.exports.isValidItem=function (item, RFSkeys, _accessProfile) {
             return false
     }
     return true
+}
+
+// Get key for accessProfiles and accessMap for agiven user or username
+module.exports.getAccessProfileName=function (user=false, username=false) {
+    if (user) {
+        let uName=user.username
+        while (uName.includes(".")) {
+            uName=uName.replace(".", "-")
+        }
+        return uName
+    } else {
+        while (username.includes(".")) {
+            username=username.replace(".", "-")
+        }
+        return username
+    }
+}
+
+// Get the week from the show given a date
+module.exports.findFirstContainingWeek=(day, weeks) => {
+    const oneDay=24*60*60*1000;
+    let dateMS=new Date(day).getTime()
+    for (week of weeks) {
+        let weekEndMS=new Date(week.end).getTime()
+        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
+            return week
+        }
+    }
+    return false
 }

@@ -65,11 +65,11 @@ calculateBudget=(item) => {
 }
 
 // Finds first week containing a day
-findFirstContainingWeek=(day, user) => {
+findFirstContainingWeek=(day, user, weeks) => {
     let dateMS=new Date(day).getTime()
-    for (week of _show.weeks) {
+    for (week of weeks) {
         let weekEndMS=new Date(week.end).getTime()
-        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-6*oneDay)) {
+        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
             if (week.crew.crewList.find(c => c.username==user.username)) {
                 return week
             }
@@ -102,7 +102,7 @@ calculateCosts=(item) => {
         for (recordPosition of record.positions) {
             let position=_show.positions.positionList.find(p => p['Code']==recordPosition.code)
             for (day in recordPosition.daysWorked) {
-                let week=findFirstContainingWeek(day, user)
+                let week=findFirstContainingWeek(day, user, _show.weeks)
                 // Only count day worked if it has the same set code as the item and it falls in a valid week 
                 if (recordPosition.daysWorked[day].set==item['Set Code']&&week) {
                     let multipliers=week.multipliers;

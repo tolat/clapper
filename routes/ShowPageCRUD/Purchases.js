@@ -8,12 +8,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     show=await Show.findById(id)
 
     // Get accessProfile
-    let apName=user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
+    let apName=crudUtils.getAccessProfileName(user)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile][section]
 
     // Generate grid data
-    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
+    let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
     let data=initializeData(show.purchases.purchaseList, show, args, week, accessProfile)
 
     // Generate array of all set codes in current estimate version
@@ -29,19 +28,21 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         data,
         accessProfile,
         user,
-        allSetCodes
+        allSetCodes,
+        apName
     })
 }
 
 // Update purchases
 module.exports.update=async function (body, showId, user) {
     let show=await Show.findById(showId).populate('weeks.crew.crewList')
-    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
 
     // Get access profile
-    let apName=user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Purchases
+    let apName=crudUtils.getAccessProfileName(user)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile].Purchases
+
+    // Get week 
+    let week=show.weeks.find(w => w._id.toString()==show.accessMap[apName].currentWeek)
 
     // Save display settings to access profile
     accessProfile.displaySettings[apName][week._id.toString()]=body.displaySettings;
@@ -67,7 +68,6 @@ module.exports.update=async function (body, showId, user) {
                 p={
                     extraColumnValues: {},
                     taxColumnValues: {},
-                    weekId: body.weeks[0]._id.toString(),
                 }
                 show.purchases.purchaseList.push(p)
             }
@@ -99,18 +99,21 @@ module.exports.update=async function (body, showId, user) {
 
     // Delete purchases that aren't in the grid
     let restrictedItems=await crudUtils.getRestrictedItems(show.purchases.purchaseList, accessProfile, 'PO Num')
+    let newPurchaseList=[]
     for (purchase of show.purchases.purchaseList) {
-        if (!body.data.find(item => item['PO Num']==purchase['PO Num'])&&!restrictedItems.includes(purchase['PO Num'])) {
-            delete await show.purchases.purchaseList.find(p => p['PO Num']==purchase['PO Num'])
-        }
+        if (body.data.find(item => item['PO Num']==purchase['PO Num'])||restrictedItems.includes(purchase['PO Num']))
+            newPurchaseList.push(purchase)
+        else
+            delete purchase
     }
 
+    show.purchases.purchaseList=newPurchaseList
     show.markModified('purchases')
     await show.save()
 
     // Create new week if required
     if (body.newWeek) {
-        await crudUtils.createWeek(body, show, genUniqueId())
+        await crudUtils.createWeek(body, show, genUniqueId(), apName)
     }
 
     // Delete all records for deleted week if required
@@ -143,9 +146,9 @@ function initializeData(purchases, _show, _args, week, accessProfile) {
             item[taxCol]=numberUtils.zeroNanToNull(parseFloat(purchases[i].taxColumnValues[taxCol]))
         }
 
-        // ** BASE THIS ON DATE NOT ON WEEK ***
-        let week=_show.weeks.find(w => w._id==purchases[i].weekId)
-        week? item['Week']=week.number:item['Week']=undefined
+        // Set data item week to be the first week containing the purchase date
+        let week=crudUtils.findFirstContainingWeek(purchases[i].Date, _show.weeks)
+        week? item['Week']=_show.weeks.map(w => w._id).indexOf(week._id)+1:item['Week']=undefined
 
         // Initialize the purchase total (Tax + Amount)
         item=updatePurchaseTotal(item, _taxColumns);

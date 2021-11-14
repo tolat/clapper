@@ -1,14 +1,15 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>;
-    var _accessProfile= <%- JSON.stringify(accessProfile)%>;
-    var _user= <%- JSON.stringify(user)%>;
-    var _allSetCodes= <%- JSON.stringify(allSetCodes)%>;
+    let _show= <%- JSON.stringify(show)%>;
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    let _user= <%- JSON.stringify(user)%>;
+    let _allSetCodes= <%- JSON.stringify(allSetCodes)%>;
+    let _apName= <%- JSON.stringify(apName)%>;
     setWeekEnding()
 
-    var _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_week._id]||{}
-    var _extraColumns=_show.purchases.extraColumns;
-    var _validators=[
+    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
+    let _extraColumns=_show.purchases.extraColumns;
+    let _validators=[
         {
             fields: ['Set Code'],
             isInvalid: function (args, field) {
@@ -49,16 +50,22 @@
         },
         {
             fields: ['PO Num'],
-            isInvalid: function (args, field) { return !args.item[field]||dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id) },
+            isInvalid: function (args, field) {
+                if (args.item['PO Num']&&args.item['PO Num']!="")
+                    if (dataView.getItems().find(i => i['PO Num']==args.item['PO Num']&&i.id!=args.item.id)) {
+                        return true
+                    }
+                return false
+            },
             validationHeader: 'Invalid PO Num!',
             validationMessage: "PO Num already exists."
         },
     ];
-    var _totals={ Total: 'sum' };
-    var _taxColumns=_show.purchases.taxColumns
+    let _totals={ Total: 'sum' };
+    let _taxColumns=_show.purchases.taxColumns
 
-    var grid;
-    var dataView;
+    let grid;
+    let dataView;
 
     // Load the grid 
     async function onLoad() {

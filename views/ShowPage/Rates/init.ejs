@@ -3,6 +3,7 @@
     let _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
+    let _apName= <%- JSON.stringify(apName)%>;
     setWeekEnding()
 
     let _extraColumns=_week.positions.extraColumns;
@@ -43,7 +44,7 @@
     let _totals={};
     let _multipliers=_week.multipliers
     let _dropdownNodes=initDropdownNodes()
-    let _displaySettings=_accessProfile.displaySettings[_user.username.replaceAll(".", "_")][_week._id]||{}
+    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
 
     var grid;
     var dataView;

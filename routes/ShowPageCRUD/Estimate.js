@@ -7,6 +7,10 @@ const crudUtils=require('./utils')
 module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
     let show=await populateShow(id);
 
+    // Initialize data for grid based on user access profile
+    let apName=await crudUtils.getAccessProfileName(user)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile][section]
+
     // Case: first estimate version
     if (!Object.keys(show.estimateVersions).length) { args.isFirstEstimate=true }
     // Case: requesting specific estimate version
@@ -17,16 +21,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     }
     //Case: no specified version, default to the cost report's version
     else {
-        let version=show.costReport.estimateVersion
+        let version=show.accessMap[apName].estimateVersion
         args.latestVersion=getLatestVersion(show)
         version? args.version=version:args.version=args.latestVersion
         args.weekEnding=show.estimateVersions[args.version].weekEnding;
     }
-
-    // Initialize data for grid based on user access profile
-    let apName=user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
 
     // Initialize data for the grid, applying the access profile
     let data=[]
@@ -43,7 +42,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         pageModals,
         data,
         accessProfile,
-        user
+        user,
+        apName
     })
 }
 
@@ -66,12 +66,11 @@ module.exports.update=async function (body, showId, user) {
     let v=body.version;
     let isNewVersion=body.isNewVersion;
     let isBlankVersion=body.isBlankVersion;
-    let show=await Show.findById(showId).populate('sets');
+    let show=await Show.findById(showId)
 
     // Get access profile
-    let apName=user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Estimate
+    let apName=await crudUtils.getAccessProfileName(user)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile].Estimate
 
     // First blank estimate case 
     if (!ov) {
@@ -84,7 +83,9 @@ module.exports.update=async function (body, showId, user) {
             sets: []
         }
 
-        show.markModified(`estimateVersions`);
+        show.accessMap[apName].estimateVersion=`${v}`
+        show.markModified('accessMap')
+        show.markModified('estimateVersions');
         await show.save();
         return { latestVersion: getLatestVersion(show) };
     }
@@ -111,8 +112,9 @@ module.exports.update=async function (body, showId, user) {
     // Update department colors
     show.departmentColorMap=body.departmentColorMap;
 
-    // Set new cost report version based on estimate page version
-    show.costReport.estimateVersion=v
+    // Set this user's active version
+    show.accessMap[apName].estimateVersion=`${v}`
+    show.markModified('accessMap')
 
     // Save show
     await show.save();

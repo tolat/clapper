@@ -18,7 +18,7 @@
                     </a>
                 </th>
                 <td>
-                    <%=show.weeks.find(w=> w._id == show.currentWeek).end.toString().slice(0,15)%>
+                    <%=show.weeks.find(w=> w._id == show.accessMap[apName].currentWeek).end.toString().slice(0,15)%>
                 </td>
                 <td>
                     <%=show.costReport.budget%>

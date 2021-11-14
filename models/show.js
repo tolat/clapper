@@ -33,7 +33,6 @@ const ShowSchema=new Schema({
         taxColumns: [],
         purchaseList: [Object]
     },
-    currentWeek: String,
     estimateVersions: Object,
     departments: [String],
     departmentColorMap: Object,

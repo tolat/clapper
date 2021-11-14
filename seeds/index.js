@@ -30,7 +30,6 @@ const seedShows=async () => {
         const firstWeekEnd=genStartDate()
         const show=new Show({
             'Name': showNames[i],
-            currentWeek: firstWeekId,
             departments: departmentNames,
             departmentColorMap: {},
             weeks: [{
@@ -48,7 +47,6 @@ const seedShows=async () => {
                     }
                 },
                 crew: {
-                    displaySettings: {},
                     extraColumns: [],
                     taxColumns: ['GST', 'PST'],
                     crewList: []
@@ -115,8 +113,16 @@ const seedShows=async () => {
                 currentMap: "Sample"
             },
             accessMap: {
-                'pigsinpyjamas@yahoo_ca': 'Test Profile',
-                'torin_olat@gmail_com': '__Owner'
+                'pigsinpyjamas@yahoo-ca': {
+                    profile: 'Test Profile',
+                    currentWeek: firstWeekId,
+                    estimateVersion: '100'
+                },
+                'torin-olat@gmail-com': {
+                    profile: '__Owner',
+                    currentWeek: firstWeekId,
+                    estimateVersion: '100'
+                }
             },
             accessProfiles: {
                 "Test Profile": {
@@ -129,7 +135,7 @@ const seedShows=async () => {
                         columnFilter: ['Location', 'Notes'],
                         dataFilter: { Episode: 200 },
                         displaySettings: {
-                            'pigsinpyjamas@yahoo_ca': {
+                            'pigsinpyjamas@yahoo-ca': {
                                 100: {}
                             }
                         }
@@ -138,7 +144,7 @@ const seedShows=async () => {
                         columnFilter: ['Invoice Num'],
                         dataFilter: { 'Set Code': '103' },
                         displaySettings: {
-                            'pigsinpyjamas@yahoo_ca': {
+                            'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
                             }
                         }
@@ -157,7 +163,7 @@ const seedShows=async () => {
                         columnFilter: ['Rate'],
                         dataFilter: { Department: 'Construction' },
                         displaySettings: {
-                            'pigsinpyjamas@yahoo_ca': {
+                            'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
                             }
                         }
@@ -172,13 +178,13 @@ const seedShows=async () => {
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin_olat@gmail_com': {} }
+                        displaySettings: { 'torin-olat@gmail-com': {} }
                     },
                     'Estimate': {
                         columnFilter: [],
                         dataFilter: {},
                         displaySettings: {
-                            'torin_olat@gmail_com': {
+                            'torin-olat@gmail-com': {
                                 100: {}
                             }
                         }
@@ -187,7 +193,7 @@ const seedShows=async () => {
                         columnFilter: [],
                         dataFilter: {},
                         displaySettings: {
-                            'torin_olat@gmail_com': {
+                            'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
                             }
                         }
@@ -195,18 +201,18 @@ const seedShows=async () => {
                     'Rentals': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin_olat@gmail_com': {} }
+                        displaySettings: { 'torin-olat@gmail-com': {} }
                     },
                     'Crew': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin_olat@gmail_com': {} }
+                        displaySettings: { 'torin-olat@gmail-com': {} }
                     },
                     'Rates': {
                         columnFilter: [],
                         dataFilter: {},
                         displaySettings: {
-                            'torin_olat@gmail_com': {
+                            'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
                             }
                         }
@@ -214,7 +220,7 @@ const seedShows=async () => {
                     'Timesheets': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin_olat@gmail_com': {} }
+                        displaySettings: { 'torin-olat@gmail-com': {} }
                     }
 
                 }
@@ -385,7 +391,6 @@ const seedPurchases=async () => {
                     'Supplier': genSupplier(),
                     'Amount': randInt(0, 5000),
                     'Description': genSupplier(),
-                    weekId: firstWeekId,
                     extraColumnValues: {},
                     taxColumnValues: { GST: 5, PST: 7 }
                 }

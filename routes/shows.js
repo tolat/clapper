@@ -8,20 +8,22 @@ const router=express.Router({ mergeParams: true });
 const Show=require('../models/show');
 const User=require('../models/user');
 const { genUniqueId }=require('../utils/numberUtils')
+const crudUtils=require('./ShowPageCRUD/utils')
 
 // Shows Load
 router.get('/', isLoggedIn, tryCatch(async (req, res, next) => {
     // Get shows that user has access to
     let shows=await Show.find({})
-    let uName=req.user.username
-    while (uName.includes(".")) { uName=uName.replace(".", "_") }
-    shows=await shows.filter(show => Object.keys(show.accessMap).includes(uName))
+    let apName=await crudUtils.getAccessProfileName(req.user)
+
+    shows=await shows.filter(show => Object.keys(show.accessMap).includes(apName))
 
     // Render shows page (homepage)
     res.render('shows', {
         title: 'Home',
-        shows: shows,
-        args: { server: req.app.get('server') }
+        shows,
+        args: { server: req.app.get('server') },
+        apName
     })
 }))
 
@@ -34,50 +36,53 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.departmentColorMap={}
 
     // Create accessProfiles and accessMap
-    let uName=req.user.username
-    while (uName.includes(".")) { uName=uName.replace(".", "_") }
+    let apName=await crudUtils.getAccessProfileName(req.user)
     show.accessProfiles={
         __Owner: {
             'Cost Report': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             },
             'Estimate': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             },
             'Purchases': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             },
             'Rentals': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             },
             'Crew': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             },
             'Rates': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             },
             'Timesheets': {
                 columnFilter: [],
                 dataFilter: {},
-                displaySettings: { [`${uName}`]: {} }
+                displaySettings: { [`${apName}`]: {} }
             }
 
         }
     }
     show.accessMap={
-        [`${uName}`]: '__Owner'
+        [`${apName}`]: {
+            profile: '__Owner',
+            estimateVersion: false,
+            currentWeek: show.currentWeek
+        }
     }
 
     // Create first week

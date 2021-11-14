@@ -13,6 +13,7 @@ const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
 const Queue=require('bull')
 const Show=require('../models/show')
+const crudUtils=require('../routes/ShowPageCRUD/utils')
 
 const ShowPageCRUD={
     Estimate: require('./ShowPageCRUD/Estimate'),
@@ -26,14 +27,15 @@ const ShowPageCRUD={
 
 // Load a Show Page section
 router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
+    const apName=crudUtils.getAccessProfileName(req.user)
     const { id, section }=req.params;
     const query=req.query;
     let show=await Show.findById(id)
     let args={
         section: section,
         server: req.app.get('server'),
-        weekList: show.weeks.map(w => { return { _id: w._id.toString(), end: w.end } }),
-        week: show.weeks.find(w => w._id.toString()==show.currentWeek)
+        weekList: show.weeks.map(w => { return { _id: w._id, end: w.end } }),
+        week: show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
     };
 
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error

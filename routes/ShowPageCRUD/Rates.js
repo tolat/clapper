@@ -8,12 +8,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let show=await populateShow(id);
 
     // Get accessProfile
-    let apName=user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]][section]
+    let apName=await crudUtils.getAccessProfileName(user)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile][section]
 
     // Generate grid data
-    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
+    let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
     let data=initializeData(week.positions.positionList, show, args, week, accessProfile)
 
     res.render('ShowPage/Template', {
@@ -25,22 +24,24 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         pageModals,
         accessProfile,
         data,
-        user
+        user,
+        apName
     })
 }
 
 // Update rates 
 module.exports.update=async function (body, showId, user) {
     let show=await Show.findById(showId).populate('crew.crewList')
-    let week=show.weeks.find(w => w._id.toString()==show.currentWeek)
 
     // Get access profile
-    let apName=user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
-    let accessProfile=show.accessProfiles[show.accessMap[`${apName}`]].Rates
+    let apName=await crudUtils.getAccessProfileName(user)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile].Rates
+
+    // Set week
+    let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
 
     // Save display settings to access profile
-    accessProfile.displaySettings[apName][week._id.toString()]=body.displaySettings;
+    accessProfile.displaySettings[apName][week._id]=body.displaySettings;
     show.markModified('accessProfiles');
 
     // Save extra Columns to week
@@ -92,15 +93,13 @@ module.exports.update=async function (body, showId, user) {
 
     // Create new week if required
     if (body.newWeek) {
-        await crudUtils.createWeek(body, show, newWeekId)
+        await crudUtils.createWeek(body, show, newWeekId, apName)
     }
 
     // Delete all records for deleted week if required
     if (body.deletedWeek) {
         await crudUtils.deleteWeek(body.deletedWeek, show, body.weeks)
     }
-
-    await show.save();
 
     return {};
 }

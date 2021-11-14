@@ -1,4 +1,5 @@
 const Show=require('../models/show')
+const crudUtils=require('../routes/ShowPageCRUD/utils')
 
 module.exports.isLoggedIn=(req, res, next) => {
     req.session.returnTo=req.originalUrl
@@ -28,9 +29,8 @@ module.exports.hasShowAccess=async (req, res, next) => {
     const showid=req.params.id
     let show=await Show.findById(showid)
 
-    // Convert . in username to _
-    let apName=req.user.username
-    while (apName.includes(".")) { apName=apName.replace(".", "_") }
+    // Get to access profile key
+    let apName=crudUtils.getAccessProfileName(req.user)
 
     if (!Object.keys(show.accessMap).includes(apName)) {
         req.flash('error', `You do not have access to the show: ${show.Name}`)
