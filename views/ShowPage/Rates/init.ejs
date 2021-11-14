@@ -88,6 +88,7 @@
     // Creates grid columns 
     function initializeColumns(positions, _show, _args) {
         let columns=[
+            { id: "__spacer", width: 0, sortable: false },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Code", name: "Code", field: "Code", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 200, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },

@@ -93,7 +93,7 @@ module.exports.update=async function (body, showId, user) {
             // Save tax column values, deferring to previous value if this column in restricted
             previousValues=rental.taxColumnValues
             rental.taxColumnValues={}
-            for (key of body.extraColumns) {
+            for (key of body.taxColumns) {
                 !accessProfile.columnFilter.includes(key)? rental.taxColumnValues[key]=item[key]:
                     rental.taxColumnValues[key]=previousValues[key]
             }
@@ -106,7 +106,7 @@ module.exports.update=async function (body, showId, user) {
     // Add old values for restricted items to the updated List
     let restrictedItems=await crudUtils.getRestrictedItems(week.rentals.rentalList, accessProfile, 'Rental Name')
     for (item of restrictedItems) {
-        updatedList.push(item)
+        updatedList.push(week.rentals.rentalList.find(rental => rental['Rental Name']==item))
     }
 
     week.rentals.rentalList=updatedList

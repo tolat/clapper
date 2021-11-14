@@ -28,10 +28,11 @@
             style="background-image: url('/public/images/undo.png'); "></button>
         <button type="button" onclick="redoCellEdit()" class="toolbar-icon"
             style="background-image: url('/public/images/redo.png'); "></button>
-        <div class="grid-toolbar-item" style="font-weight: bold;">
-            <div id="save-status" style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
-                saved
-            </div>
+        <div class="grid-toolbar-item" id="date-created-display" style="white-space: nowrap;">
+        </div>
+        <div class="grid-toolbar-item" id="save-status"
+            style="color: rgb(24, 135, 86); margin-left: 0px; font-weight: bold;">
+            saved
         </div>
         <%- include('ShowPage/departmentsBar') %>
             <div class=" grid-toolbar-searchbar">

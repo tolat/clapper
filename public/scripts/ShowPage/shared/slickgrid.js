@@ -290,7 +290,9 @@ createSlickGrid=(data, columns, options) => {
     // Handle double click event on column header click (used for sorting)
     grid.onHeaderClick.subscribe(function (e, args) {
         if (_headerDblCLick) {
-            sortColumn(args.column.field)
+            if (args.column.sortable) {
+                sortColumn(args.column.field)
+            }
         } else {
             // Remove sort arrows from grid column headers
             for (elt of document.getElementsByClassName('slick-sort-indicator')) {
@@ -1788,14 +1790,18 @@ setWeekEnding=() => {
     // If in estimate page, show the version in the week ending display, and the date created in the toolbar
     if (_args.section=='Estimate') {
         let dateCreatedText=`Date Created: ${new Date(_show.estimateVersions[_version].dateCreated).toLocaleDateString('en-US')}`
+        document.getElementById("date-created-display").innerText=dateCreatedText
 
         document.getElementById('week-ending-display').style.color='black'
         document.getElementById('week-ending-display').innerText=`Estimate Version: ${_version}`
         document.getElementById('week-ending-display-container').onclick=function () { toggleOpenVersionModal(true) }
+
+        // Add latest indicator if in latest version
         if (_version==_sortedVersionKeys[0]) {
             document.getElementById('week-ending-display-container').style.color='grey'
             document.getElementById('week-ending-display-container').innerHTML+='&nbsp- Latest'
         }
+
     } else {
         let weekEnd=new Date(_week.end)
         let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`

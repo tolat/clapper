@@ -149,7 +149,7 @@
     // Creates grid columns 
     function initializeColumns(positions) {
         let columns=[
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true },
+            { id: "__spacer", width: 0, sortable: false },
             { id: "Rental Name", name: "Rental Name", field: "Rental Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Day Rate", name: "Day Rate", field: "Day Rate", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save currency' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _currentWeekSetCodes, sortable: true, cssClass: 'required-for-save' },
@@ -174,7 +174,20 @@
 
         columns.push({ id: "Week Total", name: "Week Total", field: "Week Total", width: 80, sortable: true, cssClass: 'uneditable currency' })
 
-
+        // Apply access profile column filter to hide restricted columns
+        for (col of columns) {
+            if (_accessProfile.columnFilter.includes(col.name)) {
+                if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
+                // Hide column
+                _displaySettings.setHiddenColumns.push(col.name)
+                // Lock coumn as hidden
+                col.lockHidden=true
+                // Remove required for save class from column
+                if (col.cssClass) {
+                    col.cssClass=col.cssClass.replaceAll("required-for-save", "")
+                }
+            }
+        }
 
         return columns;
     }

@@ -188,8 +188,6 @@ saveData=(reload=false) => {
         return
     }
 
-    console.log('in saveData')
-
     // Grey screen and show loader if reloading
     if (reload) {
         document.getElementById('grid-modal-container').style.display='flex';
@@ -220,6 +218,7 @@ saveData=(reload=false) => {
     })
         .then(response => { return response.json() })
         .then(responseData => {
+            console.log(responseData)
             if (reload) { location.reload() }
             else {
                 // Push new item ids to items

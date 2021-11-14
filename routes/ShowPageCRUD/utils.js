@@ -234,9 +234,14 @@ module.exports.isRestrictedItem=function (item, accessProfile) {
 
 // Checks if item has valid required-for-save fields filled
 module.exports.isValidItem=function (item, RFSkeys, _accessProfile) {
+    if (!item) { return false }
     for (key of RFSkeys) {
-        if (!item[key]&&!_accessProfile.columnFilter.includes(key))
+        if (!item[key]) {
+            if (_accessProfile.columnFilter.includes(key)) {
+                return true
+            }
             return false
+        }
     }
     return true
 }

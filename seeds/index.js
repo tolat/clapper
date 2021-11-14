@@ -156,8 +156,8 @@ const seedShows=async () => {
                         }
                     },
                     'Rentals': {
-                        columnFilter: [],
-                        dataFilter: {},
+                        columnFilter: ['Supplier'],
+                        dataFilter: { 'Department': 'Construction' },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}

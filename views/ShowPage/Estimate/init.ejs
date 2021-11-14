@@ -147,6 +147,7 @@
     function initializeColumns(sets, _show, _args) {
         let columns=[
             // Core feature columns
+            { id: "__spacer", width: 0, sortable: false },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
