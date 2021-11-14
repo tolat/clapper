@@ -214,7 +214,7 @@ module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier)
     let restrictedItems=[]
     for (item of data) {
         for (column in accessProfile.dataFilter) {
-            if (item[column]==accessProfile.dataFilter[column]) {
+            if (accessProfile.dataFilter[column].includes(item[column])) {
                 restrictedItems.push(item[`${itemIdentifier}`])
             }
         }
@@ -225,7 +225,7 @@ module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier)
 // Returns true if item has values restricted by the accessProfile
 module.exports.isRestrictedItem=function (item, accessProfile) {
     for (column in accessProfile.dataFilter) {
-        if (item[column]==accessProfile.dataFilter[column]) {
+        if (accessProfile.dataFilter[column].includes(item[column])) {
             return true
         }
     }
@@ -274,3 +274,4 @@ module.exports.findFirstContainingWeek=(day, weeks) => {
     }
     return false
 }
+

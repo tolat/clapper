@@ -1,15 +1,19 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>
-    var _args= <%- JSON.stringify(args)%>
-        setWeekEnding()
+    let _show= <%- JSON.stringify(show)%>;
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    let _user= <%- JSON.stringify(user)%>;
+    let _apName= <%- JSON.stringify(apName)%>;
+    let _currentVersionSetCodes= <%- JSON.stringify(currentVersionSetCodes)%>;
+    let _dropdownNames= <%- JSON.stringify(dropdownNames)%>;
+    let _allUsernames= <%- JSON.stringify(allUsernames)%>;
+    setWeekEnding()
 
-    var _removeEditedField
-    var _multipliers=_show.weeks.find(w => w._id==_show.currentWeek).multipliers
-    var _extraColumns=_week.crew.extraColumns
-    var _currentWeekDays=getDaysOfCurrentWeek()
-    var _prevColumns
-    var _validators=[
+    let _removeEditedField
+    let _multipliers=_week.multipliers
+    let _extraColumns=_week.crew.extraColumns
+    let _currentWeekDays=getDaysOfCurrentWeek()
+    let _validators=[
         {
             fields: _currentWeekDays.map(day => day.toString().slice(0, 3)),
             isInvalid: function (args, field) {
@@ -25,7 +29,7 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Set '${args.item[field]}' Not Found!`
                 this.validationMessage=`New sets can only be added in the 'Estimates' page.`
-                return args.item[field]&&!_show.sets.find(s => s['Set Code']==args.item[field])
+                return args.item[field]&&!_currentVersionSetCodes.find(code => code==args.item[field].toString())
             },
         },
         {
@@ -33,11 +37,11 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Position '${args.item[field]}' Not Found!`
                 this.validationMessage='New positions can only be added in the Rates page'
-                return !_positions.find(pos => pos['Code']==args.item[field])&&args.item['Position']!=undefined&&args.item['username']!=undefined
+                return !_positions[args.item[field]]&&args.item['Position']
             }
         },
         {
-            fields: ['username', 'Name'],
+            fields: ['username'],
             isInvalid: function (args, field) {
                 this.validationHeader=`There is already an entry for user: ${args.item['username']} with position: ${args.item['Position']}`
                 this.validationMessage=''
@@ -47,28 +51,26 @@
             }
         },
     ]
-    var _totals={ Total: 'sum', Rentals: 'sum' }
-    var _allUsers=_args.allUsers
-    var _allNames=_allUsers.map(user => `${user['Name']} [${user['username']}]`)
-    var _allusernames=_allUsers.map(user => user['username'])
-    var _positions=_show.positions.positionList
-    var _taxColumns=_week.crew.taxColumns
+    let _totals={ Total: 'sum', Rentals: 'sum' }
+    let _positions=_week.positions.positionList
+    let _taxColumns=_week.crew.taxColumns
+    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
 
-    var grid
-    var dataView
+    let grid
+    let dataView
 
     // Load the grid 
     async function onLoad() {
-        var crew=_week.crew.crewList
+        let crew=_week.crew.crewList
 
         // Create options
-        var options=await initializeOptions()
+        let options=await initializeOptions()
 
         // Create grid data
-        var data=await initializeData(crew, _show, _args)
+        let data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
-        var columns=await initializeColumns(crew, _show, _args)
+        let columns=await initializeColumns(crew, _show, _args)
 
         // Create data grid
         await createSlickGrid(data, columns, options, _show, _args)
@@ -100,7 +102,6 @@
                 autoFillUserData({ item: item, cell: grid.getColumns().indexOf(grid.getColumns().find(c => c.field=='username')) })
             }
 
-            console.log('recalculating')
             item['Total']=calculateWeeklyTotal(item)
             dataView.updateItem(item.id, item)
             updateTotalsRow()
@@ -133,7 +134,7 @@
         })
 
         // Apply display settings to grid
-        applyDisplaySettings(_week.crew.displaySettings)
+        applyDisplaySettings(_displaySettings)
 
         // Calculate totals for totals footer row
         updateTotalsRow()
@@ -142,78 +143,13 @@
         setCrewPageColumnOrder()
     }
 
-    // Creates grid data 
-    function initializeData(crew, _show, _args) {
-        let data=[];
-        let count=0;
-
-        for (let i=0; i<crew.length; i++) {
-            let record=crew[i].showrecords.find(r => r.showid==_show._id);
-            for (pos of record.positions) {
-                if (daysWorkedInWeek(pos)) {
-                    let position=_show.positions.positionList.find(p => p['Code']==pos.code)||{ 'Code': 'DELETED' }
-                    let department=_show.departments.find(d => d==position['Department'])
-
-                    let item={
-                        '#': record.weeksWorked[_week._id]['#'],
-                        id: 'id_'+count,
-                        userid: crew[i]._id,
-                        'username': crew[i]['username'],
-                        'Name': crew[i]['Name'],
-                        'Position': position['Code'],
-                        'Phone': crew[i]['Phone'],
-                        'Email': crew[i]['Email'],
-                        'Date Joined': (new Date(record['Date Joined'])).toLocaleDateString('en-US'),
-                        'Department': department,
-                        editedfields: [],
-                    }
-
-                    // Load tax column values 
-                    let taxColumnValues=record.weeksWorked[_week._id].taxColumnValues
-                    if (taxColumnValues[pos.code]) {
-                        for (tax in taxColumnValues[pos.code]) {
-                            item[tax]=zeroNanToNull(taxColumnValues[pos.code][tax])
-                        }
-                    }
-
-
-                    // Load hours and setscodes for each day of this week ending
-                    item=loadUserHours(pos, item);
-
-                    // Set Rentals (payment due from rentals to this user for this week ending)
-                    item['Rentals']=zeroNanToNull(calculateWeeklyRentals(item));
-
-                    // Calculate weekly pay total and load it
-                    item['Total']=zeroNanToNull(calculateWeeklyTotal(item));
-
-                    // Add extra column values
-                    for (col of _week.crew.extraColumns) {
-                        if (record.weeksWorked[_week._id].extraColumnValues[pos.code]) {
-                            item[col]=record.weeksWorked[_week._id].extraColumnValues[pos.code][col];
-                        }
-                    }
-
-                    data.push(item);
-
-                    count++;
-                }
-
-            }
-        }
-
-        // Sort data by #
-        data=sortByNumber(data);
-
-        return data;
-    }
-
     // Creates grid columns 
     function initializeColumns(crew, _show, _args) {
         let columns=[
-            { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
-            { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _allusernames, sortable: true, minWidth: 0, cssClass: 'required-for-save' },
-            { id: "Position", name: "Position", field: "Position", width: 50, editor: AutoCompleteEditor, dataSource: _show.positions.positionList.map(p => p.Code), sortable: true, minWidth: 0, cssClass: 'required-for-save' },
-            { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _allNames, sortable: true, minWidth: 0, },
+            { id: "__spacer", width: 0, sortable: false },
+            { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _dropdownNames, sortable: true, minWidth: 0, cssClass: 'required-for-save identifier' },
+            { id: "Position", name: "Position", field: "Position", width: 50, editor: AutoCompleteEditor, dataSource: Object.keys(_positions), sortable: true, minWidth: 0, cssClass: 'required-for-save' },
+            { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _allUsernames, sortable: true, minWidth: 0, },
             { id: "Department", name: "Department", field: "Department", width: 120, sortable: true, minWidth: 0, cssClass: 'uneditable' },
             { id: "Email", name: "Email", field: "Email", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
             { id: "Phone", name: "Phone", field: "Phone", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
@@ -231,7 +167,7 @@
             let dayStringId=dayString.toString().slice(0, 3);
             columns.push(
                 { id: dayStringId, name: dayString, field: dayStringId, width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'hours-column', groupTotalsFormatter: countTotalsFormatter },
-                { id: `${dayStringId}_set`, name: `Set`, field: `${dayStringId}_set`, width: 60, editor: Slick.Editors.Text, sortable: true, cssClass: 'set-column' },
+                { id: `${dayStringId}_set`, name: `Set`, field: `${dayStringId}_set`, width: 60, editor: AutoCompleteEditor, dataSource: _currentVersionSetCodes, sortable: true, cssClass: 'set-column' },
             );
         }
 
@@ -245,6 +181,23 @@
             { id: `Rentals`, name: `Rentals`, field: 'Rentals', width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' },
             { id: `Total`, name: `Total`, field: 'Total', width: 80, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'uneditable currency' }
         ])
+
+
+        // Apply access profile column filter to hide restricted columns
+        for (col of columns) {
+            if (_accessProfile.columnFilter.includes(col.name)) {
+                if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
+                // Hide column
+                _displaySettings.setHiddenColumns.push(col.name)
+                // Lock coumn as hidden
+                col.lockHidden=true
+                // Remove required for save class from column
+                if (col.cssClass) {
+                    col.cssClass=col.cssClass.replaceAll("required-for-save", "")
+                }
+            }
+        }
+
 
         return columns;
     }

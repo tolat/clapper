@@ -166,7 +166,7 @@ calculateWeeklyTotal=(item) => {
     if (!item['Position']||item['Position']=='DELETED') { return 0 }
 
     let total=0;
-    let pos=_show.positions.positionList.find(p => p['Code']==item['Position'])
+    let pos=_week.positions.positionList[item['Position']]
     // Return 0 if no position found (errant position code)
     if (!pos) { return 0 }
     let rate=parseFloat(pos['Rate'])
@@ -286,7 +286,7 @@ autoFillUserData=(args) => {
     }
     else {
         if (_editDirectionForwards) {
-            let position=_show.positions.positionList.find(p => p['Code']==item['Position'])
+            let position=_week.positions.positionList[item['Position']]
             if (position) {
                 item['Department']=position['Department']
                 // FILL ITEM WITH RECOD DATA OR CLEAR HOURS WORKED FIELDS

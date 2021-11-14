@@ -32,6 +32,10 @@ ARTHUR:
         8.  add item order for displaySettings of each page (use an identifier key)
         7.  Add option to be able to choose directly the comparison version (instead of 'previous version'). allow alpha-numeric 
             estimate version names and default to previous version (by date created) if no comparison is specified
+        
+        ** Limit week.positionlist in crew sheet if department or code columns have been restricted
+        ** make sure apName is passed to createWeek in all crud routes
+        ** don't pass _show.weeks in savedata server request body, load weeks on server side
 
 
 

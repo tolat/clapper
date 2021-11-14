@@ -12,7 +12,6 @@ const ShowSchema=new Schema({
         end: Date,
         multipliers: Object,
         crew: {
-            displaySettings: Object,
             extraColumns: [String],
             taxColumns: [String],
             crewList: [{ type: Schema.Types.ObjectId, ref: 'User' }]
