@@ -8,7 +8,7 @@ const oneDay=24*60*60*1000;
 
 // Render ShowPage section
 module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
-    let show=await populateShow(id);
+    let show=await Show.findById(id).populate('weeks.crew.crewList')
 
     // Get accessProfile
     let apName=await crudUtils.getAccessProfileName(user)
@@ -18,7 +18,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
     let data=initializeData(week.crew.crewList, show, week, accessProfile)
     let currentVersionSetCodes=await show.estimateVersions[show.accessMap[apName].estimateVersion].sets.map(s => s['Set Code'])
-
 
     args.reloadOnWeekChange=true;
     let allUsers=await User.find({});
@@ -72,6 +71,7 @@ module.exports.update=async function (body, showId, user) {
 
     // Add/update user for each item
     let updatedList=[]
+    let keepPositionMap={}
     const RFSkeys=['username', 'Position']
     for (item of body.data) {
         if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
@@ -97,7 +97,7 @@ module.exports.update=async function (body, showId, user) {
             }
 
             // Update display keys
-            let displayKeys=['Name', 'Phone', 'Email', 'username']
+            let displayKeys=['Name', 'username']
             for (key of displayKeys) {
                 if (!accessProfile.columnFilter.includes(key))
                     user[key]=item[key];
@@ -175,9 +175,34 @@ module.exports.update=async function (body, showId, user) {
             user.markModified('showrecords.weeksWorked')
             await user.save()
 
-            updatedList.push(user)
+            // Add user to updated lsit
+            if (!updatedList.find(u => u._id.toString()==user._id.toString())) {
+                updatedList.push(user)
+            }
+
+            // Save this item's position in keep position map so it will not be deleted later
+            if (!keepPositionMap[user._id.toString()]) {
+                keepPositionMap[user._id.toString()]=[item['Position']]
+            } else {
+                keepPositionMap[user._id.toString()].push(item['Position'])
+            }
+
         }
     }
+
+    // Delete days worked for user in this week for positions not saved in keep positions
+    for (userid in keepPositionMap) {
+        let user=await User.findById(userid)
+        let record=user.showrecords.find(r => r.showid==show._id.toString())
+        for (pos of record.positions) {
+            if (!keepPositionMap[userid].includes(pos.code)) {
+                record.positions=await deletePositionDaysInWeek(record, pos.code, week)
+            }
+        }
+        user.markModified('showrecords')
+        await user.save()
+    }
+
 
     // Add old values for restricted items to the updated List. use initialize data to make items with old values for this week
     let oldShow=await Show.findById(show._id).populate('weeks.crew.crewList')
@@ -227,8 +252,6 @@ function initializeData(crew, _show, week, accessProfile=false) {
                     'username': crew[i]['username'],
                     'Name': crew[i]['Name'],
                     'Position': pos.code,
-                    'Phone': crew[i]['Phone'],
-                    'Email': crew[i]['Email'],
                     'Date Joined': (new Date(record['Date Joined'])).toLocaleDateString('en-US'),
                     'Department': department,
                     editedfields: [],
@@ -386,4 +409,28 @@ function calculateDailyLaborCost(multipliers, hours, rate, day) {
     total+=(hours-totalNonUnitHours)*rate;
 
     return total;
+}
+
+// Deletes daysworked for a position in specified week
+function deletePositionDaysInWeek(record, code, week) {
+    let newPositions=[]
+    for (pos of record.positions) {
+        if (pos.code==code) {
+            for (day in pos.daysWorked) {
+                if (dateIsInWeek(day, week)) {
+                    pos.daysWorked[day]=undefined
+                }
+            }
+        }
+        newPositions.push(pos)
+    }
+    return newPositions
+}
+
+// Returns true if date is in week
+function dateIsInWeek(date, week) {
+    let dateMS=new Date(date).getTime()
+    let weekEndMS=new Date(week.end).getTime()
+
+    return dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)
 }

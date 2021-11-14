@@ -250,51 +250,39 @@ autoFillUserData=(args) => {
     // Do nothing if not editing auto-populate fields
     if (!['username', 'Position', 'Name'].includes(col.field)) { return }
 
-    if (col.field=='username'||(col.name=='Name'&&item['Name'].includes('['))) {
-        // Auto-populate if editing forwards
-        if (_editDirectionForwards) {
-            let user;
-            // If editing name and name is selected from the dropdown, find user from that name
-            if (col.name=='Name'&&item['Name'].includes('[')) {
-                user=_allUsers.find(u => u['username']==item['Name'].slice(item['Name'].indexOf('[')+1, item['Name'].indexOf(']')));
-                item['username']=user['username']
-            }
-            // Otherwise, only auto fill if editing username 
-            else {
-                user=_allUsers.find(u => u['username']==item['username'])
-            }
-            // If user exists, auto fill item using this user
-            if (user) {
-                item['Phone']=user['Phone']
-                item['Email']=user['Email']
-                item['Name']=user['Name']
-            }
-            // If no user, set up item as a new user
-            else {
-                item['Date Joined']==new Date(Date.now()).toLocaleDateString('en-US')
-                if (item.userid) {
-                    clearShowRecordFields(item)
-                    for (field of ['Phone', 'Email', 'Name', 'Department']) {
-                        item[field]=null
-                    }
+    // Auto-populate if editing forwards
+    if (_editDirectionForwards) {
+        if (['Name', 'username'].includes(col.field)) {
+            // Populate username from Name if chosen from dropdown
+            if (col.field=='Name') {
+                if (item['Name'].includes('[')&&item['Name'].includes(']')) {
+                    let Name=item['Name'].slice(item['Name'].indexOf('[')+1, item['Name'].indexOf(']'))
+                    let username=_allUsernames.find(u => u==Name)
+                    item['username']=username
+                    item['Name']=Name
                 }
             }
-            clearShowRecordFields(item)
-        }
-        // Else use previous values to populate
-        else { item=loadPrevItemFromCommand(item) }
-    }
-    else {
-        if (_editDirectionForwards) {
-            let position=_week.positions.positionList[item['Position']]
-            if (position) {
-                item['Department']=position['Department']
-                // FILL ITEM WITH RECOD DATA OR CLEAR HOURS WORKED FIELDS
+            // Populate Name from username if username exists
+            else {
+                let Name=_dropdownNames.find(ddn => ddn.includes(item['username']))
+                if (Name) {
+                    item['Name']=Name.slice(0, Name.indexOf('['))
+                }
+            }
+            // Populate user data
+            for (key of ['Email', 'Phone', 'Date Joined']) {
+                item[key]=undefined
             }
         } else {
-            item=loadPrevItemFromCommand(item)
+            let posCode=item['Position']
+            console.log(posCode)
+            //clearShowRecordFields(item)
+            item['Department']=_week.positions.positionList[item['Position']].Department
+            item['Position']=posCode
+
         }
-    }
+    } else { item=loadPrevItemFromCommand(item) }
+
 
     // Set _groupedBy property to writable again
     if (_groupedBy) { Object.defineProperty(item, _groupedBy, { writable: true }) }

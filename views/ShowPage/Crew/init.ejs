@@ -147,12 +147,10 @@
     function initializeColumns(crew, _show, _args) {
         let columns=[
             { id: "__spacer", width: 0, sortable: false },
-            { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _dropdownNames, sortable: true, minWidth: 0, cssClass: 'required-for-save identifier' },
+            { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _allUsernames, sortable: true, minWidth: 0, cssClass: 'required-for-save identifier' },
             { id: "Position", name: "Position", field: "Position", width: 50, editor: AutoCompleteEditor, dataSource: Object.keys(_positions), sortable: true, minWidth: 0, cssClass: 'required-for-save' },
-            { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _allUsernames, sortable: true, minWidth: 0, },
+            { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _dropdownNames, sortable: true, minWidth: 0, },
             { id: "Department", name: "Department", field: "Department", width: 120, sortable: true, minWidth: 0, cssClass: 'uneditable' },
-            { id: "Email", name: "Email", field: "Email", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
-            { id: "Phone", name: "Phone", field: "Phone", width: 120, editor: Slick.Editors.Text, sortable: true, minWidth: 0 },
             { id: "Date Joined", name: "Date Joined", field: "Date Joined", width: 120, editor: Slick.Editors.Date, sortable: true, minWidth: 0 },
         ];
 
