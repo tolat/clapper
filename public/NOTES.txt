@@ -9,12 +9,17 @@ Git
 TASKS
 -   Preliminarily need to solve issues with working on pc
 
--   Remove _show variable (Torin)
--   Convert to SSL (Kit)
--   Finish access profiles (Torin)
+TORIN:
+-   Remove _show variable
+-   Finish access profiles
+-   Allow versios to be named with letters and chosen manually for comparison (modal can sort by date asc/desc)
+
+KIT:
+-   Convert to SSL
+
+ARTHUR:
 -   Get it to print nicely (Arthur)
 -   Optionally add basic styling to grid(Arthur)
--   Improve general usability
 
 -   Structural changes 
         1.  Sets can be removed from mongoose schema and just be an array of objects in estimate versions (DONE)

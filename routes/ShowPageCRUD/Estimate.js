@@ -11,19 +11,23 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let apName=await crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile][section]
 
+    // Create a list of estimateVersion keys sorted by date
+    let sortedVersionKeys=Object.keys(show.estimateVersions)
+        .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
+        .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
+        .map(ev => ev.key)
+
     // Case: first estimate version
     if (!Object.keys(show.estimateVersions).length) { args.isFirstEstimate=true }
     // Case: requesting specific estimate version
     else if (query.version) {
         args.version=query.version;
-        args.latestVersion=getLatestVersion(show);
         args.weekEnding=show.estimateVersions[query.version].weekEnding;
     }
     //Case: no specified version, default to the cost report's version
     else {
         let version=show.accessMap[apName].estimateVersion
-        args.latestVersion=getLatestVersion(show)
-        version? args.version=version:args.version=args.latestVersion
+        version? args.version=version:args.version=sortedVersionKeys[0]
         args.weekEnding=show.estimateVersions[args.version].weekEnding;
     }
 
@@ -43,7 +47,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         data,
         accessProfile,
         user,
-        apName
+        apName,
+        sortedVersionKeys
     })
 }
 
@@ -120,9 +125,11 @@ module.exports.update=async function (body, showId, user) {
     await show.save();
 
     // Save Set Data
-    let sets=show.estimateVersions[`${ov}`].sets
+    let sets=show.estimateVersions[ov].sets
+    let updatedList=[]
+    const RFSkeys=['Set Code']
     for (item of items) {
-        if (item&&item['Set Code']) {
+        if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
             let set=sets.find(s => s['Set Code']==item['Set Code'])
 
             // Create new set if item doesn't correspond to an existing set
@@ -159,16 +166,19 @@ module.exports.update=async function (body, showId, user) {
                 !accessProfile.columnFilter.includes(key)? set.extraColumnValues[key]=item[key]:
                     set.extraColumnValues[key]=previousValues[key];
             }
+
+            // Add set to updated list
+            updatedList.push(set)
         }
     }
 
-    // Delete sets that are no longer present in grid and are not restricted by an access profile
-    let restrictedItems=crudUtils.getRestrictedItems(show.estimateVersions[ov].sets, accessProfile, 'Set Code')
-    for (set of show.estimateVersions[ov].sets) {
-        if (!items.find(item => item['Set Code']==set['Set Code'])&&!restrictedItems.includes(set['Set Code'])) {
-            delete set
-        }
+    // Add old values for restricted items to the updated List
+    let restrictedItems=await crudUtils.getRestrictedItems(show.estimateVersions[ov].sets, accessProfile, 'Set Code')
+    for (item of restrictedItems) {
+        updatedList.push(item)
     }
+
+    show.estimateVersions[ov].sets=updatedList
 
     // Handle new version or version rename
     if (v!=ov) {

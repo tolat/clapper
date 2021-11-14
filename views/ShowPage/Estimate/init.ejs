@@ -4,10 +4,11 @@
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
+    let _sortedVersionKeys= <%- JSON.stringify(sortedVersionKeys)%>;
 
     let _version=_args.version;
+    let _originalVersion=_args.version
     let _displaySettings=_accessProfile.displaySettings[_apName][_version]||{}
-    let _latestVersion=_args.latestVersion;
     let _extraColumns=[];
     let _fringes={};
     let _mandayRates={};
@@ -99,9 +100,6 @@
         // Set estimate status to saved
         await updateSaveStatus(true);
 
-        // If this is the most recent estimate, put(latest in version display)
-        if (_args.version==_args.latestVersion) { document.getElementById('latest-version-display').innerText='(latest)' }
-
         // if estimate versions exist, populate this version's manday rates and fringes
         if (_show.estimateVersions[_args.version]) {
             // Populate Manday Rates
@@ -134,8 +132,7 @@
         });
 
         // Preliminary saveData (Sets cost report estimate version to this estimate's number)
-        if (Object.keys(_show.estimateVersions)[0]) {
-            saveData()
+        if (_sortedVersionKeys[0]) {
             // If manday rates are not set, open the manday rate modal to set them
             if (!Object.keys(_show.estimateVersions[_args.version].mandayRates)[0]) {
                 toggleManDayRatesModal(true)

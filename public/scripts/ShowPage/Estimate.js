@@ -272,7 +272,7 @@ toggleAddFringeModal=(show, addFringe=false) => {
 // Updates the displayed version name
 updateVersionName=(isNewVersion=false) => {
     if (['', null, undefined, false].includes(document.getElementById('enter-version').value)) { return }
-    document.getElementById('estimate-version-display').innerText=document.getElementById('enter-version').value;
+    _version=document.getElementById('enter-version').value;
     toggleEnterVersionModal(false);
 
     // save estimate as new version and blank if specified, then hide enter version modal
@@ -329,9 +329,6 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
         return
     }
 
-    // Get current version from estimate-version-display. replace '.' with '_' to avoid database bson key problems
-    let currentVersion=document.getElementById('estimate-version-display').innerText.replace('.', '_');
-
     // Post estimate data and version to server
     fetch(server+`/shows/${_show._id}/Estimate`, {
         method: 'POST',
@@ -343,8 +340,8 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             fringes: _fringes,
             departmentTotals: _departmentTotals,
             departments: _show.departments,
-            originalVersion: _version,
-            version: currentVersion,
+            originalVersion: _originalVersion,
+            version: _version,
             departmentColorMap: _show.departmentColorMap,
             isNewVersion: isNewVersion,
             isBlankVersion: isBlankVersion,
@@ -366,8 +363,8 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             // Update Totals
             updateTotalsRow()
             // If a new estimate was created or the version name was changed, navigate to new version page
-            if (isNewVersion||currentVersion!=_version) {
-                window.location=server+`/shows/${_show._id}/Estimate?version=${currentVersion}`;
+            if (isNewVersion||_version!=_originalVersion) {
+                window.location=server+`/shows/${_show._id}/Estimate?version=${_version}`;
             } else {
                 // Update saveStatus
                 updateSaveStatus(true);

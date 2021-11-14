@@ -53,11 +53,11 @@ module.exports.update=async function (body, showId, user) {
     show.markModified('weeks');
 
     // Save items
+    let updatedList={}
+    const RFSkeys=['Name', 'Department', 'Code', 'Rate']
     for (item of body.data) {
-        const RFSkeys=['Name', 'Department', 'Code', 'Rate']
-        if (item&&crudUtils.isValidItem(item, RFSkeys, accessProfile)) {
+        if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
             let pos=week.positions.positionList[item['Code']]||{}
-            week.positions.positionList[item['Code']]=pos
 
             // Set core position values
             for (key of ['Name', 'Department', 'Rate', 'Code']) {
@@ -73,19 +73,21 @@ module.exports.update=async function (body, showId, user) {
                 !accessProfile.columnFilter.includes(key)? pos.extraColumnValues[key]=item[key]:
                     pos.extraColumnValues[key]=previousValues[key]
             }
+
+            // Add pos to the updated list
+            updatedList[item['Code']]=pos
         }
     }
 
-    // Delete positions that aren't in the grid
+    // Add old values for restricted items to the updated List
     let positionItems=await Object.keys(week.positions.positionList)
         .map(pCode => { let p=week.positions.positionList[pCode]; p.Code=pCode; return p })
     let restrictedItems=await crudUtils.getRestrictedItems(positionItems, accessProfile, 'Code')
-    for (posCode in week.positions.positionList) {
-        if (!body.data.find(item => item['Code']==posCode)&&!restrictedItems.includes(posCode)) {
-            delete week.positions.positionList[posCode]
-        }
+    for (item of restrictedItems) {
+        updatedList[item.Code]=week.positions.positionList[item.Code]
     }
 
+    week.positions.positionList=updatedList
     await show.save();
 
     // Create new id if new week is being created

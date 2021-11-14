@@ -28,14 +28,7 @@
             style="background-image: url('/public/images/undo.png'); "></button>
         <button type="button" onclick="redoCellEdit()" class="toolbar-icon"
             style="background-image: url('/public/images/redo.png'); "></button>
-        <div class="grid-toolbar-item" id="estimate-version" style="font-weight: bold;">Version:
-            <div id="estimate-version-display" style="margin-left: 5px;">
-                <% if(args.version) { %>
-                    <%=args.version.replace('_', '.' ) %>
-                        <% } %>
-            </div>
-            <div id='latest-version-display' style="margin-left: 5px; color: rgb(108, 117, 124);">
-            </div>
+        <div class="grid-toolbar-item" style="font-weight: bold;">
             <div id="save-status" style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
                 saved
             </div>

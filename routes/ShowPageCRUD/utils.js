@@ -222,6 +222,16 @@ module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier)
     return restrictedItems
 }
 
+// Returns true if item has values restricted by the accessProfile
+module.exports.isRestrictedItem=function (item, accessProfile) {
+    for (column in accessProfile.dataFilter) {
+        if (item[column]==accessProfile.dataFilter[column]) {
+            return true
+        }
+    }
+    return false
+}
+
 // Checks if item has valid required-for-save fields filled
 module.exports.isValidItem=function (item, RFSkeys, _accessProfile) {
     for (key of RFSkeys) {

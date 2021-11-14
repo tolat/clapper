@@ -31,7 +31,13 @@ const seedShows=async () => {
         const show=new Show({
             'Name': showNames[i],
             departments: departmentNames,
-            departmentColorMap: {},
+            departmentColorMap: {
+                'Construction': '#FF7575',
+                'Paint': '#FFF475',
+                'Greens': '#5FF283',
+                'Metal Fab': '#5FC5F2',
+                'Sculptors': '#FFFFFF'
+            },
             weeks: [{
                 _id: firstWeekId,
                 end: firstWeekEnd,
@@ -152,7 +158,11 @@ const seedShows=async () => {
                     'Rentals': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: {}
+                        displaySettings: {
+                            'pigsinpyjamas@yahoo-ca': {
+                                [`${firstWeekId}`]: {}
+                            }
+                        }
                     },
                     'Crew': {
                         columnFilter: [],
@@ -227,15 +237,6 @@ const seedShows=async () => {
             },
         })
 
-        // Assign random colours to departments
-        let hexVals=['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        for (d of show.departments) {
-            let color='#';
-            for (let i=0; i<6; i++) {
-                color=color.concat(hexVals[randInt(0, hexVals.length)]);
-            }
-            show.departmentColorMap[d]=color;
-        }
         await show.save();
     }
 }
@@ -403,7 +404,7 @@ const seedPurchases=async () => {
 }
 
 const seedRentals=async () => {
-    const shows=await Show.find().populate('sets').populate('weeks.crew.crewList').populate('positions.positionList')
+    const shows=await Show.find().populate('weeks.crew.crewList')
     for (show of shows) {
         let rentalNames=[
             'Construction Coordinator Kit',
@@ -428,7 +429,7 @@ const seedRentals=async () => {
             let rental={
                 'Set Code': set['Set Code'],
                 'Day Rate': Math.floor(randInt(10, 300)/10)*10,
-                'Description': rentalNames[i],
+                'Rental Name': rentalNames[i],
                 'Days Rented': randInt(0, 7),
                 'Code': rentalPositions[i],
                 taxColumnValues: {

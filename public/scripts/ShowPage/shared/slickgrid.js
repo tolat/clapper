@@ -1784,17 +1784,27 @@ setWeekEnding=() => {
         return
     }
     _week=_args.week
-    let weekEnd=new Date(_week.end)
-    let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
+
+    // If in estimate page, show the version in the week ending display, and the date created in the toolbar
     if (_args.section=='Estimate') {
-        weekEndingText=`Date Created: ${new Date(_show.estimateVersions[_version].dateCreated).toLocaleDateString('en-US')}`
-        document.getElementById('week-ending-display-container').classList.add('no-hover-style')
+        let dateCreatedText=`Date Created: ${new Date(_show.estimateVersions[_version].dateCreated).toLocaleDateString('en-US')}`
+
+        document.getElementById('week-ending-display').style.color='black'
+        document.getElementById('week-ending-display').innerText=`Estimate Version: ${_version}`
+        document.getElementById('week-ending-display-container').onclick=function () { toggleOpenVersionModal(true) }
+        if (_version==_sortedVersionKeys[0]) {
+            document.getElementById('week-ending-display-container').style.color='grey'
+            document.getElementById('week-ending-display-container').innerHTML+='&nbsp- Latest'
+        }
     } else {
-        if (_args.weekList[0]._id==_week._id) {
+        let weekEnd=new Date(_week.end)
+        let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
+        if (_args.weekList[_args.weekList.length-1]._id==_week._id) {
             document.getElementById('week-ending-latest-indicator').style.display='flex'
         }
+        document.getElementById('week-ending-display').innerText=weekEndingText
+
     }
-    document.getElementById('week-ending-display').innerText=weekEndingText
 }
 
 // Toggles delete week warning modal and deletes week if specified

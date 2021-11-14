@@ -1,17 +1,32 @@
 <script>
     // Global variables
     var _show= <%- JSON.stringify(show)%>;
-    var _args= <%- JSON.stringify(args)%>;
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    let _user= <%- JSON.stringify(user)%>;
+    let _apName= <%- JSON.stringify(apName)%>;
+    let _currentWeekSetCodes= <%- JSON.stringify(currentWeekSetCodes)%>;
     setWeekEnding()
 
     var _extraColumns=_week.rentals.extraColumns;
     var _validators=[
         {
+            fields: ['Rental Name'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`${field} Invalid!`;
+                this.validationMessage=`${field} already exists.`;
+                if (!args.item[field]) {
+                    return false
+                } else {
+                    return dataView.getItems().find(i => i[field]==args.item[field]&&!i.id==args.item.id);
+                }
+            }
+        },
+        {
             fields: ['Day Rate', 'Days Rented'],
             isInvalid: function (args, field) {
                 this.validationHeader=`${field} Invalid!`;
                 this.validationMessage=`${field} must be a number.`;
-                return isNaN(parseFloat(args.item[field]));
+                return isNaN(parseFloat(args.item[field]))&&args.item[field];
             }
         },
         {
@@ -33,7 +48,7 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Set '${args.item[field]}' Not Found!`
                 this.validationMessage=`New sets can only be added in the 'Estimates' page.`
-                return !_show.sets.find(s => s['Set Code']==args.item['Set Code'])
+                return !_currentWeekSetCodes.find(s => s==args.item['Set Code'])&&args.item[field]
             }
         },
         {
@@ -41,7 +56,7 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Position '${args.item[field]}' Not Found!`
                 this.validationMessage=`New positions can only be added in the 'Rates' page.\nPosition codes are case-sensitive!`
-                return !_show.positions.positionList.find(p => p['Code']==args.item['Code'])&&item['Code']!=undefined
+                return !_week.positions.positionList[args.item['Code']]&&args.item['Code']!=undefined
             }
         },
         {
@@ -49,6 +64,7 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Department '${args.item[field]}' Not Found!`
                 this.validationMessage=`New departments can only be added in the 'Estimates' page.\nDepartments are case-sensitive!`
+                if (!args.item[field]||args.item[field]=="") { return false }
                 let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
                 let dep=false;
                 if (depIdx>=0) {
@@ -64,6 +80,7 @@
     var _allShowCrew=_args.allShowCrew
     var _allUsers=_args.allUsers
     var _taxColumns=_week.rentals.taxColumns
+    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
 
     var _allShowCrewNames=[]
     var _allShowCrewUsers=[]
@@ -84,7 +101,7 @@
         var options=await initializeOptions();
 
         // Create grid data
-        var data=await initializeData(rentals);
+        let data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
         var columns=await initializeColumns(rentals);
@@ -120,7 +137,7 @@
         }
 
         // Apply display settings to grid
-        applyDisplaySettings(_week.rentals.displaySettings)
+        applyDisplaySettings(_displaySettings)
 
         // Calculate all rental weekly totals
         await calculateAllWeeklyTotals();
@@ -129,53 +146,13 @@
         await updateTotalsRow();
     }
 
-    // Creates grid data 
-    function initializeData(rentals) {
-        let data=[];
-
-        for (let i=0; i<rentals.length; i++) {
-            let item={
-                id: 'id_'+i,
-                '#': rentals[i]['#'],
-                'Day Rate': rentals[i]['Day Rate'],
-                'Days Rented': rentals[i]['Days Rented'],
-                'Description': rentals[i]['Description'],
-                'Department': rentals[i]['Department'],
-                'Set Code': rentals[i]['Set Code'],
-                'Supplier': rentals[i]['Supplier'],
-                editedfields: []
-            }
-
-            if (rentals[i]['Code']) {
-                item['Code']=rentals[i]['Code']
-            }
-
-            for (taxCol of _week.rentals.taxColumns) {
-                item[taxCol]=zeroNanToNull(parseFloat(rentals[i].taxColumnValues[taxCol]))
-            }
-
-            for (extraCol of _week.rentals.extraColumns) {
-                item[extraCol]=rentals[i].extraColumnValues[extraCol]
-            }
-
-            item['Week Total']=getWeekTotal(item)
-
-            data.push(item);
-        }
-
-        // Sort data by #
-        data=sortByNumber(data);
-
-        return data;
-    }
-
     // Creates grid columns 
     function initializeColumns(positions) {
         let columns=[
             { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true },
-            { id: "Description", name: "Description", field: "Description", width: 200, editor: Slick.Editors.Text, sortable: true },
+            { id: "Rental Name", name: "Rental Name", field: "Rental Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Day Rate", name: "Day Rate", field: "Day Rate", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save currency' },
-            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _show.sets.map(s => s['Set Code']), sortable: true, cssClass: 'required-for-save' },
+            { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _currentWeekSetCodes, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 90, sortable: true, editor: AutoCompleteEditor, dataSource: _show.departments, cssClass: 'required-for-save' },
             { id: "Days Rented", name: "Days Rented", field: "Days Rented", width: 90, editor: Slick.Editors.Text, sortable: true },
             { id: "Supplier", name: "Supplier", field: "Supplier", width: 150, sortable: true, editor: AutoCompleteEditor, dataSource: _allShowCrewNames },

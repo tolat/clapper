@@ -57,9 +57,10 @@ module.exports.update=async function (body, showId, user) {
     show.markModified('purchases.taxColumns')
 
     // Update Purchases
+    let updatedList=[]
     for (item of body.data) {
         const RFSkeys=['Set Code', 'Department', 'PO Num', 'Date']
-        if (item&&crudUtils.isValidItem(item, RFSkeys, accessProfile)) {
+        if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
             // Find existing purchase 
             let p=await show.purchases.purchaseList.find(purch => purch['PO Num']==item['PO Num'])
 
@@ -94,20 +95,19 @@ module.exports.update=async function (body, showId, user) {
                 !accessProfile.columnFilter.includes(key)? p.taxColumnValues[key]=item[key]:
                     p.taxColumnValues[key]=previousValues[key]
             }
+
+            // Add position to updated List
+            updatedList.push(p)
         }
     }
 
-    // Delete purchases that aren't in the grid
+    // Add old values for restricted items to the updated List
     let restrictedItems=await crudUtils.getRestrictedItems(show.purchases.purchaseList, accessProfile, 'PO Num')
-    let newPurchaseList=[]
-    for (purchase of show.purchases.purchaseList) {
-        if (body.data.find(item => item['PO Num']==purchase['PO Num'])||restrictedItems.includes(purchase['PO Num']))
-            newPurchaseList.push(purchase)
-        else
-            delete purchase
+    for (item of restrictedItems) {
+        updatedList.push(item)
     }
 
-    show.purchases.purchaseList=newPurchaseList
+    show.purchases.purchaseList=updatedList
     show.markModified('purchases')
     await show.save()
 
