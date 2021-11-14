@@ -104,7 +104,7 @@ module.exports.update=async function (body, showId, user) {
     // Add old values for restricted items to the updated List
     let restrictedItems=await crudUtils.getRestrictedItems(show.purchases.purchaseList, accessProfile, 'PO Num')
     for (item of restrictedItems) {
-        updatedList.push(item)
+        updatedList.push(show.purchases.purchaseList.find(p => p['PO Num']==item)
     }
 
     show.purchases.purchaseList=updatedList
