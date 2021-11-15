@@ -31,10 +31,13 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         args.weekEnding=show.estimateVersions[args.version].weekEnding;
     }
 
-    // Initialize data for the grid, applying the access profile
+    // Initialize data for the grid, applying the access profile. also update current estimate version
     let data=[]
     if (args.version) {
         data=await initializeData(show.estimateVersions[`${args.version}`].sets, show, args, args.version, accessProfile)
+        show.accessMap[apName].estimateVersion=args.version
+        show.markModified('accessMap')
+        await show.save()
     }
 
     res.render('ShowPage/Template', {
@@ -197,7 +200,7 @@ module.exports.update=async function (body, showId, user) {
         else {
             show.estimateVersions[v].dateCreated=new Date(Date.now())
 
-            // Add displaysettings for cost report page
+            // Add displaysettings for cost report page 
             show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][v]={
                 [`${show.accessMap[apName].currentWeek}`]: {}
             }
