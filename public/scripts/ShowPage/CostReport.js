@@ -282,7 +282,7 @@ toggleOpenVersionModal=(show) => {
 
 // Set estimate version
 openEstimate=(version) => {
-    console.log(version)
+    toggleOpenVersionModal(false)
     saveData(true, version);
 }
 
