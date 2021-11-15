@@ -259,7 +259,7 @@ autoFillUserData=(args) => {
                     let Name=item['Name'].slice(item['Name'].indexOf('[')+1, item['Name'].indexOf(']'))
                     let username=_allUsernames.find(u => u==Name)
                     item['username']=username
-                    item['Name']=Name
+                    item['Name']=item['Name'].slice(0, item['Name'].indexOf('['))
                 }
             }
             // Populate Name from username if username exists

@@ -126,19 +126,25 @@ module.exports.update=async function (body, showId, user) {
             }
 
             // Save extra column values, deferring to previous value if this column in restricted
-            let previousValues=record.weeksWorked[week._id].extraColumnValues
-            record.weeksWorked[week._id].extraColumnValues={}
+            let previousValues=record.weeksWorked[week._id].extraColumnValues[item['Position']]||false
+            record.weeksWorked[week._id].extraColumnValues[item['Position']]={}
             for (key of body.extraColumns) {
-                !accessProfile.columnFilter.includes(key)? record.weeksWorked[week._id].extraColumnValues[key]=item[key]:
-                    record.weeksWorked[week._id].extraColumnValues[key]=previousValues[key]
+                if (!accessProfile.columnFilter.includes(key)) {
+                    record.weeksWorked[week._id].extraColumnValues[item['Position']][key]=item[key]
+                } else if (previousValues) {
+                    record.weeksWorked[week._id].extraColumnValues[item['Position']][key]=previousValues[key]
+                }
             }
 
-            // Save tax column values, deferring to previous value if this column in restricted
-            previousValues=record.weeksWorked[week._id].taxColumnValues
-            record.weeksWorked[week._id].taxColumnValues={}
+            // Save extra column values, deferring to previous value if this column in restricted
+            previousValues=record.weeksWorked[week._id].taxColumnValues[item['Position']]||false
+            record.weeksWorked[week._id].taxColumnValues[item['Position']]={}
             for (key of body.taxColumns) {
-                !accessProfile.columnFilter.includes(key)? record.weeksWorked[week._id].taxColumnValues[key]=item[key]:
-                    record.weeksWorked[week._id].taxColumnValues[key]=previousValues[key]
+                if (!accessProfile.columnFilter.includes(key)) {
+                    record.weeksWorked[week._id].taxColumnValues[item['Position']][key]=item[key]
+                } else if (previousValues) {
+                    record.weeksWorked[week._id].taxColumnValues[item['Position']][key]=previousValues[key]
+                }
             }
 
             // Update date joined
@@ -203,7 +209,6 @@ module.exports.update=async function (body, showId, user) {
         await user.save()
     }
 
-
     // Add old values for restricted items to the updated List. use initialize data to make items with old values for this week
     let oldShow=await Show.findById(show._id).populate('weeks.crew.crewList')
     let oldWeek=oldShow.weeks.find(w => w._id==week._id)
@@ -265,6 +270,13 @@ function initializeData(crew, _show, week, accessProfile=false) {
                     }
                 }
 
+                // Add extra column values
+                for (col of week.crew.extraColumns) {
+                    if (record.weeksWorked[week._id].extraColumnValues[pos.code]) {
+                        item[col]=record.weeksWorked[week._id].extraColumnValues[pos.code][col];
+                    }
+                }
+
                 // Load hours and setscodes for each day of this week ending
                 item=loadUserHours(pos, item, currentWeekDays);
 
@@ -273,13 +285,6 @@ function initializeData(crew, _show, week, accessProfile=false) {
 
                 // Calculate weekly pay total and load it
                 item['Total']=numUtils.zeroNanToNull(calculateWeeklyTotal(item, week, currentWeekDays));
-
-                // Add extra column values
-                for (col of week.crew.extraColumns) {
-                    if (record.weeksWorked[week._id].extraColumnValues[pos.code]) {
-                        item[col]=record.weeksWorked[week._id].extraColumnValues[pos.code][col];
-                    }
-                }
 
                 data.push(item);
 
