@@ -8,7 +8,6 @@ const ShowSchema=new Schema({
     owner: String,
     weeks: [{
         _id: String,
-        number: Number,
         end: Date,
         multipliers: Object,
         crew: {

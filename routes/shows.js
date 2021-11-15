@@ -89,7 +89,6 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     let newWeek={
         _id: show.currentWeek,
         end: new Date(req.body.show.firstweekending+'T07:00'),
-        number: 1,
         multipliers: {
             0: {
                 Mon: 1,
@@ -103,7 +102,6 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
         },
         crew: {
             crewList: [],
-            displaySettings: {},
             extraColumns: [],
             taxColumns: []
         },
@@ -111,8 +109,11 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
             rentalList: [],
             extraColumns: [],
             taxColumns: [],
-            displaySettings: {}
         },
+        positions: {
+            extraColumns: [],
+            positionList: {}
+        }
     }
 
     show.timesheets.currentMap=undefined

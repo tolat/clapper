@@ -37,6 +37,17 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         data=await initializeData(show.estimateVersions[`${args.version}`].sets, show, args, args.version, accessProfile)
         show.accessMap[apName].estimateVersion=args.version
         show.markModified('accessMap')
+
+        // Make sure cost report section of access profile has a display settings entry for this version
+        if (!show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][args.version]) {
+            let week=show.accessMap[apName].currentWeek
+            let dSettings;
+            week? dSettings={ [`${week}`]: {} }:dSettings={}
+            show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][args.version]=dSettings
+            show.markModified('accessProfiles')
+        }
+
+        console.log(show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings)
         await show.save()
     }
 

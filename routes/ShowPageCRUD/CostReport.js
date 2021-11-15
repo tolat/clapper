@@ -123,7 +123,10 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
     let data=[];
     let mandayRates=show.estimateVersions[estimateVersion].mandayRates
     let fringes=show.estimateVersions[estimateVersion].fringes
-    let totalFringe=Object.keys(fringes).map(k => { return numUtils.zeroNanToNull(parseFloat(fringes[k]))||0 }).reduce((p, c) => p+c)/100+1
+    let totalFringe=0
+    if (Object.keys(fringes)[0]) {
+        totalFringe=Object.keys(fringes).map(k => { return numUtils.zeroNanToNull(parseFloat(fringes[k]))||0 }).reduce((p, c) => p+c)/100+1
+    }
 
     for (let i=0; i<sets.length; i++) {
         let item={
