@@ -776,6 +776,11 @@ reorderColumns=(columnOrder) => {
         }
     }
     else { newColumns=columns }
+
+    // Add columns that are not accounted for by the column ordering 
+    let unaccountedForCols=columns.filter(c => !newColumns.find(clm => clm.name==c.name))
+    newColumns.push(...unaccountedForCols)
+
     grid.setColumns(newColumns);
 }
 
