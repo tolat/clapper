@@ -200,7 +200,7 @@ calculateCosts=(item) => {
 }
 
 // Save cost report
-saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
+saveData=(reload=false, updateVersion=false) => {
     if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
 
     // Indicate grid is saving
@@ -228,7 +228,7 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
         body: JSON.stringify({
             data: dataView.getItems(),
             extraColumns: _extraColumns,
-            estimateVersion: estimateVersion,
+            updateVersion: updateVersion,
             totals: updateTotalsRow(),
             newWeek: _newWeek,
             weeks: _show.weeks,
@@ -246,7 +246,6 @@ saveData=(reload=false, estimateVersion=_show.costReport.estimateVersion) => {
     })
         .then(response => { return response.text(); })
         .then(responseData => {
-            console.log(responseData)
             if (reload) { location.reload() }
             else {
                 // Update saveStatus
@@ -283,6 +282,7 @@ toggleOpenVersionModal=(show) => {
 
 // Set estimate version
 openEstimate=(version) => {
+    console.log(version)
     saveData(true, version);
 }
 

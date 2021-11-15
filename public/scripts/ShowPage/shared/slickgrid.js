@@ -1,27 +1,27 @@
 // Global Variables
-var _contextCell
-var _itemBeforeEdit
-var _test=false
-var _groupedBy
-var _editDirectionForwards=true
-var _validEdit=true
-var _week=null
-var _frozenColumns=0
-var _dataSaved=true
-var _cellCssStyles={}
-var _newWeek=false
-var _deletedWeek=false
-var _showrecordWeekMap={}
-var _prevColumns
-var _prevColMap
-var _prevDepartmentOrder
-var _overrideBlankRFSWarning=false
-var _headerDblCLick=false
-var _colSortMap={}
-var _userYesNo=true
+let _contextCell
+let _itemBeforeEdit
+let _test=false
+let _groupedBy
+let _editDirectionForwards=true
+let _validEdit=true
+let _week=null
+let _frozenColumns=0
+let _dataSaved=true
+let _cellCssStyles={}
+let _newWeek=false
+let _deletedWeek=false
+let _showrecordWeekMap={}
+let _prevColumns
+let _prevColMap
+let _prevDepartmentOrder
+let _overrideBlankRFSWarning=false
+let _headerDblCLick=false
+let _colSortMap={}
+let _userYesNo=true
 
 // Edit History Buffer
-var undoRedoBuffer={
+let undoRedoBuffer={
     commandQueue: [],
     commandCtr: 0,
 }
@@ -29,11 +29,11 @@ var undoRedoBuffer={
 const alphabet='abcdefghijklmnopqrstuvwxyz1234567890'.split('');
 const oneDay=24*60*60*1000;
 
-var server;
-var newRowIds=0;
+let server;
+let newRowIds=0;
 
 // Currency formatter
-var formatter=new Intl.NumberFormat('en-US', {
+let formatter=new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
 });

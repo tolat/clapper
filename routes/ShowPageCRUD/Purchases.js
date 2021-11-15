@@ -11,12 +11,14 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let apName=crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile][section]
 
+    args.version=show.accessMap[apName].estimateVersion
+
     // Generate grid data
     let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
-    let data=initializeData(show.purchases.purchaseList, show, args, week, accessProfile)
+    let data=initializeData(show.purchases.purchaseList, show, args, week, accessProfile, args.version)
 
     // Generate array of all set codes in current estimate version
-    let allSetCodes=show.estimateVersions[show.costReport.estimateVersion].sets.map(s => s['Set Code'])
+    let allSetCodes=show.estimateVersions[args.version].sets.map(s => s['Set Code'])
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
@@ -125,7 +127,7 @@ module.exports.update=async function (body, showId, user) {
 }
 
 // Creates grid data 
-function initializeData(purchases, _show, _args, week, accessProfile) {
+function initializeData(purchases, _show, _args, week, accessProfile, version) {
     let _taxColumns=_show.purchases.taxColumns
     let data=[];
 
@@ -154,7 +156,7 @@ function initializeData(purchases, _show, _args, week, accessProfile) {
         item=updatePurchaseTotal(item, _taxColumns);
 
         // Load set data into purchase
-        let set=_show.estimateVersions[_show.costReport.estimateVersion].sets.find(s => s['Set Code']==purchases[i]['Set Code'])
+        let set=_show.estimateVersions[version].sets.find(s => s['Set Code']==purchases[i]['Set Code'])
         if (set) {
             item['Set Code']=set['Set Code'];
             item['Episode']=set['Episode'];

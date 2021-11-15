@@ -297,7 +297,7 @@ deleteVersion=() => {
     toggleDeleteVersionModal(false);
 
     // Get current version from estimate-version-display. replace '.' with '_' to avoid database bson key problems
-    let currentVersion=document.getElementById('estimate-version-display').innerText.replace('.', '_');
+    let currentVersion=_version
 
     fetch(server+`/shows/${_show._id}/Estimate`, {
         method: 'DELETE',

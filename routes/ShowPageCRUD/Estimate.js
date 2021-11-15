@@ -194,7 +194,15 @@ module.exports.update=async function (body, showId, user) {
             show.estimateVersions[v].extraColumns=[]
         }
         if (!isNewVersion) { delete show.estimateVersions[ov] }
-        else { show.estimateVersions[v].dateCreated=new Date(Date.now()) }
+        else {
+            show.estimateVersions[v].dateCreated=new Date(Date.now())
+
+            // Add displaysettings for cost report page
+            show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][v]={
+                [`${show.accessMap[apName].currentWeek}`]: {}
+            }
+            show.markModified('accessProfiles')
+        }
     }
 
     await show.markModified('estimateVersions')

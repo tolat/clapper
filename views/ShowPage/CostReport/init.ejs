@@ -1,22 +1,24 @@
 <script>
     // Global variables
     var _show= <%- JSON.stringify(show)%>;
-    var _args= <%- JSON.stringify(args)%>;
+    let _accessProfile= <%- JSON.stringify(accessProfile)%>;
+    let _user= <%- JSON.stringify(user)%>;
+    let _apName= <%- JSON.stringify(apName)%>;
+    let _estimateVersion= <%- JSON.stringify(estimateVersion)%>;
     setWeekEnding()
 
     var _extraColumns=_show.costReport.extraColumns;
     var _validators=[];
     var _totals={ Budget: 'sum', 'To Date': 'sum', Remaining: 'sum' };
     var _showCrew=_args.showCrew
+    let _displaySettings=_accessProfile.displaySettings[_apName][_estimateVersion][_week._id]||{}
 
     // Set correct version, defaulting to latest version if the cost report's version has been deleted or renamed
-    var _version=_show.costReport.estimateVersion;
-    if (!Object.keys(_show.estimateVersions).includes(_version)) {
-        _version=getLatestVersion();
-        _show.costReport.estimateVersion=_version;
-        document.getElementById('cost-report-estimate-version-display').innerText=`\xa0${_version.replace('_', '.')}`;
-    }
-    if (_version==getLatestVersion()) {
+    var _version=_args.version
+    document.getElementById('cost-report-estimate-version-display').innerText=`\xa0${_version.replace('_', '.')}`;
+
+    // indicate if currently working with latest estimate version
+    if (_version==_args.latestVersion) {
         document.getElementById('cost-report-estimate-version-display').innerHTML+=`
         <div style="color: grey; margin-left: 5px">(latest)</div`;
     }
@@ -32,7 +34,7 @@
         var options=await initializeOptions();
 
         // Create grid data
-        var data=await initializeData(sets);
+        let data=<%- JSON.stringify(data)%>;
 
         // Create grid columns
         var columns=await initializeColumns(sets);
@@ -50,105 +52,16 @@
         })
 
         // Apply display settings to grid
-        if (_show.costReport.displaySettings) { await applyDisplaySettings(_show.costReport.displaySettings) }
+        applyDisplaySettings(_displaySettings)
 
         // Calcualte totals for totals footer row
         await updateTotalsRow();
-
-        // Add any cols that have been erased by the display settings
-        await addMissingCols(columns);
 
         // Reorder departments
         await reorderDepartments();
         undoRedoBuffer.commandQueue.pop()
         undoRedoBuffer.commandCtr--
-
-        // Save cost report so the totals variables for the shows table on the homepage are updated
-        await saveData();
-    }
-
-    // Creates grid data 
-    function initializeData(sets) {
-        let data=[];
-
-        for (let i=0; i<sets.length; i++) {
-            let item={
-                id: 'id_'+i,
-                setid: sets[i]._id,
-                // Core features
-                ['Set Code']: sets[i]['Set Code'],
-                ['Episode']: sets[i]['Episode'],
-                ['Name']: sets[i]['Name'],
-            }
-
-            // Set # 
-            item['#']=_show.costReport.setNumberMap[sets[i]['Set Code']];
-
-            // Initialize overall totals
-            let costs=calculateCosts(item);
-
-            // Set total cost keys to 0
-            let costKeys=['To Date', 'This Week', 'Labor', 'Man Days', 'Materials', 'Rentals'];
-            item['Budget']=zeroNanToNull(parseFloat(calculateBudget(item)).toFixed(2));
-            for (key of costKeys) { item[key]=0 }
-
-            // Add department split-out costs
-            for (d of _show.departments) {
-                let labor=costs[0][d].total;
-                let materials=costs[1][d].total;
-                let rentals=costs[2][d].total;
-                let week=costs[0][d].week+costs[1][d].week+costs[2][d].week;
-                let mandays=costs[0][d].mandays
-
-                item[`${d}_week`]=zeroNanToNull(week.toFixed(2));
-                item[`${d}_todate`]=zeroNanToNull((labor+materials+rentals).toFixed(2));
-                item[`${d}_budget`]=zeroNanToNull((sets[i].estimateTotals[_version].departmentTotals[d]).toFixed(2));
-                item[`${d}_labor`]=zeroNanToNull(labor.toFixed(2));
-                item[`${d}_materials`]=zeroNanToNull(materials.toFixed(2));
-                item[`${d}_rentals`]=zeroNanToNull(rentals.toFixed(2));
-                item[`${d}_mandays`]=zeroNanToNull(mandays.toFixed(2));
-
-                // Calculate precent remaining
-                let pctRemaining=((item[`${d}_budget`]-item[`${d}_todate`])/item[`${d}_budget`]*100);
-                if (isNaN(pctRemaining)) { pctRemaining=0 }
-                item[`${d}_pctremaining`]=zeroNanToNull(pctRemaining.toFixed(0));
-
-                item['Labor']+=labor;
-                item['Man Days']+=mandays;
-                item['Materials']+=materials;
-                item['Rentals']+=rentals;
-                item['This Week']+=week;
-                item['To Date']+=labor+materials+rentals;
-            }
-
-            // Calculate and set overall remaining 
-            if (!item['Budget']&&item['To Date']>0&&item['To Date']!=null) {
-                item['Remaining']=-item['To Date']
-            } else {
-                item['Remaining']=zeroNanToNull((parseFloat(item['Budget'])-parseFloat(item['To Date'])).toFixed(2));
-            }
-
-            // Calculate and set overall % remaining
-            if (item['Budget']!=0) { item['% Remaining']=zeroNanToNull((item['Remaining']/item['Budget']*100).toFixed(0)) }
-
-            // Set total costs to 2 decimal places and set to null if 0 or Nan
-            for (key of costKeys) {
-                item[key]=zeroNanToNull(parseFloat(item[key]).toFixed(2));
-            }
-
-            // Add extra column values
-            for (col of _show.costReport.extraColumns) {
-                let map=_show.costReport.setExtraColumnMap[item['Set Code']];
-                if (map) { item[col]=map[col] }
-            }
-
-            data.push(item);
-        }
-
-        // Sort data by #
-        data=sortByNumber(data);
-
-        return data;
+        updateSaveStatus(true)
     }
 
     // Creates grid columns 

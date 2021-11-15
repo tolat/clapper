@@ -2,6 +2,7 @@ const { populateShow }=require('../../utils/schemaUtils')
 const { genUniqueId }=require('../../utils/numberUtils')
 const Show=require('../../models/show')
 const User=require('../../models/user')
+const oneDay=24*60*60*1000;
 
 // Returns array of dates representing the current week
 module.exports.getDaysOfWeekEnding=(date) => {
@@ -263,7 +264,7 @@ module.exports.getAccessProfileName=function (user=false, username=false) {
 }
 
 // Get the week from the show given a date
-module.exports.findFirstContainingWeek=(day, weeks) => {
+module.exports.findFirstContainingWeek=function (day, weeks) {
     const oneDay=24*60*60*1000;
     let dateMS=new Date(day).getTime()
     for (week of weeks) {
@@ -273,5 +274,40 @@ module.exports.findFirstContainingWeek=(day, weeks) => {
         }
     }
     return false
+}
+
+module.exports.calculateDailyLaborCost=function (multipliers, hours, rate, day) {
+    let total=0;
+
+    // Sort multipliers
+    let multiplierKeys=Object.keys(multipliers).sort((a, b) => { return a-b });
+
+    // Calculate the multiplied hours and total payout in each multiplier interval
+    let totalNonUnitHours=0;
+    for (let i=0; i<multiplierKeys.length; i++) {
+        let multipliedHours=0;
+
+        if (multiplierKeys[i+1]&&hours>multiplierKeys[i+1]) {
+            multipliedHours=multiplierKeys[i+1]-multiplierKeys[i];
+        } else if (hours>multiplierKeys[i]) {
+            multipliedHours=hours-multiplierKeys[i]
+        }
+
+        total+=multipliedHours*multipliers[multiplierKeys[i]][day]*rate;
+        totalNonUnitHours+=multipliedHours;
+    }
+    total+=(hours-totalNonUnitHours)*rate;
+
+    return total;
+}
+
+module.exports.isInCurrentWeek=function (day, user, _week) {
+    let dateMS=new Date(day).getTime()
+    let weekEndMS=new Date(_week.end).getTime()
+    if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
+        if (_week.crew.crewList.find(c => c.username==user.username)) {
+            return true
+        }
+    }
 }
 

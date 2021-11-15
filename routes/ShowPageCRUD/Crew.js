@@ -377,7 +377,7 @@ function calculateWeeklyTotal(item, _week, _currentWeekDays) {
     for (date of _currentWeekDays) {
         let day=date.toString().slice(0, 3);
         let hours=numUtils.zeroNanToNull(parseFloat(item[day]))||0
-        total+=calculateDailyLaborCost(_week.multipliers, hours, rate, day);
+        total+=crudUtils.calculateDailyLaborCost(_week.multipliers, hours, rate, day);
     }
 
     // Add tax and rentals to make final total
@@ -388,32 +388,6 @@ function calculateWeeklyTotal(item, _week, _currentWeekDays) {
     }
 
     return (total*(tax/100+1)+rentals).toFixed(2);
-}
-
-// Calculates the daily labor cost given multipliers, hours, rate, and day
-function calculateDailyLaborCost(multipliers, hours, rate, day) {
-    let total=0;
-
-    // Sort multipliers
-    let multiplierKeys=Object.keys(multipliers).sort((a, b) => { return a-b });
-
-    // Calculate the multiplied hours and total payout in each multiplier interval
-    let totalNonUnitHours=0;
-    for (let i=0; i<multiplierKeys.length; i++) {
-        let multipliedHours=0;
-
-        if (multiplierKeys[i+1]&&hours>multiplierKeys[i+1]) {
-            multipliedHours=multiplierKeys[i+1]-multiplierKeys[i];
-        } else if (hours>multiplierKeys[i]) {
-            multipliedHours=hours-multiplierKeys[i]
-        }
-
-        total+=multipliedHours*multipliers[multiplierKeys[i]][day]*rate;
-        totalNonUnitHours+=multipliedHours;
-    }
-    total+=(hours-totalNonUnitHours)*rate;
-
-    return total;
 }
 
 // Deletes daysworked for a position in specified week

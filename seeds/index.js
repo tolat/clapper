@@ -93,10 +93,7 @@ const seedShows=async () => {
                 purchaseList: []
             },
             costReport: {
-                displaySettings: {},
                 extraColumns: [],
-                estimateVersion: '100',
-                setNumberMap: {},
                 setExtraColumnMap: {},
             },
             timesheets: {
@@ -135,7 +132,13 @@ const seedShows=async () => {
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: {}
+                        displaySettings: {
+                            'pigsinpyjamas@yahoo-ca': {
+                                100: {
+                                    [`${firstWeekId}`]: {}
+                                }
+                            }
+                        }
                     },
                     'Estimate': {
                         columnFilter: ['Location', 'Notes'],
@@ -192,7 +195,13 @@ const seedShows=async () => {
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
-                        displaySettings: { 'torin-olat@gmail-com': {} }
+                        displaySettings: {
+                            'torin-olat@gmail-com': {
+                                100: {
+                                    [`${firstWeekId}`]: {}
+                                }
+                            }
+                        }
                     },
                     'Estimate': {
                         columnFilter: [],
