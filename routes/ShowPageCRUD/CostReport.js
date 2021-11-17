@@ -67,15 +67,14 @@ module.exports.update=async function (body, showId, user) {
     show.costReport.extraColumns=body.extraColumns;
     show.markModified('costReport.extraColumns');
 
-    // Handle changing estimate versions *****
+    // Handle changing estimate versions
     if (body.updateVersion) {
         if (!accessProfile.displaySettings[apName][body.updateVersion]) {
             accessProfile.displaySettings[apName][body.updateVersion]={
-                [`${week._id}`]: body.displaySettings
+                [`${week._id}`]: {}
             }
-        } else {
-            accessProfile.displaySettings[apName][body.updateVersion][week._id]=body.displaySettings
         }
+
         show.accessMap[apName].estimateVersion=body.updateVersion
         show.markModified('accessMap')
         show.markModified('accessProfiles')

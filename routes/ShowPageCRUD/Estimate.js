@@ -47,7 +47,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
             show.markModified('accessProfiles')
         }
 
-        console.log(show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings)
         await show.save()
     }
 
