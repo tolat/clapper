@@ -12,7 +12,7 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 tsGenQueue.on('global:completed', async (job, result) => {
     // Print error to console if error
     if (result.statusCode) {
-        console.log(`******************\nError:${result.statusCode}\n\n${result.message}\n******************`)
+        console.log(`Error:${result.statusCode}\n\n${result.message}\n`)
         return
     }
 
