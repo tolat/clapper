@@ -63,6 +63,7 @@ generateTimesheets=() => {
         .then(responseData => {
             // Check evey  1000 ms to see if generation is done
             checkGenerationInterval=setInterval(() => {
+                console.log('checking for timesheets...')
                 fetch(server+`/checkgenerated/${responseData.file.filename}`, { method: 'GET', credentials: 'include' })
                     .then(response => { return response.json() })
                     .then(responseData => {

@@ -8,7 +8,6 @@ const fs=require('fs')
 const path=require('path')
 const GridStream=require('gridfs-stream')
 const mongoose=require('mongoose')
-const Set=require('./models/set')
 
 // Connect to the database and handle connection errors
 mongoose.connect(process.env.DB_URL, {
@@ -27,13 +26,17 @@ db.once('open', () => {
 // Create consumer queue
 const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
+tsGenQueue.on('global:completed', (job, result) => {
+    console.log('DONE JOB!')
+})
+
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
     // Wait for template to be piped form the database
     await pipeTemplateFromDb(job).catch(e => done(e))
 
     // Generate timesheets
-    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename).catch(e => done(e))
+    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename, job.data.apName, job.data.accessProfile).catch(e => done(e))
 
     //Delete old file from GridFS
     await removeTemplateFromDB(job.data.filename).catch(e => done(e))
@@ -43,15 +46,16 @@ tsGenQueue.process(async (job, done) => {
 
     // Finish job 
     done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
-
 })
 
+// Delete uploaded tmeplate form db 
 function removeTemplateFromDB(filename) {
     return new Promise(function (resolve, reject) {
         global.gfs.remove({ filename }, () => resolve())
     })
 }
 
+// Pipe completed timesheets xlsx file from local /uploads directory to the database
 function pipeCompletedTimesheetsToDb(job) {
     return new Promise(function (resolve, reject) {
         const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
@@ -67,6 +71,7 @@ function pipeCompletedTimesheetsToDb(job) {
     })
 }
 
+// Pipe xlsx template from the database to local /uploads directory
 function pipeTemplateFromDb(job) {
     return new Promise(function (resolve, reject) {
         // Create streams and read file from mongo to local uploads directory and add .xlsx extension
@@ -91,7 +96,7 @@ function getDaysOfWeekEnding(date) {
 }
 
 // Generate timesheets using the file at filepath as the template workbook
-async function generateTimesheets(show, valueMap, week, filename) {
+async function generateTimesheets(show, valueMap, week, filename, apName, accessProfile) {
     // Get timesheet template workbook
     const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
     let workbook=new ExcelJS.Workbook()
@@ -100,6 +105,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
     let currentWeekDays=getDaysOfWeekEnding(week.end)
     const oneDay=24*60*60*1000;
 
+    // Returns true if this user in in the crew list for given week
     function isInCurrentWeek(day, user) {
         let dateMS=new Date(day).getTime()
         let weekEndMS=new Date(week.end).getTime()
@@ -125,6 +131,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
                 sheetName=newName
             }
 
+            // Add worksheet for this postion for this user to the timesheets workbook 
             let newSheet=workbook.addWorksheet(sheetName)
 
             // Save sheetName in position for use when populating values
@@ -151,7 +158,7 @@ async function generateTimesheets(show, valueMap, week, filename) {
         let record=user.showrecords.find(r => r.showid==show._id.toString())
 
         for (pos of record.positions) {
-            let position=show.positions.positionList.find(p => p.Code==pos.code)
+            let position=week.positions.positionList[pos.code]
 
             let sheet=await workbook.getWorksheet(pos.sheetName)
 
@@ -192,8 +199,9 @@ async function generateTimesheets(show, valueMap, week, filename) {
                 mulHoursMap[`${weekDay}-Hours-Total`]=hours
                 hoursSetMap[`${weekDay}-Set`]=pos.daysWorked[day].set
 
-                let set=await Set.find({ 'Set Code': pos.daysWorked[day].set })
-                setEpisodeMap[`${weekDay}-Episode`]=set.Episode||""
+                let estimateVersion=show.estimateVersions[show.accessMap[apName].estimateVersion]
+                let set=await estimateVersion.sets.find(s => s['Set Code']==pos.daysWorked[day].set)||{ Episode: "" }
+                setEpisodeMap[`${weekDay}-Episode`]=set.Episode
             }
 
             // Assign variable values to cells in spreadsheet

@@ -14,6 +14,7 @@ const { populateShow }=require('../utils/schemaUtils')
 const Queue=require('bull')
 const Show=require('../models/show')
 const crudUtils=require('../routes/ShowPageCRUD/utils')
+const schemaUtils=require('../utils/schemaUtils')
 
 const ShowPageCRUD={
     Estimate: require('./ShowPageCRUD/Estimate'),
@@ -65,15 +66,19 @@ router.post('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
 }))
 
 // Put route for uploading new timesheet templates
-router.put('/', isLoggedIn, upload.single('file'), tryCatch(async (req, res, next) => {
-    let show=await populateShow(req.params.id)
-    let cellValueMap=await parseValueMap(JSON.parse(req.body.items))
-    let week=await show.weeks.find(w => w._id.toString()==show.currentWeek)
+router.put('/', isLoggedIn, hasShowAccess, upload.single('file'), tryCatch(async (req, res, next) => {
+    const apName=crudUtils.getAccessProfileName(req.user)
+    const show=await schemaUtils.populateShow(req.params.id)
+    const accessProfile=show.accessProfiles[show.accessMap[apName].profile].Timesheets
+    const cellValueMap=await crudUtils.parseValueMap(JSON.parse(req.body.items))
+    const week=await show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
 
     // Queue generation job for worker
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     await tsGenQueue.add({
         show,
+        accessProfile,
+        apName,
         valueMap: cellValueMap,
         week,
         fileid: req.file.id,

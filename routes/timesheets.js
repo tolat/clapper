@@ -10,6 +10,7 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Listen to Bull queue for completed timesheet generation 
 tsGenQueue.on('global:completed', async (job, result) => {
+    console.log(`\n\n'completed, in timesheets.js'\n\n`)
     // Print error to console if error
     if (result.statusCode) {
         console.log(`******************\nError:${result.statusCode}\n\n${result.message}\n******************`)
@@ -48,14 +49,14 @@ function pipeCompletedTimesheetsFromDB(resultObj) {
 }
 
 // Check if timesheets have been generated for :filenamme template
-router.get('/checkgenerated/:filename', isLoggedIn, (req, res, next) => {
+router.get('/checkgenerated/:filename', isLoggedIn, tryCatch(async (req, res, next) => {
     // Tell client if timesheets for :filename have been generated
     if (global.generatedTimesheets.includes(req.params.filename)) {
         res.send({ filename: req.params.filename })
     } else {
         res.send({ filename: false })
     }
-})
+}))
 
 // Download :filename from uploads folder route
 router.get('/uploads/:filename', isLoggedIn, async (req, res, next) => {

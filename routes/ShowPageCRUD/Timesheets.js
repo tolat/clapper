@@ -26,7 +26,7 @@ module.exports.update=async function (body, showId) {
 
     if (show.timesheets.currentMap) {
         // Parse value map from grid and save new map values
-        currentMap.cellValueMap=await parseValueMap(body.data)
+        currentMap.cellValueMap=await crudUtils.parseValueMap(body.data)
         show.markModified('timesheets.timesheetMaps')
 
         // Save display settings to show
@@ -94,26 +94,6 @@ module.exports.update=async function (body, showId) {
 
     return { messages: messages }
 }
-
-// Parse cell-value map for timesheet generation from slickgrid data
-function parseValueMap(items) {
-    let cellValueMap={}
-    let sheetCols='a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.aa.ab.ac.ad.ae.af.ag.ah.ai.aj.ak.al.am.an.ao.ap.aq.ar.as.at.au.av.aw.ax.ay.az.ba.bb.bc.bd.be.bf.bg.bh.bi.bj.bk.bl.bm.bn.bo.bp.bq.br.bs.bt.bu.bv.bw.bx.by.bz'.split('.').map(x => { return x.toUpperCase() })
-
-    // ADD EXTRA COLUMN VALUES HERE
-
-    for (item of items) {
-        for (col of sheetCols) {
-            if (item[col]) {
-                if (!cellValueMap[col]) { cellValueMap[col]={} }
-                cellValueMap[col][item.id]=item[col]
-            }
-        }
-    }
-
-    return cellValueMap
-}
-
 
 
 
