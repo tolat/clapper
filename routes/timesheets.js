@@ -10,7 +10,6 @@ const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
 
 // Listen to Bull queue for completed timesheet generation 
 tsGenQueue.on('global:completed', async (job, result) => {
-    console.log(`\n\n'completed, in timesheets.js'\n\n`)
     // Print error to console if error
     if (result.statusCode) {
         console.log(`******************\nError:${result.statusCode}\n\n${result.message}\n******************`)
