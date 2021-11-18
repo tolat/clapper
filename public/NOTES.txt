@@ -13,6 +13,7 @@ TORIN:
 -   Remove _show variable
 -   Finish access profiles
 -   Allow versios to be named with letters and chosen manually for comparison (modal can sort by date asc/desc)
+-   Copy display settings for version or week when creating new
 
 KIT:
 -   Convert to SSL

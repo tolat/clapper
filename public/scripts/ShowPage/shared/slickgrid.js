@@ -1837,7 +1837,7 @@ toggleDeleteWeekWarningModal=(show, weekNum, weekId, deleteWeek=false) => {
 
             // If deleting current week, delete on server immediately and reload page to most recent week
             if (weekNum==currentWeekNum) {
-                changeWeek(_weekList[_weekList.length-1]._id)
+                changeWeek(_args.weekList[_args.weekList.length-1]._id)
             } else {
                 // Update grid to reflect week deletion
                 updateSaveStatus(false)
