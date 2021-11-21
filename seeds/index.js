@@ -117,18 +117,19 @@ const seedShows=async () => {
             },
             accessMap: {
                 'pigsinpyjamas@yahoo-ca': {
-                    profile: 'Test Profile',
+                    profile: 'Test Access',
                     currentWeek: firstWeekId,
                     estimateVersion: '100'
                 },
                 'torin-olat@gmail-com': {
-                    profile: '__Owner',
+                    profile: 'Owner',
                     currentWeek: firstWeekId,
                     estimateVersion: '100'
                 }
             },
             accessProfiles: {
-                "Test Profile": {
+                "Test Access": {
+                    name: 'Test Access',
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
@@ -191,7 +192,8 @@ const seedShows=async () => {
                         displaySettings: {}
                     }
                 },
-                __Owner: {
+                Owner: {
+                    name: 'Owner',
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
