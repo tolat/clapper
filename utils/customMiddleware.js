@@ -13,8 +13,9 @@ module.exports.isLoggedIn=(req, res, next) => {
 
 module.exports.isShowOwner=async (req, res, next) => {
     const showid=req.params.id
+    const apName=crudUtils.getAccessProfileName(req.user)
     let show=await Show.findById(showid)
-    if (show.owner!=req.user.username) {
+    if (!show.accessMap[apName].profile=='Owner') {
         req.flash('error', `You do not have access to the show: ${show.Name}`)
         if (!req.isAuthenticated()) {
             return res.redirect('/login')

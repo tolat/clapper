@@ -143,7 +143,8 @@ app.all('*', (req, res, next) => {
 app.use((err, req, res, next) => {
     const { statusCode=500 }=err;
     console.log(err.stack);
-    if (!err.message) { err.message='Something Went Wrong!' }
+    err.message='Something Went Wrong :('
+    err.stack=undefined
     res.status(statusCode).render('error', {
         title: 'Error',
         statusCode: statusCode,

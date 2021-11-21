@@ -84,7 +84,7 @@ markInvalidHourSetPairs=() => {
 saveData=(reload=false) => {
     if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
 
-    markInvalidHourSetPairs()
+    //markInvalidHourSetPairs()
 
     // Indicate grid is saving
     let statusElement=document.getElementById('save-status');

@@ -6,7 +6,7 @@
 </head>
 
 <body style="align-items: center; margin-top: 2rem;">
-    <div class="alert alert-danger" role="alert" id="error-container"
+    <div class="alert alert-secondary" role="alert" id="error-container"
         style="width: 50%; max-height: 90%; overflow-y: scroll; font-size: 0.75rem;">
         <h4 class="alert-heading">
             Error - <%=statusCode%>
@@ -14,11 +14,11 @@
         <p>
             <%= err.message%>
         </p>
-        <p style="height: 20rem; overflow-y: scroll;">
+        <p style="max-height: 20rem; overflow-y: scroll;">
             <%= err.stack%>
         </p>
         <hr>
-        <button type="button" class="btn btn-outline-danger" onclick="window.history.go(-1); return false;">Back</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.history.go(-1); return false;">Back</a>
     </div>
 </body>
 
