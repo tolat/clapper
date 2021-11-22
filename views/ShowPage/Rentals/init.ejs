@@ -5,6 +5,9 @@
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
     let _currentWeekSetCodes= <%- JSON.stringify(currentWeekSetCodes)%>;
+    let _userPosForWeekMap= <%- JSON.stringify(userPosForWeekMap)%>;
+    let _userNamesForWeekMap= <%- JSON.stringify(userNamesForWeekMap)%>;
+    let _posDeptMap= <%- JSON.stringify(posDeptMap)%>;
     setWeekEnding()
 
     var _extraColumns=_week.rentals.extraColumns;
@@ -36,11 +39,11 @@
                 this.validationMessage=`Suppliers are crew members.\nCrew members can only be added in the 'Crew' page.`;
                 let user=false;
                 if (args.item['Supplier']&&args.item['Supplier'].includes('[')&&args.item['Supplier'].includes(']')) {
-                    user=_allShowCrewUsers.find(u => u['username']==args.item['Supplier'].slice(args.item['Supplier'].indexOf('[')+1, args.item['Supplier'].indexOf(']')));
+                    user=_userNamesForWeekMap[args.item['Supplier'].slice(args.item['Supplier'].indexOf('[')+1, args.item['Supplier'].indexOf(']'))]
                 } else {
-                    user=_allShowCrewUsers.find(u => u['username']==args.item['Supplier'])
+                    user=_userNamesForWeekMap[args.item['Supplier']]
                 }
-                return (!user||user==undefined)&&item['Supplier']
+                return !user&&item['Supplier']
             }
         },
         {
@@ -52,11 +55,19 @@
             }
         },
         {
-            fields: ['Code'],
+            fields: ['Supplier Code'],
             isInvalid: function (args, field) {
                 this.validationHeader=`Position '${args.item[field]}' Not Found!`
                 this.validationMessage=`New positions can only be added in the 'Rates' page.\nPosition codes are case-sensitive!`
-                return !_week.positions.positionList[args.item['Code']]&&args.item['Code']!=undefined
+                return args.item[field]&&!Object.keys(_posDeptMap).includes(args.item[field])
+            }
+        },
+        {
+            fields: ['Rental Name'],
+            isInvalid: function (args, field) {
+                this.validationHeader=`Rental with name: '${args.item[field]}' already exists!`
+                this.validationMessage=`Rental names must be unique`
+                return args.item[field]&&dataView.getItems().find(i => i[field]==args.item[field]&&i.id!=args.item.id)
             }
         },
         {
@@ -81,14 +92,7 @@
     var _allUsers=_args.allUsers
     var _taxColumns=_week.rentals.taxColumns
     let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
-
-    var _allShowCrewNames=[]
-    var _allShowCrewUsers=[]
-    for (id of _allShowCrew) {
-        let user=_allUsers.find(u => u._id==id)
-        _allShowCrewUsers.push(user)
-        _allShowCrewNames.push(`${user['Name']} [${user['username']}]`)
-    }
+    var _allWeekCrewNames=Object.keys(_userNamesForWeekMap).map(uname => `${_userNamesForWeekMap[uname]} [${uname}]`)
 
     var grid;
     var dataView;
@@ -155,8 +159,8 @@
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _currentWeekSetCodes, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 90, sortable: true, editor: AutoCompleteEditor, dataSource: _show.departments, cssClass: 'required-for-save' },
             { id: "Days Rented", name: "Days Rented", field: "Days Rented", width: 90, editor: Slick.Editors.Text, sortable: true },
-            { id: "Supplier", name: "Supplier", field: "Supplier", width: 150, sortable: true, editor: AutoCompleteEditor, dataSource: _allShowCrewNames },
-            { id: "Code", name: "Code", field: "Code", width: 80, editor: Slick.Editors.Text, sortable: true },
+            { id: "Supplier", name: "Supplier", field: "Supplier", width: 150, sortable: true, editor: AutoCompleteEditor, dataSource: _allWeekCrewNames },
+            { id: "Supplier Code", name: "Supplier Code", field: "Supplier Code", width: 80, editor: AutoCompleteEditor, dataSource: Object.keys(_posDeptMap), sortable: true },
         ];
 
         // Add extra columns (user-defined)

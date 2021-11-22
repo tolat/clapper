@@ -129,7 +129,6 @@ const seedShows=async () => {
             },
             accessProfiles: {
                 "Test Access": {
-                    name: 'Test Access',
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
@@ -193,7 +192,6 @@ const seedShows=async () => {
                     }
                 },
                 Owner: {
-                    name: 'Owner',
                     'Cost Report': {
                         columnFilter: [],
                         dataFilter: {},
@@ -348,7 +346,7 @@ const seedUsers=async () => {
     for (s of shows) {
         let show=await Show.findById(s._id)
         let startIdx=randInt(0, users.length);
-        for (let i=startIdx; i<startIdx+30; i++) {
+        for (let i=startIdx; i<startIdx+10; i++) {
             let user=users[i%users.length];
             let joinDate=genDateBetween(new Date(show.weeks[0].end.getTime()-(7*oneDay)), show.weeks[0].end);
             let posCodes=Object.keys(show.weeks[0].positions.positionList)
@@ -454,14 +452,14 @@ const seedRentals=async () => {
                 'Day Rate': Math.floor(randInt(10, 300)/10)*10,
                 'Rental Name': rentalNames[i],
                 'Days Rented': randInt(0, 7),
-                'Code': rentalPositions[i],
+                'Supplier Code': rentalPositions[i],
                 taxColumnValues: {
                     'GST': randInt(0, 1)*5,
                     'PST': randInt(0, 1)*7,
                 },
                 extraColumnValues: {}
             }
-            rental['Department']=show.weeks[0].positions.positionList[rental['Code']]['Department']
+            rental['Department']=show.weeks[0].positions.positionList[rental['Supplier Code']]['Department']
 
             for (user of crewList) {
                 let record=user.showrecords.find(r => r.showid==show._id.toString())
@@ -469,6 +467,7 @@ const seedRentals=async () => {
                     let position=record.positions.find(p => p.code==rentalPositions[i])
                     if (position) {
                         rental['Supplier']=user['username']
+                        rental['Supplier Code']=position.code
                         break
                     }
                 }

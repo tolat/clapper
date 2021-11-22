@@ -39,28 +39,36 @@ getGroupAggregators=() => {
     return aggregators;
 }
 
-// Sets the auto-fill names to only users with correct position
+// initialize supplier dropdowns at page laod
 setSupplierOptions=(args) => {
-    let col=grid.getColumns()[args.cell];
-    if (col.name=='Supplier'||col.name=='Code') {
-        let item=dataView.getItemByIdx(args.row)
-        let dataSource=[];
-        if (item['Code']) {
-            let crewWithCode=_week.crew.crewList.filter(c => {
-                let record=c.showrecords.find(r => r.showid==_show._id)
-                if (record&&record.positions.find(p => p.code==item['Code'])) {
-                    return true
-                }
-                return false
-            })
-            for (user of crewWithCode) {
-                dataSource.push(`${user['Name']} [${user['username']}]`);
-            }
-            col.dataSource=dataSource;
-        }
-        else {
-            col.dataSource=_allShowCrewNames
-        }
+    let item
+    args.item? item=args.item:item=dataView.getItemById(dataView.mapRowsToIds([args.row])[0])
+
+    // Update data source for supplier column autofill based on Supplier Code
+    if (item['Supplier Code']) {
+        let cols=grid.getColumns()
+        cols.find(c => c.name=='Supplier').dataSource=Object.keys(_userPosForWeekMap)
+            .filter(uname => _userPosForWeekMap[uname].includes(item['Supplier Code']))
+            .map(uname => `${_userNamesForWeekMap[uname]} [${uname}]`)
+        grid.setColumns(cols)
+    } else {
+        // Update data source for autofill in supplier column
+        let cols=grid.getColumns()
+        cols.find(c => c.name=='Supplier').dataSource=_allWeekCrewNames
+        grid.setColumns(cols)
+    }
+
+    // Update data source for Supplier Code column autofill based on Supplier
+    if (item['Supplier']&&Object.keys(_userNamesForWeekMap).includes(item['Supplier'])) {
+        // Update data source for autofill in supplier column
+        let cols=grid.getColumns()
+        cols.find(c => c.name=='Supplier Code').dataSource=_userPosForWeekMap[item['Supplier']]
+        grid.setColumns(cols)
+    } else {
+        // Update data source for autofill in supplier column
+        let cols=grid.getColumns()
+        cols.find(c => c.name=='Supplier Code').dataSource=Object.keys(_posDeptMap)
+        grid.setColumns(cols)
     }
 }
 
@@ -72,50 +80,32 @@ autoFillSupplierData=(args) => {
     // Set _groupedBy property to unwritable
     if (_groupedBy) { Object.defineProperty(item, _groupedBy, { writable: false, configurable: true }) }
 
-    // Do nothing if not editing supplier or code fields
-    if (col.name!='Supplier'&&col.name!='Code') { return }
-    setSupplierOptions(args);
-
-    if (col.name=='Code') {
+    if (col.name=='Supplier Code') {
         // Auto-populate if editing forwards
         if (_editDirectionForwards) {
-            // Find position
-            let pos=_show.positions.positionList.find(p => p['Code']==item['Code']);
+            if (item['Supplier Code']) {
+                item['Department']=_posDeptMap[item['Supplier Code']]
 
-            // Use position to populate if found
-            if (pos) {
-                item['Department']=pos['Department'];
-                let user=_allShowCrewUsers.find(u => u['username']==item['Supplier'])
-                if (user) {
-                    let record=user.showrecords.find(r => r.showid==_show._id)
-                    if (!record.positions.find(p => p.code==item['Code'])) {
-                        item['Supplier']=undefined;
-                    }
-                } else {
-                    item['Supplier']=undefined;
+                // Clear Supplier if supplier has not worked new position in this week
+                if (item['Supplier']&&!_userPosForWeekMap[item['Supplier']].includes(item['Supplier Code'])) {
+                    item['Supplier']=undefined
                 }
             }
         }
         // Else use previous values to populate
         else { item=loadPrevItemFromCommand(item) }
-    } else {
+    } else if (col.name=='Supplier') {
         // Auto-populate if editing forwards
         if (_editDirectionForwards) {
-            let user;
             // Find user
             if (item['Supplier'].includes('[')&&item['Supplier'].includes(']')) {
-                user=_allShowCrewUsers.find(u => u['username']==item['Supplier'].slice(item['Supplier'].indexOf('[')+1, item['Supplier'].indexOf(']')));
                 item['Supplier']=item['Supplier'].slice(item['Supplier'].indexOf('[')+1, item['Supplier'].indexOf(']'));
-            } else { user=_allShowCrewUsers.find(u => u['Name']==item['Supplier']) }
-
-            // Use user to populate if found
-            if (user) {
-                let record=user.showrecords.find(r => r.showid==_show._id);
-                let position=_show.positions.positionList.find(p => p['Code']==record.positions[0].code);
-                item['Code']=position['Code'];
-                item['Department']=position['Department'];
-            } else {
-                delete item.supplierid
+            }
+            // If supplier has positions for the week, update rental supplier code and department to first position code in list
+            let userPositions=_userPosForWeekMap[item['Supplier']]
+            if (userPositions) {
+                item['Supplier Code']=userPositions[0]
+                item['Department']=_posDeptMap[userPositions[0]]
             }
         }
         // Else use previous values to populate
@@ -171,7 +161,8 @@ calculateAllWeeklyTotals=() => {
 
 // Update rentals
 saveData=(reload=false) => {
-    if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
+    // Only save if saving is not already underway, and the user has not overidden the RFS warning
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
 
     // Indicate grid is saving
     let statusElement=document.getElementById('save-status');
@@ -221,6 +212,8 @@ saveData=(reload=false) => {
             console.log(responseData)
             if (reload) { location.reload() }
             else {
+                // Update _savingUnderway to false once save is complete
+                _savingUnderway=false
                 // Push new item ids to items
                 clearDeletedItems();
                 // Update saveStatus

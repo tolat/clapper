@@ -312,7 +312,8 @@ deleteVersion=() => {
 
 // Update estimate version
 saveData=(isNewVersion=false, isBlankVersion=false) => {
-    if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
+    // Only save if saving is not already underway, and the user has not overidden the RFS warning
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
 
     // Indicate grid is saving
     let statusElement=document.getElementById('save-status');
@@ -358,6 +359,8 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
     })
         .then(response => { return response.json() })
         .then(responseData => {
+            // Update _savingUnderway to false once save is complete
+            _savingUnderway=false
             // Clear items with a deleted required-for-save field
             clearDeletedItems();
             // Update Totals

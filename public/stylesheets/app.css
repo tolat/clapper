@@ -416,7 +416,7 @@ input.department-input:focus{
 }
 
 #access-profile-display{
-    margin-right: 13px;
+    margin-right: 1rem;
     color: rgb(255, 193, 49);
     font-weight: bold;
 }
@@ -855,6 +855,7 @@ tbody tr{
 
 .shows-table-delete-button{
     color: red;
+    text-align: right;
 }
 
 .shows-table-delete-button:hover{

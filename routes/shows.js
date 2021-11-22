@@ -1,7 +1,7 @@
 const express=require('express');
 const tryCatch=require('../utils/tryCatch');
 const ExpressError=require('../utils/ExpressError');
-const { isLoggedIn }=require('../utils/customMiddleware')
+const { isLoggedIn, isShowOwner }=require('../utils/customMiddleware')
 
 const router=express.Router({ mergeParams: true });
 
@@ -38,7 +38,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     // Create accessProfiles and accessMap
     let apName=await crudUtils.getAccessProfileName(req.user)
     show.accessProfiles={
-        __Owner: {
+        Owner: {
             'Cost Report': {
                 columnFilter: [],
                 dataFilter: {},
@@ -79,7 +79,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     }
     show.accessMap={
         [`${apName}`]: {
-            profile: '__Owner',
+            profile: 'Owner',
             estimateVersion: false,
             currentWeek: show.currentWeek
         }
@@ -125,7 +125,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
 }))
 
 // Delete show with id
-router.delete('/:id', isLoggedIn, tryCatch(async (req, res, next) => {
+router.delete('/:id', isLoggedIn, isShowOwner, tryCatch(async (req, res, next) => {
     // Delete all user records of show
     let messages=[]
     let show=await (await Show.findById(req.params.id))

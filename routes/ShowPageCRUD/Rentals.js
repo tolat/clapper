@@ -19,8 +19,36 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let currentWeekSetCodes=await show.estimateVersions[show.accessMap[apName].estimateVersion].sets.map(s => s['Set Code'])
 
     args.reloadOnWeekChange=true
-    args.allUsers=await User.find({})
-    args.allShowCrew=await crudUtils.getAllCrewIDs(show._id)
+
+    // Generate a map of all show crew usernames to their position codes for this week
+    const allShowUsers=await crudUtils.getAllCrewUsers(await crudUtils.getAllCrewIDs(show._id))
+    let userPosForWeekMap={}
+    let userNamesForWeekMap={}
+    for (user of allShowUsers) {
+        const record=user.showrecords.find(r => r.showid==show._id.toString())
+        for (pos of record.positions) {
+            let daysWorkedInWeek=false
+            // Mark this position as worked in week if it has dasy worked in the current week
+            for (day in pos.daysWorked) {
+                if (await crudUtils.isInCurrentWeek(day, user, week)) {
+                    daysWorkedInWeek=true
+                }
+            }
+            if (daysWorkedInWeek) {
+                // Generate userNameMap
+                if (!userNamesForWeekMap[user.username]) { userNamesForWeekMap[user.username]=user.Name }
+                // Generate userPosMap
+                if (!userPosForWeekMap[user.username]) { userPosForWeekMap[user.username]=[] }
+                if (!userPosForWeekMap[user.username].includes[pos.code]) { userPosForWeekMap[user.username].push(pos.code) }
+            }
+        }
+    }
+
+    // Generate a map of all position codes to their department
+    let posDeptMap={}
+    for (pos in week.positions.positionList) {
+        posDeptMap[pos]=week.positions.positionList[pos].Department
+    }
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
@@ -33,7 +61,10 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         accessProfile,
         user,
         apName,
-        currentWeekSetCodes
+        currentWeekSetCodes,
+        userPosForWeekMap,
+        userNamesForWeekMap,
+        posDeptMap
     })
 }
 
@@ -76,7 +107,7 @@ module.exports.update=async function (body, showId, user) {
                 week.rentals.rentalList.push(rental)
             }
 
-            let displayKeys=['Rental Name', 'Day Rate', 'Set Code', 'Department', 'Days Rented', 'Supplier', 'Code']
+            let displayKeys=['Rental Name', 'Day Rate', 'Set Code', 'Department', 'Days Rented', 'Supplier', 'Supplier Code']
             for (key of displayKeys) {
                 if (!accessProfile.columnFilter.includes(key))
                     rental[key]=item[key];
@@ -140,11 +171,8 @@ function initializeData(rentals, _week, accessProfile) {
             'Department': rentals[i]['Department'],
             'Set Code': rentals[i]['Set Code'],
             'Supplier': rentals[i]['Supplier'],
+            'Supplier Code': rentals[i]['Supplier Code'],
             editedfields: []
-        }
-
-        if (rentals[i]['Code']) {
-            item['Code']=rentals[i]['Code']
         }
 
         for (taxCol of _week.rentals.taxColumns) {

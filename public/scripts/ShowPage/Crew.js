@@ -82,9 +82,8 @@ markInvalidHourSetPairs=() => {
 
 // Update estimate
 saveData=(reload=false) => {
-    if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
-
-    //markInvalidHourSetPairs()
+    // Only save if saving is not already underway, and the user has not overidden the RFS warning
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
 
     // Indicate grid is saving
     let statusElement=document.getElementById('save-status');
@@ -140,6 +139,8 @@ saveData=(reload=false) => {
             console.log(responseData.message)
             if (reload) { location.reload() }
             else {
+                // Update _savingUnderway to false once save is complete
+                _savingUnderway=false
                 // Push new item ids to items
                 clearDeletedItems()
                 // Update Totals
@@ -191,8 +192,9 @@ calculateWeeklyTotal=(item) => {
 calculateWeeklyRentals=(item) => {
     let rentalAmount=0;
     if (item['username']&&item['Position']) {
-        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Code']==item['Position'])
+        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Supplier Code']==item['Position'])
         for (rental of rentals) {
+            console.log(rental)
             let tax=0;
             for (t of _week.rentals.taxColumns) {
                 tax+=parseFloat(rental.taxColumnValues[t])||0

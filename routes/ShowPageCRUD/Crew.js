@@ -80,12 +80,10 @@ module.exports.update=async function (body, showId, user) {
             // Create new user if user does not exist
             if (!user) {
                 user=new User();
-                user.username=item['userrname']
+                user.username=item['username']
                 user.showrecords=[{
                     positions: [],
                     weeksWorked: {},
-                    showid: show._id.toString(),
-                    showname: show['Name']
                 }]
                 user.showrecords[0].weeksWorked[_cw]={
                     extraColumnValues: {},
@@ -181,7 +179,7 @@ module.exports.update=async function (body, showId, user) {
             user.markModified('showrecords.weeksWorked')
             await user.save()
 
-            // Add user to updated lsit
+            // Add user to updated list
             if (!updatedList.find(u => u._id.toString()==user._id.toString())) {
                 updatedList.push(user)
             }
@@ -351,7 +349,7 @@ function loadUserHours(recordPosition, item, _currentWeekDays) {
 function calculateWeeklyRentals(item, _week) {
     let rentalAmount=0;
     if (item['username']&&item['Position']) {
-        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Code']==item['Position'])
+        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Supplier Code']==item['Position'])
         for (rental of rentals) {
             let tax=0;
             for (t of _week.rentals.taxColumns) {

@@ -62,6 +62,9 @@
         undoRedoBuffer.commandQueue.pop()
         undoRedoBuffer.commandCtr--
         updateSaveStatus(true)
+
+        // Initial save to update cost report totals
+        saveData()
     }
 
     // Creates grid columns 

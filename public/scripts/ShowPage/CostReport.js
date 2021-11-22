@@ -201,7 +201,8 @@ calculateCosts=(item) => {
 
 // Save cost report
 saveData=(reload=false, updateVersion=false) => {
-    if (!_overrideBlankRFSWarning&&blankRequiredWarning()) { return }
+    // Only save if saving is not already underway, and the user has not overidden the RFS warning
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
 
     // Indicate grid is saving
     let statusElement=document.getElementById('save-status');
@@ -248,6 +249,8 @@ saveData=(reload=false, updateVersion=false) => {
         .then(responseData => {
             if (reload) { location.reload() }
             else {
+                // Update _savingUnderway to false once save is complete
+                _savingUnderway=false
                 // Update saveStatus
                 updateSaveStatus(true);
                 // Reflect the change in save point in the Undo/Redo buffer command queue

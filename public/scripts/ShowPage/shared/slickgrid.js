@@ -19,6 +19,7 @@ let _overrideBlankRFSWarning=false
 let _headerDblCLick=false
 let _colSortMap={}
 let _userYesNo=true
+let _savingUnderway=false
 
 // Edit History Buffer
 let undoRedoBuffer={

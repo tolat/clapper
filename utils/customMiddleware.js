@@ -15,12 +15,12 @@ module.exports.isShowOwner=async (req, res, next) => {
     const showid=req.params.id
     const apName=crudUtils.getAccessProfileName(req.user)
     let show=await Show.findById(showid)
-    if (!show.accessMap[apName].profile=='Owner') {
-        req.flash('error', `You do not have access to the show: ${show.Name}`)
+    if (show.accessMap[apName].profile!='Owner') {
+        req.flash('error', `You cannot delete the show: ${show.Name}`)
         if (!req.isAuthenticated()) {
-            return res.redirect('/login')
+            return res.send({ redirect: `${process.env.SERVER}/login` })
         } else {
-            return res.redirect('/shows')
+            return res.send({ redirect: `${process.env.SERVER}/shows` })
         }
     }
     next()
@@ -36,9 +36,9 @@ module.exports.hasShowAccess=async (req, res, next) => {
     if (!Object.keys(show.accessMap).includes(apName)) {
         req.flash('error', `You do not have access to the show: ${show.Name}`)
         if (!req.isAuthenticated()) {
-            return res.redirect('/login')
+            return res.send({ redirect: `${process.env.SERVER}/login` })
         } else {
-            return res.redirect('/shows')
+            return res.send({ redirect: `${process.env.SERVER}/shows` })
         }
     }
     next()
