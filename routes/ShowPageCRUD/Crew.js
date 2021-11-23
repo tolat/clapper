@@ -175,6 +175,13 @@ module.exports.update=async function (body, showId, user) {
                 }
             }
 
+            // Clear days worked from showrecords that are null
+            for (day in record.daysWorked) {
+                if (!record.daysWorked[day]) {
+                    delete record.daysWorked[day]
+                }
+            }
+
             user.markModified('showrecords')
             user.markModified('showrecords.weeksWorked')
             await user.save()

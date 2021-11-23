@@ -229,7 +229,7 @@ function calculateCosts(item, _show, _week, _showCrew) {
         let record=user.showrecords.find(r => r.showid==_show._id.toString());
         for (recordPosition of record.positions) {
             let position=_week.positions.positionList[recordPosition.code]
-            for (day in recordPosition.daysWorked) {
+            for (day of Object.keys(recordPosition.daysWorked).filter(d => recordPosition.daysWorked[d])) {
                 let week=crudUtils.findFirstContainingWeek(day, _show.weeks)
                 // Only count day worked if it has the same set code as the item and it falls in a valid week 
                 if (recordPosition.daysWorked[day].set==item['Set Code']&&week) {
