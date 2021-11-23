@@ -327,6 +327,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
     if (invalidCellsRemain()) {
         toggleLoadingScreen(false)
         updateSaveStatus(_dataSaved)
+        _savingUnderway=false
         return
     }
 

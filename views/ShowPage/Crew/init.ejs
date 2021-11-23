@@ -17,19 +17,19 @@
         {
             fields: _currentWeekDays.map(day => day.toString().slice(0, 3)),
             isInvalid: function (args, field) {
-                _removeEditedField=isNaN(args.item[field])||args.item[field]>24;
-                return _removeEditedField;
+                this.validationHeader='Invalid Hours!'
+                this.validationMessage="Hours must be a number between 0 and 24"
+                _removeEditedField=args.item[field]&&(isNaN(args.item[field])||args.item[field]>24)
+                return _removeEditedField||(_savingUnderway&&args.item[field]&&!args.item[field+'_set'])
             },
-            validationHeader: 'Invalid Hours!',
-            validationMessage: "Hours must be a number between 0 and 24.",
-            skipOnSave: true
         },
         {
             fields: _currentWeekDays.map(day => day.toString().slice(0, 3)+'_set'),
             isInvalid: function (args, field) {
                 this.validationHeader=`Set '${args.item[field]}' Not Found!`
                 this.validationMessage=`New sets can only be added in the 'Estimates' page.`
-                return args.item[field]&&!_currentVersionSetCodes.find(code => code==args.item[field].toString())
+                return (args.item[field]&&!_currentVersionSetCodes.find(code => code==args.item[field].toString()))||
+                    (_savingUnderway&&args.item[field]&&!args.item[field.replace('_set', '')])
             },
         },
         {

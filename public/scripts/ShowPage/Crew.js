@@ -48,38 +48,6 @@ getGroupAggregators=() => {
     return aggregators;
 }
 
-// Finds hour-set pairs that are incomplete and colors them red
-markInvalidHourSetPairs=() => {
-    let items=dataView.getItems();
-    let weekDayStrings=_currentWeekDays.map(d => d.toString().slice(0, 3));
-
-    let hangingSetsOrHours={}
-    let hoursHaveSets=true;
-    for (item of items) {
-        let row=items.indexOf(item);
-        row=getGroupedRow(row);
-        hangingSetsOrHours[row]={}
-        for (day of weekDayStrings) {
-            if ((item[day]&&item[day]!=0)&&!item[`${day}_set`]) {
-                let col=grid.getColumns().find(c => c.field==day).id;
-                hangingSetsOrHours[row][col]='invalid-cell';
-                hoursHaveSets=false;
-            }
-            else if ((!item[day]||item[day]==0)&&item[`${day}_set`]) {
-                let col=grid.getColumns().find(c => c.field==`${day}_set`).id;
-                hangingSetsOrHours[row][col]='invalid-cell';
-                hoursHaveSets=false;
-            }
-        }
-    }
-    if (!hoursHaveSets) {
-        grid.setCellCssStyles("hangingSetsOrHours", hangingSetsOrHours);
-    } else {
-        grid.removeCellCssStyles('hangingSetsOrHours')
-        delete _cellCssStyles['hangingSetsOrHours']
-    }
-}
-
 // Update estimate
 saveData=(reload=false) => {
     // Only save if saving is not already underway, and the user has not overidden the RFS warning
@@ -97,6 +65,7 @@ saveData=(reload=false) => {
     if (invalidCellsRemain()) {
         toggleLoadingScreen(false)
         updateSaveStatus(_dataSaved)
+        _savingUnderway=false
         return
     }
 

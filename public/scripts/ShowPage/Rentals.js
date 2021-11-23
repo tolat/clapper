@@ -104,8 +104,12 @@ autoFillSupplierData=(args) => {
             // If supplier has positions for the week, update rental supplier code and department to first position code in list
             let userPositions=_userPosForWeekMap[item['Supplier']]
             if (userPositions) {
-                item['Supplier Code']=userPositions[0]
-                item['Department']=_posDeptMap[userPositions[0]]
+                if (item['Supplier Code']) {
+                    if (!userPositions.includes(item['Supplier Code'])) {
+                        item['Supplier Code']=userPositions[0]
+                        item['Department']=_posDeptMap[userPositions[0]]
+                    }
+                }
             }
         }
         // Else use previous values to populate
@@ -176,6 +180,7 @@ saveData=(reload=false) => {
     if (invalidCellsRemain()) {
         toggleLoadingScreen(false)
         updateSaveStatus(_dataSaved)
+        _savingUnderway=false
         return
     }
 

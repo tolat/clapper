@@ -178,7 +178,7 @@ async function generateTimesheets(show, valueMap, week, filename, apName, access
             let mulHoursMap={}
             let hoursSetMap={}
             let setEpisodeMap={}
-            let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(dw, user))
+            let posDays=await Object.keys(pos.daysWorked).filter(dw => isInCurrentWeek(dw, user)).filter(dayKey => pos.daysWorked[dayKey])
             for (day of posDays) {
                 let weekDay=new Date(day).toDateString('en-US').slice(0, 3)
                 let hours=pos.daysWorked[day].hours
@@ -204,6 +204,7 @@ async function generateTimesheets(show, valueMap, week, filename, apName, access
                 setEpisodeMap[`${weekDay}-Episode`]=set.Episode
             }
 
+            console.log(2)
             // Assign variable values to cells in spreadsheet
             for (col in valueMap) {
                 for (row in valueMap[col]) {

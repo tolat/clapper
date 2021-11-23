@@ -258,6 +258,9 @@ createSlickGrid=(data, columns, options) => {
             await grid.invalidate()
             await grid.render()
         }
+
+        // Stop double click to enter cell editor (edit with key press)
+
     })
 
     // Grid Key Listener

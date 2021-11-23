@@ -90,8 +90,24 @@ function downloadTimesheets(filename) {
 
 // Update Timesheets
 saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteMap=false) => {
+    // Only save if saving is not already underway, and the user has not overidden the RFS warning
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
+
+    // Indicate grid is saving
+    let statusElt=document.getElementById('save-status');
+    statusElt.innerText='saving...';
+    statusElt.style.color='rgb(255, 193, 49)';
+
+    // Run all validators
+    runAllValidators()
+
     // Cancel save if invalid cells remain
-    if (invalidCellsRemain()) { return }
+    if (invalidCellsRemain()) {
+        toggleLoadingScreen(false)
+        updateSaveStatus(_dataSaved)
+        _savingUnderway=false
+        return
+    }
 
     // Do nothing if trying to open current map
     if (!reload&&openMap) {
