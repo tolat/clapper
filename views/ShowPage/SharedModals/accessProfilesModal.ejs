@@ -16,7 +16,7 @@
                             </button>
                         </h2>
                         <div id="collapse<%=i%>"
-                            class="accordion-collapse collapse <%if(Object.keys(args.accessProfiles)[i]==args.accessProfileName){%>show<%}%>"
+                            class="accordion-collapse collapse <%if(profileName==args.accessProfileName){%>show<%}%>"
                             aria-labelledby="heading<%=i%>" data-bs-parent="#access-profiles-accordion">
                             <div class="accordion-body" style="display: flex; flex-direction: column;">
                                 <%let profileNameId=profileName%>
@@ -33,7 +33,8 @@
                                                             <%=pKeys[j]%>
                                                         </button>
                                                     </h2>
-                                                    <div id="collapse<%=i%>-<%=j%>" class="accordion-collapse collapse"
+                                                    <div id="collapse<%=i%>-<%=j%>"
+                                                        class="accordion-collapse collapse <%if(pKeys[j].replace(" ","")==args.section){%>show<%}%>"
                                                         aria-labelledby="heading<%=i%>-<%=j%>"
                                                         data-bs-parent="#ap-sub-accordion-<%=profileNameId%>">
                                                         <div class="accordion-body ap-sub-accordion-page-container">
