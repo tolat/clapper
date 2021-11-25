@@ -461,12 +461,12 @@ input.department-input:focus{
     flex-direction: column;
 }
 
-.column-filter-container{
+.ap-filter-container{
     display: flex;
     flex-wrap: wrap;
 }
 
-.column-filter-item{
+.ap-filter-item{
     display: flex;
     justify-content: center;
     padding: 0px 5px 0px 5px;
@@ -476,7 +476,7 @@ input.department-input:focus{
     background-color: rgb(226, 226, 226);
 }
 
-.delete-column-filter-button{
+.delete-filter-item-button{
     font-size: 1.1em;
     margin-left: 10px;
     padding-left: 5px;
@@ -485,17 +485,17 @@ input.department-input:focus{
     font-weight: bold;
 }
 
-.add-column-filter-button{
+.add-filter-item-button{
     font-size: 1.3em;
     margin: 0 0 0 6px;
     font-weight: bold;
 }
 
-.add-column-filter-button:hover{
+.add-filter-item-button:hover{
     cursor: pointer;
 }
 
-.delete-column-filter-item:hover{
+.delete-filter-item-button:hover{
     cursor: pointer;
 }
 

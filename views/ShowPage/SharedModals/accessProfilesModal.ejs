@@ -38,22 +38,39 @@
                                                         aria-labelledby="heading<%=i%>-<%=j%>"
                                                         data-bs-parent="#ap-sub-accordion-<%=profileNameId%>">
                                                         <div class="accordion-body ap-sub-accordion-page-container">
-                                                            <div>
-                                                                Data Filter
+                                                            <div class="ap-filter-container">
+                                                                <div style="margin-top: 5px;">
+                                                                    Data Filter:
+                                                                </div>
+                                                                <%for(col in profile[pKeys[j]].dataFilter){%>
+                                                                    <div class="ap-filter-item">
+                                                                        <%=col%>: <%for(val of
+                                                                                profile[pKeys[j]].dataFilter[col]){%>
+                                                                                <%=val%>,
+                                                                                    <%}%>
+                                                                                        <div
+                                                                                            class="delete-filter-item-button">
+                                                                                            x
+                                                                                        </div>
+                                                                    </div>
+                                                                    <%}%>
+                                                                        <div class="add-filter-item-button">
+                                                                            +
+                                                                        </div>
                                                             </div>
-                                                            <div class="column-filter-container">
+                                                            <div class="ap-filter-container">
                                                                 <div style="margin-top: 5px;">
                                                                     Column Filter:
                                                                 </div>
                                                                 <%for(col of profile[pKeys[j]].columnFilter){%>
-                                                                    <div class="column-filter-item">
+                                                                    <div class="ap-filter-item">
                                                                         <%=col%>
-                                                                            <div class="delete-column-filter-button">
+                                                                            <div class="delete-filter-item-button">
                                                                                 x
                                                                             </div>
                                                                     </div>
                                                                     <%}%>
-                                                                        <div class="add-column-filter-button">
+                                                                        <div class="add-filter-item-button">
                                                                             +
                                                                         </div>
                                                             </div>
