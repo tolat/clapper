@@ -2788,3 +2788,14 @@ toggleCheckYesNoModal=(show, message) => {
         document.getElementById('check-yes-no-modal-message').innerText=message;
     }
 }
+
+// Hide and sshow access profiles modal
+toggleAccessProfilesModal=(show) => {
+    if (show) {
+        document.getElementById('grid-modal-container').style.display='flex';
+        document.getElementById('access-profiles-modal').style.display='flex';
+    } else {
+        document.getElementById('grid-modal-container').style.display=null;
+        document.getElementById('access-profiles-modal').style.display=null;
+    }
+}

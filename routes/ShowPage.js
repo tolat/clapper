@@ -37,7 +37,8 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         server: req.app.get('server'),
         weekList: show.weeks.map(w => { return { _id: w._id, end: w.end } }),
         week: show.weeks.find(w => w._id==show.accessMap[apName].currentWeek),
-        accessProfileName: show.accessMap[apName].profile
+        accessProfileName: show.accessMap[apName].profile,
+        accessProfiles: show.accessProfiles
     };
 
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error

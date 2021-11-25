@@ -426,6 +426,79 @@ input.department-input:focus{
     cursor: pointer;
 }
 
+#access-profiles-modal{
+    width: 80%;
+    max-width: 80%;
+    max-height: 80%;
+}
+
+#access-profiles-accordion{
+    width: 100%;
+    max-height: 100%;
+    overflow-y: scroll;
+}
+
+#access-profiles-accordion .accordion-item{
+    background-color: transparent;
+
+}
+#access-profiles-accordion h2:hover{
+    text-decoration: underline;
+}
+
+.accordion-button{
+    background-color:inherit !important;
+    color: black !important;
+    height: 1rem;
+}
+
+#access-profiles-accordion .accordion-button::after{
+    background-image: none !important;
+}
+
+.ap-sub-accordion-page-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.column-filter-container{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.column-filter-item{
+    display: flex;
+    justify-content: center;
+    padding: 0px 5px 0px 5px;
+    margin: 2.5px 0 2.5px 5px;
+    border: 1px solid black;
+    border-radius: 2px;
+    background-color: rgb(226, 226, 226);
+}
+
+.delete-column-filter-button{
+    font-size: 1.1em;
+    margin-left: 10px;
+    padding-left: 5px;
+    border-left: 1px solid black;
+    color: red;
+    font-weight: bold;
+}
+
+.add-column-filter-button{
+    font-size: 1.3em;
+    margin: 0 0 0 6px;
+    font-weight: bold;
+}
+
+.add-column-filter-button:hover{
+    cursor: pointer;
+}
+
+.delete-column-filter-item:hover{
+    cursor: pointer;
+}
+
 #contextMenu {
     background: #e1efc7;
     border: 1px solid gray;
