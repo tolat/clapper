@@ -210,38 +210,92 @@ module.exports.getAllCrewUsers=async function (IDlist) {
     return userList
 }
 
-// Returns an array of identifiers corresponding to items that are restricted by accessProfile (itemIdentifier key is user defined as )
+// Returns an array of identifiers corresponding to items that are restricted by accessProfile 
+// (itemIdentifier key is user defined as a unique identifier for the item)
 module.exports.getRestrictedItems=function (data, accessProfile, itemIdentifier) {
+    let isWhitelist=accessProfile.dataFilter.type=='w'
     let restrictedItems=[]
+
+    // If dataFilter is a whitelist, add all items Initially
+    if (isWhitelist) { restrictedItems=data.map(i => i[itemIdentifier]) }
+
     for (item of data) {
-        for (column in accessProfile.dataFilter) {
-            if (accessProfile.dataFilter[column].includes(item[column])) {
-                restrictedItems.push(item[`${itemIdentifier}`])
+        for (column in accessProfile.dataFilter.filter) {
+            if (accessProfile.dataFilter.filter[column].includes(item[column])) {
+                isWhitelist?
+                    restrictedItems.splice(restrictedItems.indexOf(item[itemIdentifier]), 1)
+                    :restrictedItems.push(item[itemIdentifier])
             }
         }
     }
     return restrictedItems
 }
 
-// Returns true if item has values restricted by the accessProfile
-module.exports.isRestrictedItem=function (item, accessProfile) {
-    for (column in accessProfile.dataFilter) {
-        if (accessProfile.dataFilter[column].includes(item[column])) {
-            return true
+// Apply access profile to data removing restricted items and values from restricted columns
+module.exports.filterRestrictedColumnData=function (data, accessProfile, IDkey) {
+    // Duplicate data
+    let originalData=[]
+    for (item of data) {
+        let originalItem={}
+        Object.assign(originalItem, item)
+        originalData.push(originalItem)
+    }
+
+    let isWhitelist=accessProfile.columnFilter.type=='w'
+
+    // If whitelist, hide all item values except idkey 
+    if (isWhitelist) {
+        data=data.map(item => {
+            let newItem={ id: item.id }
+            newItem[IDkey]=item[IDkey]
+            return newItem
+        })
+    }
+
+    for (item of data) {
+        for (column of accessProfile.columnFilter.filter) {
+            // Only hide or unhide column data other than IDkey
+            if (column!=IDkey) {
+                accessProfile.columnFilter.type=='w'?
+                    item[column]=originalData.find(i => i.id==item.id)[column]:
+                    item[column]=undefined
+            }
         }
     }
-    return false
+
+    return data
+}
+
+// Returns true if item has values restricted by the accessProfile
+module.exports.isRestrictedItem=function (item, accessProfile) {
+    const isWhitelist=accessProfile.dataFilter.type=='w'
+    for (column in accessProfile.dataFilter.filter) {
+        if (accessProfile.dataFilter.filter[column].includes(item[column])) {
+            return !isWhitelist
+        }
+    }
+    return isWhitelist
+}
+
+module.exports.isRestrictedColumn=function (col, accessProfile) {
+    const isWhitelist=accessProfile.columnFilter.type=='w'
+    if (accessProfile.columnFilter.filter.includes(col)) {
+        return !isWhitelist
+    }
+    return isWhitelist
 }
 
 // Checks if item has valid required-for-save fields filled
-module.exports.isValidItem=function (item, RFSkeys, _accessProfile) {
+module.exports.isValidItem=function (item, RFSkeys, accessProfile) {
     if (!item) { return false }
+    const isWhitelist=accessProfile.dataFilter.type=='w'
     for (key of RFSkeys) {
         if (!item[key]) {
-            if (_accessProfile.columnFilter.includes(key)) {
-                return true
+            if (accessProfile.columnFilter.filter.includes(key)) {
+                return !isWhitelist
+            } else {
+                return isWhitelist
             }
-            return false
         }
     }
     return true

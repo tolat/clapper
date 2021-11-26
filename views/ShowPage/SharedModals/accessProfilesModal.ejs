@@ -42,10 +42,10 @@
                                                                 <div style="margin-top: 5px;">
                                                                     Data Filter:
                                                                 </div>
-                                                                <%for(col in profile[pKeys[j]].dataFilter){%>
+                                                                <%for(col in profile[pKeys[j]].dataFilter.filter){%>
                                                                     <div class="ap-filter-item">
                                                                         <%=col%>: <%for(val of
-                                                                                profile[pKeys[j]].dataFilter[col]){%>
+                                                                                profile[pKeys[j]].dataFilter.filter[col]){%>
                                                                                 <%=val%>,
                                                                                     <%}%>
                                                                                         <div
@@ -62,7 +62,7 @@
                                                                 <div style="margin-top: 5px;">
                                                                     Column Filter:
                                                                 </div>
-                                                                <%for(col of profile[pKeys[j]].columnFilter){%>
+                                                                <%for(col of profile[pKeys[j]].columnFilter.filter){%>
                                                                     <div class="ap-filter-item">
                                                                         <%=col%>
                                                                             <div class="delete-filter-item-button">

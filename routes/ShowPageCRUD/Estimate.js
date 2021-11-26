@@ -157,27 +157,28 @@ module.exports.update=async function (body, showId, user) {
 
             // Update unrestricted core display keys
             for (key of ['Set Code', 'Episode', 'Name']) {
-                if (!accessProfile.columnFilter.includes(key)) {
+                if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     set[key]=item[key];
                 }
             }
 
             // Update unrestricted Estimate specific keys
             for (key of getDepartmentKeys(show)) {
-                if (!accessProfile.columnFilter.includes(key)) {
+                if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     let value=item[key];
                     if (isNaN(value)||value==0) { value=0 }
                     set.departmentValues[key]=value;
                 }
             }
 
+
             // Update extra column keys, deleting values for columns that don't exist anymore
             let previousValues=set.extraColumnValues
             set.extraColumnValues={}
             for (key of body.extraColumns) {
                 // Set extra column value for this key if it isn't restricted. if it is, then set it to the previous values
-                !accessProfile.columnFilter.includes(key)? set.extraColumnValues[key]=item[key]:
-                    set.extraColumnValues[key]=previousValues[key];
+                !crudUtils.isRestrictedColumn(key, accessProfile)? set.extraColumnValues[key]=item[key]:
+                    set.extraColumnValues[key]=previousValues[key]
             }
 
             // Add set to updated list
@@ -185,7 +186,7 @@ module.exports.update=async function (body, showId, user) {
         }
     }
 
-    // Add old values for restricted items to the updated List
+    // Add old restricted items to the updated List
     let restrictedItems=await crudUtils.getRestrictedItems(show.estimateVersions[ov].sets, accessProfile, 'Set Code')
     for (item of restrictedItems) {
         updatedList.push(show.estimateVersions[ov].sets.find(s => s['Set Code']==item))
@@ -272,16 +273,10 @@ function initializeData(sets, _show, _args, _version, accessProfile) {
         }
     }
 
-    // Apply access profile to data removing restricted items and values from restricted columns
-    for (item of data) {
-        for (column of accessProfile.columnFilter) {
-            if (item[column]) {
-                item[column]=undefined
-            }
-        }
-    }
+
     let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'Set Code')
-    data=data.filter(item => !restrictedItems.includes(item['Set Code']))
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'Set Code')
+        .filter(item => !restrictedItems.includes(item['Set Code']))
 
     return data;
 }

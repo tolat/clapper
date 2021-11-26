@@ -203,14 +203,7 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
         data.push(item);
     }
 
-    // Apply access profile to data removing restricted items and values from restricted columns
-    for (item of data) {
-        for (column of accessProfile.columnFilter) {
-            if (item[column]) {
-                item[column]=undefined
-            }
-        }
-    }
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile)
     let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'id')
     data=data.filter(item => !restrictedItems.includes(item['id']))
 

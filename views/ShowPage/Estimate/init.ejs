@@ -171,16 +171,8 @@
         // Department columns 
         for (d of _show.departments) { columns=columns.concat(addDepartment(d)) }
 
-        // Apply access profile column filter to hide restricted columns
-        for (col of columns) {
-            if (_accessProfile.columnFilter.includes(col.name)) {
-                if (_show.estimateVersions[_version]) {
-                    if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
-                    _displaySettings.setHiddenColumns.push(col.name)
-                }
-                col.lockHidden=true
-            }
-        }
+        // Apply access profile column filter to hide restricted columns if _version exists
+        columns=hideRestrictedColumns(columns, 'Set Code')
 
         return columns;
     }

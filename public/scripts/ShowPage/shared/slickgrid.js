@@ -1681,7 +1681,7 @@ validateEdit=(validator, args) => {
     let cols=grid.getColumns()
     for (field of validator.fields) {
         // Only validate field if it is not restricted by _accessProfile
-        if (!_accessProfile.columnFilter.includes(field)) {
+        if (!_accessProfile.columnFilter.filter.includes(field)) {
             if (cols[args.cell].field==field) {
                 if (validator.isInvalid(args, field)) {
                     // Mark invalid cell red
@@ -2652,7 +2652,7 @@ runAllValidators=() => {
                 if (!v.skipOnSave) {
                     for (field of v.fields) {
                         // Only validate field if it is not restricted by _accessProfile
-                        if (!_accessProfile.columnFilter.includes(field)) {
+                        if (!_accessProfile.columnFilter.filter.includes(field)) {
                             let args={ item: item }
                             let row=dataView.getRowByItem(item)
                             if (v.isInvalid(args, field)) {
@@ -2798,4 +2798,41 @@ toggleAccessProfilesModal=(show) => {
         document.getElementById('grid-modal-container').style.display=null;
         document.getElementById('access-profiles-modal').style.display=null;
     }
+}
+
+// Applies acces profile to hide restricted columns
+hideRestrictedColumns=(columns, IDkey) => {
+    // Apply access profile column filter to hide restricted columns if _version exists
+    if (!_show.estimateVersions[_version]) { return [] }
+
+    // initialize hidden columns display setting if it is empty
+    if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
+
+    // Initialize all columns to restricted if accessProfile filter is whitelist
+    let isWhitelist=_accessProfile.columnFilter.type=='w'
+    if (isWhitelist) {
+        _displaySettings.setHiddenColumns=_displaySettings.setHiddenColumns.concat(columns.map(c => c.field))
+        columns=columns.map(c => { c.lockHidden=true; return c })
+    }
+
+    // Apply access profile column filter
+    for (col of columns) {
+        if (_accessProfile.columnFilter.filter.includes(col.field)) {
+            if (isWhitelist) {
+                _displaySettings.setHiddenColumns.splice(_displaySettings.setHiddenColumns.indexOf(col.field), 1)
+                col.lockHidden=false
+            } else {
+                _displaySettings.setHiddenColumns.push(col.field)
+                col.lockHidden=true
+            }
+        }
+    }
+
+    // Always show the IDkey column
+    if (_displaySettings.setHiddenColumns.includes(IDkey)) {
+        _displaySettings.setHiddenColumns.splice(_displaySettings.setHiddenColumns.indexOf(IDkey), 1)
+        columns[columns.indexOf(columns.find(c => c.field==IDkey))].lockHidden=false
+    }
+
+    return columns
 }
