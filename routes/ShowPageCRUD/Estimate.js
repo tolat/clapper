@@ -192,6 +192,7 @@ module.exports.update=async function (body, showId, user) {
         updatedList.push(show.estimateVersions[ov].sets.find(s => s['Set Code']==item))
     }
 
+    // Set original estimate version sets to be updatedList
     show.estimateVersions[ov].sets=updatedList
 
     // Handle new version or version rename
@@ -207,6 +208,7 @@ module.exports.update=async function (body, showId, user) {
             }
             show.estimateVersions[v].extraColumns=[]
         }
+        // Delete old version if this is not a new version (i.e. this is a rename)
         if (!isNewVersion) { delete show.estimateVersions[ov] }
         else {
             show.estimateVersions[v].dateCreated=new Date(Date.now())

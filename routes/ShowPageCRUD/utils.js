@@ -274,7 +274,7 @@ module.exports.isRestrictedItem=function (item, accessProfile) {
             return !isWhitelist
         }
     }
-    return isWhitelist
+    return false
 }
 
 module.exports.isRestrictedColumn=function (col, accessProfile) {

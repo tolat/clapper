@@ -2,91 +2,12 @@
     <div id="access-profiles-modal-message"
         style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
         <h4>Access Profiles</h4>
-        <button id="access-profiles-modal-new" onclick="" style="font-size: 1.5rem;">+</button>
     </div>
     <div class="accordion accordion-flush" id="access-profiles-accordion">
-        <%for(let i=0; i < Object.keys(args.accessProfiles).length;i++){%>
-            <%let profile=args.accessProfiles[Object.keys(args.accessProfiles)[i]] %>
-                <%let profileName=Object.keys(args.accessProfiles)[i]%>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header access-profiles-accordion-header" id="heading<%=i%>">
-                            <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapse<%=i%>" aria-expanded="true" aria-controls="collapse<%=i%>">
-                                <%=Object.keys(args.accessProfiles)[i]%>
-                            </button>
-                        </h2>
-                        <div id="collapse<%=i%>"
-                            class="accordion-collapse collapse <%if(profileName==args.accessProfileName){%>show<%}%>"
-                            aria-labelledby="heading<%=i%>" data-bs-parent="#access-profiles-accordion">
-                            <div class="accordion-body" style="display: flex; flex-direction: column;">
-                                <%let profileNameId=profileName%>
-                                    <%while(profileNameId.includes(" ")){profileNameId = profileNameId.replace(" ","")}%>
-                        <div class=" accordion" id="ap-sub-accordion-<%=profileNameId%>">
-                                        <%let pKeys=Object.keys(args.accessProfiles[profileName])%>
-                                            <%for (let j=0; j < pKeys.length; j++){%>
-                                                <div class="accordion-item">
-                                                    <h2 class="accordion-header" id="heading<%=i%>-<%=j%>">
-                                                        <button class="accordion-button" type="button"
-                                                            data-bs-toggle="collapse"
-                                                            data-bs-target="#collapse<%=i%>-<%=j%>" aria-expanded="true"
-                                                            aria-controls="collapse<%=i%>-<%=j%>">
-                                                            <%=pKeys[j]%>
-                                                        </button>
-                                                    </h2>
-                                                    <div id="collapse<%=i%>-<%=j%>"
-                                                        class="accordion-collapse collapse <%if(pKeys[j].replace(" ","")==args.section){%>show<%}%>"
-                                                        aria-labelledby="heading<%=i%>-<%=j%>"
-                                                        data-bs-parent="#ap-sub-accordion-<%=profileNameId%>">
-                                                        <div class="accordion-body ap-sub-accordion-page-container">
-                                                            <div class="ap-filter-container">
-                                                                <div style="margin-top: 5px;">
-                                                                    Data Filter:
-                                                                </div>
-                                                                <%for(col in profile[pKeys[j]].dataFilter.filter){%>
-                                                                    <div class="ap-filter-item">
-                                                                        <%=col%>: <%for(val of
-                                                                                profile[pKeys[j]].dataFilter.filter[col]){%>
-                                                                                <%=val%>,
-                                                                                    <%}%>
-                                                                                        <div
-                                                                                            class="delete-filter-item-button">
-                                                                                            x
-                                                                                        </div>
-                                                                    </div>
-                                                                    <%}%>
-                                                                        <div class="add-filter-item-button">
-                                                                            +
-                                                                        </div>
-                                                            </div>
-                                                            <div class="ap-filter-container">
-                                                                <div style="margin-top: 5px;">
-                                                                    Column Filter:
-                                                                </div>
-                                                                <%for(col of profile[pKeys[j]].columnFilter.filter){%>
-                                                                    <div class="ap-filter-item">
-                                                                        <%=col%>
-                                                                            <div class="delete-filter-item-button">
-                                                                                x
-                                                                            </div>
-                                                                    </div>
-                                                                    <%}%>
-                                                                        <div class="add-filter-item-button">
-                                                                            +
-                                                                        </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <%}%>
-                            </div>
-                        </div>
-                    </div>
     </div>
-    <%}%>
-</div>
-<div class="modal-button-container">
-    <button id="access-profiles-modal-close" onclick="toggleAccessProfilesModal(false)"
-        style="color: black;">Close</button>
-    <button id="access-profiles-modal-new" onclick="" style="color: green;">Save</button>
-</div>
+    <div class="modal-button-container">
+        <button id="access-profiles-modal-close" onclick="toggleAccessProfilesModal(false)"
+            style="color: black;">Close</button>
+        <button id="access-profiles-modal-new" onclick="" style="color: green;">Add</button>
+    </div>
 </div>

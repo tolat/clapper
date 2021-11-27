@@ -5,7 +5,10 @@
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
     let _estimateVersion= <%- JSON.stringify(estimateVersion)%>;
+
     setWeekEnding()
+    populateAccessProfileModal()
+
 
     var _extraColumns=_show.costReport.extraColumns;
     var _validators=[];
@@ -134,6 +137,9 @@
 
         // Add a buffer column
         columns.push({ id: '___ExtraColumn___', field: '___ExtraColumn___', deletable: true, name: '___ExtraColumn___', width: 1000, cssClass: 'extra-column cost-report-column', headerCssClass: 'extra-column' })
+
+        // Apply access profile column filter to hide restricted columns if _version exists
+        columns=hideRestrictedColumns(columns, 'id')
 
         return columns;
     }

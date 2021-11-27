@@ -2836,3 +2836,103 @@ hideRestrictedColumns=(columns, IDkey) => {
 
     return columns
 }
+
+// Populates access profiles modal 
+populateAccessProfileModal=() => {
+    let accessProfileAccordion=document.getElementById('access-profiles-accordion')
+
+    // Create an accordion item for each accesss profile
+    for (ap in _args.accessProfiles) {
+        let apName=ap.replaceAll(" ", "")
+
+        // String to put into html to show accordion item for current access profile
+        let isCurrentProfile=""
+        if (ap==_args.accessProfileName) { isCurrentProfile='show' }
+
+        let apAccordionItem=`
+        <div class="accordion-item">
+            <h2 class="accordion-header access-profiles-accordion-header" id="heading${apName}">
+                <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}">
+                    ${ap}
+                </button>
+            </h2>
+            <div id="collapse${apName}" class="accordion-collapse collapse ${isCurrentProfile}" data-bs-parent="#access-profiles-accordion">
+                <div class="accordion-body" style="display: flex; flex-direction: column;">
+                    <div class=" accordion" id="ap-sub-accordion-${apName}">`
+
+
+        // Generate html for each page in access profile
+        for (apPage in _args.accessProfiles[ap]) {
+            let apPageName=apPage.replaceAll(" ", "")
+
+            // String to put into html to show accordion item for current access profile
+            let isCurrentSection=""
+            if (apPageName==_args.section) { isCurrentSection='show' }
+
+            // Start sub-accordion item and Data filter container
+            let subAccordionItem=`
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading${apName}-${apPageName}">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}-${apPageName}">
+                        ${apPage}
+                    </button>
+                </h2>
+                <div id="collapse${apName}-${apPageName}" class="accordion-collapse collapse ${isCurrentSection}" data-bs-parent="#ap-sub-accordion-${apName}">
+                    <div class="accordion-body ap-sub-accordion-page-container">
+                        <div class="ap-filter-container">
+                            <div style="margin-top: 5px;">
+                                Data Filter:
+                            </div>`
+
+
+            // Set items to be black if this is a blacklist, or white if it is a whitelist
+            let dataFilterStyle='style="background-color: black; color: white;"'
+            if (_args.accessProfiles[ap][apPage].dataFilter.type=='w') { dataFilterStyle='style="background-color: white; color: black;"' }
+
+            // Add sub accordion items for the datafilter
+            for (col in _args.accessProfiles[ap][apPage].dataFilter.filter) {
+                let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle}>${col}:`
+
+                for (val of _args.accessProfiles[ap][apPage].dataFilter.filter[col]) {
+                    dataFilterItem=dataFilterItem.concat(`&nbsp${val},`)
+                }
+
+                dataFilterItem=dataFilterItem.concat(`<div class="delete-filter-item-button">x</div></div>`)
+                subAccordionItem=subAccordionItem.concat(dataFilterItem)
+            }
+
+            // End data filter container and start column filter container
+            subAccordionItem=subAccordionItem.concat(`
+                <div class="add-filter-item-button">
+                +
+                </div>
+            </div>
+            <div class="ap-filter-container">
+                        <div style="margin-top: 5px;">
+                            Column Filter:
+                        </div>
+            `)
+
+            // Set items to be black if this is a blacklist, or white if it is a whitelist
+            let columnFilterStyle='style="background-color: black; color: white;"'
+            if (_args.accessProfiles[ap][apPage].columnFilter.type=='w') { columnFilterStyle='style="background-color: white; color: black;"' }
+
+            // Add sub accordion items for the columnfilter
+            for (col of _args.accessProfiles[ap][apPage].columnFilter.filter) {
+                let columnFilterItem=`<div class="ap-filter-item" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
+
+                subAccordionItem=subAccordionItem.concat(columnFilterItem)
+            }
+
+            // End column filter container and entire sub accordion item
+            subAccordionItem=subAccordionItem.concat(`<div class="add-filter-item-button">+</div></div></div></div></div>`)
+
+            // Append sub accordion item to the accordion item for this profile
+            apAccordionItem=apAccordionItem.concat(subAccordionItem)
+        }
+
+        // End accordion item and append it to the top level accordion container
+        apAccordionItem=apAccordionItem.concat(`</div></div></div></div>`)
+        accessProfileAccordion.innerHTML+=apAccordionItem
+    }
+}

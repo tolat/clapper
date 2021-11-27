@@ -6,6 +6,8 @@
     let _apName= <%- JSON.stringify(apName)%>;
     let _sortedVersionKeys= <%- JSON.stringify(sortedVersionKeys)%>;
 
+    populateAccessProfileModal()
+
     let _version=_args.version;
     let _originalVersion=_args.version
     let _displaySettings=_accessProfile.displaySettings[_apName][_version]||{}

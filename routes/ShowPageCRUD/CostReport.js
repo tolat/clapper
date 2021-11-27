@@ -90,7 +90,7 @@ module.exports.update=async function (body, showId, user) {
         if (item['Set Code']) {
             // Save extra column values if they are not restricted
             for (col of body.extraColumns) {
-                if (!accessProfile.columnFilter.includes(col)) {
+                if (!crudUtils.isRestrictedColumn(col, accessProfile)) {
                     if (!show.costReport.setExtraColumnMap[item['Set Code']])
                         show.costReport.setExtraColumnMap[item['Set Code']]={}
                     show.costReport.setExtraColumnMap[item['Set Code']][col]=item[col];
@@ -203,9 +203,9 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
         data.push(item);
     }
 
-    data=crudUtils.filterRestrictedColumnData(data, accessProfile)
     let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'id')
-    data=data.filter(item => !restrictedItems.includes(item['id']))
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'id')
+        .filter(item => !restrictedItems.includes(item['id']))
 
     return data;
 }

@@ -8,7 +8,9 @@
     let _userPosForWeekMap= <%- JSON.stringify(userPosForWeekMap)%>;
     let _userNamesForWeekMap= <%- JSON.stringify(userNamesForWeekMap)%>;
     let _posDeptMap= <%- JSON.stringify(posDeptMap)%>;
+
     setWeekEnding()
+    populateAccessProfileModal()
 
     var _extraColumns=_week.rentals.extraColumns;
     var _validators=[

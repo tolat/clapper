@@ -4,7 +4,9 @@
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
+
     setWeekEnding()
+    populateAccessProfileModal()
 
     let _extraColumns=_week.positions.extraColumns;
     let _validators=[
