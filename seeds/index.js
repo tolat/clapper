@@ -141,8 +141,8 @@ const seedShows=async () => {
                         }
                     },
                     'Estimate': {
-                        columnFilter: { type: 'w', filter: ['Location', 'Notes'] },
-                        dataFilter: { type: 'b', filter: { 'Episode': ['200'] } },
+                        columnFilter: { type: 'b', filter: ['Location', 'Notes'] },
+                        dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 100: {}
