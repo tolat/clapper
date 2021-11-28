@@ -180,20 +180,8 @@
 
         columns.push({ id: "Week Total", name: "Week Total", field: "Week Total", width: 80, sortable: true, cssClass: 'uneditable currency' })
 
-        // Apply access profile column filter to hide restricted columns
-        for (col of columns) {
-            if (_accessProfile.columnFilter.includes(col.name)) {
-                if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
-                // Hide column
-                _displaySettings.setHiddenColumns.push(col.name)
-                // Lock coumn as hidden
-                col.lockHidden=true
-                // Remove required for save class from column
-                if (col.cssClass) {
-                    col.cssClass=col.cssClass.replaceAll("required-for-save", "")
-                }
-            }
-        }
+        // Apply access profile column filter to hide restricted columns if _version exists
+        columns=hideRestrictedColumns(columns, 'Rental Name')
 
         return columns;
     }

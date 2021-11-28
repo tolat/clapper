@@ -104,8 +104,8 @@
         }
 
 
-        // Apply access profile column filter to hide restricted columns if _version exists
-        columns=hideRestrictedColumns(columns, col.name)
+        // Apply access profile column filter to hide restricted columns 
+        columns=hideRestrictedColumns(columns, "Code")
 
         return columns;
     }
