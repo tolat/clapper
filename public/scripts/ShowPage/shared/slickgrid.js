@@ -2847,6 +2847,9 @@ populateAccessProfileModal=() => {
 
     // Create an accordion item for each accesss profile
     for (ap in _args.accessProfiles) {
+        // Don't show owner access profile
+        if (ap=='Owner') { continue }
+
         let apName=ap.replaceAll(" ", "")
 
         // String to put into html to show accordion item for current access profile
@@ -2873,7 +2876,7 @@ populateAccessProfileModal=() => {
             let isCurrentSection=""
             if (apPageName==_args.section) { isCurrentSection='show' }
 
-            // Start sub-accordion item and Data filter container
+            // Start sub-accordion item 
             let subAccordionItem=`
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading${apName}-${apPageName}">
@@ -2883,10 +2886,28 @@ populateAccessProfileModal=() => {
                 </h2>
                 <div id="collapse${apName}-${apPageName}" class="accordion-collapse collapse ${isCurrentSection}" data-bs-parent="#ap-sub-accordion-${apName}">
                     <div class="accordion-body ap-sub-accordion-page-container">
-                        <div class="ap-filter-container">
-                            <div style="margin-top: 5px;">
-                                Data Filter:
-                            </div>`
+                        <div class="access-profiles-checkbox-container">`
+
+
+            // Add checkbox options for accessProfile options
+            for (option in _args.accessProfiles[ap][apPage].options) {
+                let optionName=option.replaceAll(" ", "")
+                let value=''
+                if (_args.accessProfiles[ap][apPage].options[option]) { value='checked' }
+                subAccordionItem+=`
+                    <div class="access-profiles-checkbox" id="${apName}-${apPageName}-${optionName}-checkbox">
+                        <input type="checkbox" style="margin-right: 5px" ${value}>
+                        ${option}
+                    </div>`
+
+            }
+
+            // End checkbox container and Start Data filter container
+            subAccordionItem+=`</div>
+            <div class="ap-filter-container">
+                <div style="margin-top: 5px;">
+                    Data Filter:
+                </div>`
 
 
             // Set items to be black if this is a blacklist, or white if it is a whitelist
@@ -2895,18 +2916,23 @@ populateAccessProfileModal=() => {
 
             // Add sub accordion items for the datafilter
             for (col in _args.accessProfiles[ap][apPage].dataFilter.filter) {
-                let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle}>${col}:`
+                let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle}>${col}:<div id="${apName}-${apPageName}-column-filter-values" style="margin-left: 5px;">`
 
                 for (val of _args.accessProfiles[ap][apPage].dataFilter.filter[col]) {
-                    dataFilterItem=dataFilterItem.concat(`&nbsp${val},`)
+                    dataFilterItem+=`${val}`
+                    if (val!=_args.accessProfiles[ap][apPage].dataFilter.filter[col].at(-1)) {
+                        dataFilterItem+=','
+                    }
                 }
 
-                dataFilterItem=dataFilterItem.concat(`<div class="delete-filter-item-button">x</div></div>`)
-                subAccordionItem=subAccordionItem.concat(dataFilterItem)
+                dataFilterItem+=`</div><div class="edit-filter-item-button" 
+                onclick="toggleEditColumnFilterModal(true, '${ap}', '${apPage}', '${col}')">Edit</div></div>`
+
+                subAccordionItem+=dataFilterItem
             }
 
             // End data filter container and start column filter container
-            subAccordionItem=subAccordionItem.concat(`
+            subAccordionItem+=`
                 <div class="add-filter-item-button">
                 +
                 </div>
@@ -2915,7 +2941,7 @@ populateAccessProfileModal=() => {
                         <div style="margin-top: 5px;">
                             Column Filter:
                         </div>
-            `)
+            `
 
             // Set items to be black if this is a blacklist, or white if it is a whitelist
             let columnFilterStyle='style="background-color: black; color: white;"'
@@ -2925,18 +2951,78 @@ populateAccessProfileModal=() => {
             for (col of _args.accessProfiles[ap][apPage].columnFilter.filter) {
                 let columnFilterItem=`<div class="ap-filter-item" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
 
-                subAccordionItem=subAccordionItem.concat(columnFilterItem)
+                subAccordionItem+=columnFilterItem
             }
 
             // End column filter container and entire sub accordion item
-            subAccordionItem=subAccordionItem.concat(`<div class="add-filter-item-button">+</div></div></div></div></div>`)
+            subAccordionItem+=`<div class="add-filter-item-button">+</div></div></div></div></div>`
 
             // Append sub accordion item to the accordion item for this profile
-            apAccordionItem=apAccordionItem.concat(subAccordionItem)
+            apAccordionItem+=subAccordionItem
         }
 
         // End accordion item and append it to the top level accordion container
-        apAccordionItem=apAccordionItem.concat(`</div></div></div></div>`)
+        apAccordionItem+=`</div></div></div></div>`
         accessProfileAccordion.innerHTML+=apAccordionItem
     }
 }
+
+toggleEditColumnFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false) => {
+    if (show) {
+        document.getElementById('edit-column-filter-modal').style.display='flex';
+        document.getElementById('access-profiles-modal').style.display=null
+        document.getElementById('edit-column-filter-modal-memory').innerText=JSON.stringify({ ap, apPage, filterCol, newFilter })
+
+        let currentValues=document.getElementById(`${ap.replaceAll(" ", "")}-${apPage.replaceAll(" ", "")}-column-filter-values`).innerText
+        document.getElementById('edit-column-filter-modal-message').innerHTML=`
+        Items on the <b>${apPage}</b> page with values in the <b>${filterCol}</b> column that match values in the list below will be restricted for users who have been assigned the Access Profile <b>'${ap}'</b>. Use commas to separate the values in the list below:
+        <input id="edit-column-filter-modal-input" value="${currentValues}" style="margin-top: 10px; width: 100%;">`
+
+    } else {
+        document.getElementById('edit-column-filter-modal').style.display=null;
+
+        if (save) {
+            let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("edit-column-filter-modal-input").value)
+            let memory=JSON.parse(document.getElementById('edit-column-filter-modal-memory').innerText)
+
+            document.getElementById(`${memory.ap.replaceAll(" ", "")}-${memory.apPage.replaceAll(" ", "")}-column-filter-values`).innerText=newValues
+            _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter=newValues.split(',')
+        }
+
+        // Update and repopulate modal
+
+        document.getElementById('access-profiles-modal').style.display='flex';
+        grid.focus()
+    }
+}
+
+
+cleanUpColumnFilterModalInputValues=(vals) => {
+    let newVals=''
+    let beforeStart=true
+    let afterComma=false
+    for (v of vals) {
+        // Strip leading whitespace
+        if (v==' '&&beforeStart) { continue }
+        // Strip whitespace after commas
+        if (v==',') {
+            beforeStart=false
+            afterComma=true
+            newVals+=v
+            continue
+        }
+        if (afterComma) {
+            beforeStart=false
+            if (v==' ') { continue }
+            else {
+                newVals+=v
+                afterComma=false
+                continue
+            }
+        }
+        newVals+=v
+    }
+
+    return newVals
+}
+

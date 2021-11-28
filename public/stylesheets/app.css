@@ -10,6 +10,10 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+input[type="checkbox"] { 
+    filter: grayscale(0.1);
+}
+
 #navbar{
     position: fixed;
     width: 100%;
@@ -458,6 +462,19 @@ input.department-input:focus{
     background-image: none !important;
 }
 
+.access-profiles-checkbox-container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 5px;
+}
+
+.access-profiles-checkbox{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .ap-sub-accordion-page-container{
     display: flex;
     flex-direction: column;
@@ -476,6 +493,17 @@ input.department-input:focus{
     border: 1px solid black;
     border-radius: 2px;
     background-color: rgb(226, 226, 226);
+}
+
+.edit-filter-item-button{
+    margin-left: 10px;
+    padding-left: 5px;
+    color: gray;
+    font-weight: bold;
+}
+
+.edit-filter-item-button:hover{
+    cursor: pointer;
 }
 
 .delete-filter-item-button{

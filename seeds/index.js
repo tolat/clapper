@@ -130,7 +130,13 @@ const seedShows=async () => {
             accessProfiles: {
                 "Test Access": {
                     'Cost Report': {
-                        columnFilter: { type: 'w', filter: ['Budget', 'Name', 'Episode', 'Set Code'] },
+                        options: {
+                            'Add Columns': true,
+                            'Change Week': true,
+                            'Change Version': true,
+                            'Edit Accesss Profiles': true,
+                        },
+                        columnFilter: { type: 'b', filter: ['Budget', 'Name', 'Episode', 'Set Code'] },
                         dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
