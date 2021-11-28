@@ -61,7 +61,7 @@ module.exports.update=async function (body, showId, user) {
 
             // Set core position values
             for (key of ['Name', 'Department', 'Rate', 'Code']) {
-                if (!accessProfile.columnFilter.includes(key)) {
+                if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     pos[key]=item[key]
                 }
             }
@@ -70,7 +70,7 @@ module.exports.update=async function (body, showId, user) {
             let previousValues=pos.extraColumnValues
             pos.extraColumnValues={}
             for (key of body.extraColumns) {
-                !accessProfile.columnFilter.includes(key)? pos.extraColumnValues[key]=item[key]:
+                !crudUtils.isRestrictedColumn(key, accessProfile)? pos.extraColumnValues[key]=item[key]:
                     pos.extraColumnValues[key]=previousValues[key]
             }
 
@@ -131,16 +131,9 @@ function initializeData(positions, _show, _args, _week, accessProfile) {
         data.push(item);
     }
 
-    // Apply access profile to data removing restricted items and values from restricted columns
-    for (item of data) {
-        for (column of accessProfile.columnFilter) {
-            if (item[column]) {
-                item[column]=undefined
-            }
-        }
-    }
-    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'Code')
-    data=data.filter(item => !restrictedItems.includes(item['Code']))
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'id')
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'id')
+        .filter(item => !restrictedItems.includes(item['id']))
 
     return data;
 }

@@ -19,7 +19,7 @@ body::-webkit-scrollbar {
 }
 
 b#username{
-    font-size: 14pt;
+    font-size: 15pt;
 }
 
 #navbar .container-fluid{
@@ -69,6 +69,7 @@ button.navbar-toggler{
 
 #dropdownMenuButton1{
     border-radius: .1rem;
+    font-size: 14px;
 }
 
 .container-fluid.sheet-container{
@@ -419,6 +420,7 @@ input.department-input:focus{
     margin-right: 1rem;
     color: rgb(255, 193, 49);
     font-weight: bold;
+    font-size: 15px;
 }
 
 #access-profile-display:hover{

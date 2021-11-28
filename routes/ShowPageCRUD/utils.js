@@ -140,6 +140,7 @@ function findPrecedingWeek(weekEnd, weeks) {
     }
 }
 
+// Creates new weeks worked for users' showrecord who will be in the new week
 module.exports.copyWeekFromRecord=async function (body, show, record, newWeekId, user, currentWeekId) {
     let activeInNewWeek=[]
     let newWeekRecord={
@@ -185,6 +186,7 @@ module.exports.copyWeekFromRecord=async function (body, show, record, newWeekId,
     return activeInNewWeek
 }
 
+// Returns a list of all crew member ids that are in at least one week's crew list for this show
 module.exports.getAllCrewIDs=async function (showid) {
     let tempShow=await Show.findById(showid);
     let allCrewMembers=[]
@@ -200,6 +202,7 @@ module.exports.getAllCrewIDs=async function (showid) {
     return allCrewMembers
 }
 
+// Returns a list of all Users that are in at least one week's crew list for this show
 module.exports.getAllCrewUsers=async function (IDlist) {
     let userList=[]
     for (id of IDlist) {
@@ -277,6 +280,7 @@ module.exports.isRestrictedItem=function (item, accessProfile) {
     return false
 }
 
+// Returns true if column is restricted by the access profile
 module.exports.isRestrictedColumn=function (col, accessProfile) {
     const isWhitelist=accessProfile.columnFilter.type=='w'
     if (accessProfile.columnFilter.filter.includes(col)) {
@@ -288,13 +292,17 @@ module.exports.isRestrictedColumn=function (col, accessProfile) {
 // Checks if item has valid required-for-save fields filled
 module.exports.isValidItem=function (item, RFSkeys, accessProfile) {
     if (!item) { return false }
-    const isWhitelist=accessProfile.dataFilter.type=='w'
+    const isWhitelist=accessProfile.columnFilter.type=='w'
     for (key of RFSkeys) {
         if (!item[key]) {
             if (accessProfile.columnFilter.filter.includes(key)) {
-                return !isWhitelist
+                if (isWhitelist) {
+                    return false
+                } else {
+                    continue
+                }
             } else {
-                return isWhitelist
+                return false
             }
         }
     }
@@ -330,6 +338,7 @@ module.exports.findFirstContainingWeek=function (day, weeks) {
     return false
 }
 
+// Calculate daily labor cost given multipliers, hours for that day, a rate and a date
 module.exports.calculateDailyLaborCost=function (multipliers, hours, rate, day) {
     let total=0;
 
@@ -355,14 +364,13 @@ module.exports.calculateDailyLaborCost=function (multipliers, hours, rate, day) 
     return total;
 }
 
+// REturns true if day is is in current week and user is also in the current week's crewlist
 module.exports.isInCurrentWeek=function (day, user, _week) {
     let dateMS=new Date(day).getTime()
     let weekEndMS=new Date(_week.end).getTime()
-    if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
-        if (_week.crew.crewList.find(c => c.username==user.username)) {
-            return true
-        }
-    }
+    return dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)&&
+        _week.crew.crewList.find(c => c.username==user.username)
+
 }
 
 // Parse cell-value map for timesheet generation from slickgrid data

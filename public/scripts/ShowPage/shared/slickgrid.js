@@ -2803,7 +2803,7 @@ toggleAccessProfilesModal=(show) => {
 // Applies acces profile to hide restricted columns
 hideRestrictedColumns=(columns, IDkey) => {
     // Apply access profile column filter to hide restricted columns if _version exists
-    if (!_show.estimateVersions[_version]) { return [] }
+    if (_args.section=='Estimate'&&!_show.estimateVersions[_version]) { return [] }
 
     // initialize hidden columns display setting if it is empty
     if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }

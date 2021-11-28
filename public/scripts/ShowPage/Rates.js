@@ -125,8 +125,6 @@ toggleMultipliersModal=(show, update=false) => {
     else {
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('multipliers-modal').style.display='flex';
-        document.getElementById('week-ending-display').style.zIndex=199;
-        document.getElementById('week-ending-display').style.backgroundColor='white';
         loadMultipliersModal();
     }
 }

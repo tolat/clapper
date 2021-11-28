@@ -97,7 +97,7 @@ module.exports.update=async function (body, showId, user) {
             // Update display keys
             let displayKeys=['Name', 'username']
             for (key of displayKeys) {
-                if (!accessProfile.columnFilter.includes(key))
+                if (!crudUtils.isRestrictedColumn(key, accessProfile))
                     user[key]=item[key];
             }
 
@@ -127,7 +127,7 @@ module.exports.update=async function (body, showId, user) {
             let previousValues=record.weeksWorked[week._id].extraColumnValues[item['Position']]||false
             record.weeksWorked[week._id].extraColumnValues[item['Position']]={}
             for (key of body.extraColumns) {
-                if (!accessProfile.columnFilter.includes(key)) {
+                if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     record.weeksWorked[week._id].extraColumnValues[item['Position']][key]=item[key]
                 } else if (previousValues) {
                     record.weeksWorked[week._id].extraColumnValues[item['Position']][key]=previousValues[key]
@@ -138,7 +138,7 @@ module.exports.update=async function (body, showId, user) {
             previousValues=record.weeksWorked[week._id].taxColumnValues[item['Position']]||false
             record.weeksWorked[week._id].taxColumnValues[item['Position']]={}
             for (key of body.taxColumns) {
-                if (!accessProfile.columnFilter.includes(key)) {
+                if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     record.weeksWorked[week._id].taxColumnValues[item['Position']][key]=item[key]
                 } else if (previousValues) {
                     record.weeksWorked[week._id].taxColumnValues[item['Position']][key]=previousValues[key]
@@ -223,7 +223,9 @@ module.exports.update=async function (body, showId, user) {
         updatedList.push(week.crew.crewList.find(c => c['username']==item))
     }
 
+    // Update week's crew list with updated list
     week.crew.crewList=updatedList
+
     show.markModified('weeks')
     show.markModified('weeks.crew')
     show.markModified('weeks.crew.crewList')
@@ -298,18 +300,10 @@ function initializeData(crew, _show, week, accessProfile=false) {
         }
     }
 
-    // Apply access profile to filter data if it has been passed
     if (accessProfile) {
-        // Apply access profile to data removing restricted items and values from restricted columns
-        for (item of data) {
-            for (column of accessProfile.columnFilter) {
-                if (item[column]) {
-                    item[column]=undefined
-                }
-            }
-        }
         let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'id')
-        data=data.filter(item => !restrictedItems.includes(item['id']))
+        data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'id')
+            .filter(item => !restrictedItems.includes(item['id']))
     }
 
     return data;

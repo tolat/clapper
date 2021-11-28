@@ -91,8 +91,8 @@
     function initializeColumns(positions, _show, _args) {
         let columns=[
             { id: "__spacer", width: 0, sortable: false },
-            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Code", name: "Code", field: "Code", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
+            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 200, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
             { id: "Rate", name: "Rate", field: "Rate", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save rate' },
         ];
@@ -103,20 +103,10 @@
             columns.push(column);
         }
 
-        // Apply access profile column filter to hide restricted columns
-        for (col of columns) {
-            if (_accessProfile.columnFilter.includes(col.name)) {
-                if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
-                // Hide column
-                _displaySettings.setHiddenColumns.push(col.name)
-                // Lock coumn as hidden
-                col.lockHidden=true
-                // Remove required for save class from column
-                if (col.cssClass) {
-                    col.cssClass=col.cssClass.replaceAll("required-for-save", "")
-                }
-            }
-        }
+
+        // Apply access profile column filter to hide restricted columns if _version exists
+        columns=hideRestrictedColumns(columns, col.name)
+
         return columns;
     }
 

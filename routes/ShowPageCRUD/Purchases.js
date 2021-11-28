@@ -78,7 +78,7 @@ module.exports.update=async function (body, showId, user) {
             // Save display key data
             let displayKeys=['Set Code', 'Department', 'Date', 'PO Num', 'Invoice Num', 'Supplier', 'Amount', 'Description']
             for (key of displayKeys) {
-                if (!accessProfile.columnFilter.includes(key))
+                if (!crudUtils.isRestrictedColumn(key, accessProfile))
                     p[key]=item[key];
             }
 
@@ -86,7 +86,7 @@ module.exports.update=async function (body, showId, user) {
             let previousValues=p.extraColumnValues
             p.extraColumnValues={};
             for (key of body.extraColumns) {
-                !accessProfile.columnFilter.includes(key)? p.extraColumnValues[key]=item[key]:
+                !crudUtils.isRestrictedColumn(key, accessProfile)? p.extraColumnValues[key]=item[key]:
                     p.extraColumnValues[key]=previousValues[key]
             }
 
@@ -94,7 +94,7 @@ module.exports.update=async function (body, showId, user) {
             previousValues=p.extraColumnValues
             p.taxColumnValues={}
             for (key of show.purchases.taxColumns) {
-                !accessProfile.columnFilter.includes(key)? p.taxColumnValues[key]=item[key]:
+                !crudUtils.isRestrictedColumn(key, accessProfile)? p.taxColumnValues[key]=item[key]:
                     p.taxColumnValues[key]=previousValues[key]
             }
 
@@ -176,16 +176,10 @@ function initializeData(purchases, _show, _args, week, accessProfile, version) {
         data.push(item);
     }
 
-    // Apply access profile to data removing restricted items and values from restricted columns
-    for (item of data) {
-        for (column of accessProfile.columnFilter) {
-            if (item[column]) {
-                item[column]=undefined
-            }
-        }
-    }
+
     let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'PO Num')
-    data=data.filter(item => !restrictedItems.includes(item['PO Num']))
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'PO Num')
+        .filter(item => !restrictedItems.includes(item['PO Num']))
 
     return data;
 }
