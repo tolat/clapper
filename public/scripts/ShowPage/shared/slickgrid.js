@@ -2933,7 +2933,7 @@ populateAccessProfileModal=() => {
 
 
                 dataFilterItem+=`</div><div class="edit-filter-item-button" style = "color: ${editButtonColor};" 
-                onclick="toggleEditColumnFilterModal(true, '${ap}', '${apPage}', '${col}')">Edit</div></div>`
+                onclick="toggleEditDataFilterModal(true, '${ap}', '${apPage}', '${col}')">Edit</div></div>`
 
                 subAccordionItem+=dataFilterItem
             }
@@ -2975,23 +2975,24 @@ populateAccessProfileModal=() => {
     }
 }
 
-toggleEditColumnFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false, del=false) => {
+// Hide and shoe the modal to edit a cloumn 
+toggleEditDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false, del=false) => {
     if (show) {
-        document.getElementById('edit-column-filter-modal').style.display='flex';
+        document.getElementById('edit-data-filter-modal').style.display='flex';
         document.getElementById('access-profiles-modal').style.display=null
-        document.getElementById('edit-column-filter-modal-memory').innerText=JSON.stringify({ ap, apPage, filterCol, newFilter })
+        document.getElementById('edit-data-filter-modal-memory').innerText=JSON.stringify({ ap, apPage, filterCol, newFilter })
 
         let currentValues=document.getElementById(`${ap.replaceAll(" ", "")}-${apPage.replaceAll(" ", "")}-column-filter-values`).innerText
-        document.getElementById('edit-column-filter-modal-message').innerHTML=`
+        document.getElementById('edit-data-filter-modal-message').innerHTML=`
         Items on the <b>${apPage}</b> page with values in the <b>${filterCol}</b> column that match values in the list below will be restricted for users who have been assigned the Access Profile <b>'${ap}'</b>. Use commas to separate the values in the list below:
-        <input id="edit-column-filter-modal-input" value="${currentValues}" style="margin-top: 10px; width: 100%;">`
+        <input id="edit-data-filter-modal-input" value="${currentValues}" style="margin-top: 10px; width: 100%;">`
 
     } else {
-        document.getElementById('edit-column-filter-modal').style.display=null;
-        let memory=JSON.parse(document.getElementById('edit-column-filter-modal-memory').innerText)
+        document.getElementById('edit-data-filter-modal').style.display=null;
+        let memory=JSON.parse(document.getElementById('edit-data-filter-modal-memory').innerText)
 
         if (save) {
-            let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("edit-column-filter-modal-input").value)
+            let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("edit-data-filter-modal-input").value)
             document.getElementById(`${memory.ap.replaceAll(" ", "")}-${memory.apPage.replaceAll(" ", "")}-column-filter-values`).innerText=newValues.replaceAll(',', ', ')
             _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter=newValues.split(',')
         } else if (del) {
