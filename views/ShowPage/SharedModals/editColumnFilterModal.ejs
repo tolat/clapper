@@ -1,11 +1,11 @@
 <div id="edit-column-filter-modal" class="grid-modal" style="min-height: 5rem; min-width: 68%;">
-    <div id="edit-column-filter-modal-message">
-
-    </div>
+    <div style="color: black;" onclick="toggleEditColumnFilterModal(false)">Back</div>
+    <div id="edit-column-filter-modal-message"></div>
     <div id="edit-column-filter-modal-memory" style="display: none;"></div>
     <div class="modal-button-container">
-        <button id="edit-column-filter-modal-cancel" onclick="toggleEditColumnFilterModal(false)"
-            style="color: black;">Cancel</button>
+        <button id="edit-column-filter-modal-cancel"
+            onclick="toggleEditColumnFilterModal(false,false,false,false,false,false,true)"
+            style="color: red;">Delete</button>
         <button id="edit-column-filter-modal-save"
             onclick="toggleEditColumnFilterModal(false,false,false,false,false,true)"
             style="color: green;">Save</button>

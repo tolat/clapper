@@ -284,10 +284,8 @@ module.exports.isRestrictedItem=function (item, accessProfile) {
 module.exports.isRestrictedColumn=function (col, accessProfile) {
     const isWhitelist=accessProfile.columnFilter.type=='w'
     if (accessProfile.columnFilter.filter.includes(col)) {
-        console.log(`column ${col} found in filter. restricted is ${!isWhitelist}`)
         return !isWhitelist
     } else {
-        console.log(`column ${col} NOT found in filter. restricted is ${isWhitelist}`)
         return isWhitelist
     }
 }

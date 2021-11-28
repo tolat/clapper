@@ -498,8 +498,8 @@ input.department-input:focus{
 .edit-filter-item-button{
     margin-left: 10px;
     padding-left: 5px;
-    color: gray;
     font-weight: bold;
+    border-left: 1px solid grey;
 }
 
 .edit-filter-item-button:hover{
@@ -512,6 +512,7 @@ input.department-input:focus{
     padding-left: 5px;
     color: red;
     font-weight: bold;
+    border-left: 1px solid grey;
 }
 
 .add-filter-item-button{

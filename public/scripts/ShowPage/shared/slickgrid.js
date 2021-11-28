@@ -2910,22 +2910,29 @@ populateAccessProfileModal=() => {
                 </div>`
 
 
-            // Set items to be black if this is a blacklist, or white if it is a whitelist
+            // Set styles for whitelist/blacklist
             let dataFilterStyle='style="background-color: black; color: white;"'
-            if (_args.accessProfiles[ap][apPage].dataFilter.type=='w') { dataFilterStyle='style="background-color: white; color: black;"' }
+            let editButtonColor='white'
+            if (_args.accessProfiles[ap][apPage].dataFilter.type=='w') {
+                dataFilterStyle='style="background-color: white; color: black;"'
+                editButtonColor='black'
+            }
 
             // Add sub accordion items for the datafilter
             for (col in _args.accessProfiles[ap][apPage].dataFilter.filter) {
-                let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle}>${col}:<div id="${apName}-${apPageName}-column-filter-values" style="margin-left: 5px;">`
+                let colName=col.replaceAll(' ', '')
+                let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle} id="${apName}-${apPageName}-dataFilter-${colName}">
+                ${col}:<div id="${apName}-${apPageName}-column-filter-values" style="margin-left: 5px;">`
 
                 for (val of _args.accessProfiles[ap][apPage].dataFilter.filter[col]) {
                     dataFilterItem+=`${val}`
                     if (val!=_args.accessProfiles[ap][apPage].dataFilter.filter[col].at(-1)) {
-                        dataFilterItem+=','
+                        dataFilterItem+=', '
                     }
                 }
 
-                dataFilterItem+=`</div><div class="edit-filter-item-button" 
+
+                dataFilterItem+=`</div><div class="edit-filter-item-button" style = "color: ${editButtonColor};" 
                 onclick="toggleEditColumnFilterModal(true, '${ap}', '${apPage}', '${col}')">Edit</div></div>`
 
                 subAccordionItem+=dataFilterItem
@@ -2949,7 +2956,8 @@ populateAccessProfileModal=() => {
 
             // Add sub accordion items for the columnfilter
             for (col of _args.accessProfiles[ap][apPage].columnFilter.filter) {
-                let columnFilterItem=`<div class="ap-filter-item" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
+                let colName=col.replaceAll(' ', '')
+                let columnFilterItem=`<div class="ap-filter-item" id="${apName}-${apPageName}-columnFilter-${colName}" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
 
                 subAccordionItem+=columnFilterItem
             }
@@ -2967,7 +2975,7 @@ populateAccessProfileModal=() => {
     }
 }
 
-toggleEditColumnFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false) => {
+toggleEditColumnFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false, del=false) => {
     if (show) {
         document.getElementById('edit-column-filter-modal').style.display='flex';
         document.getElementById('access-profiles-modal').style.display=null
@@ -2980,13 +2988,15 @@ toggleEditColumnFilterModal=(show, ap=false, apPage=false, filterCol=false, newF
 
     } else {
         document.getElementById('edit-column-filter-modal').style.display=null;
+        let memory=JSON.parse(document.getElementById('edit-column-filter-modal-memory').innerText)
 
         if (save) {
             let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("edit-column-filter-modal-input").value)
-            let memory=JSON.parse(document.getElementById('edit-column-filter-modal-memory').innerText)
-
-            document.getElementById(`${memory.ap.replaceAll(" ", "")}-${memory.apPage.replaceAll(" ", "")}-column-filter-values`).innerText=newValues
+            document.getElementById(`${memory.ap.replaceAll(" ", "")}-${memory.apPage.replaceAll(" ", "")}-column-filter-values`).innerText=newValues.replaceAll(',', ', ')
             _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter=newValues.split(',')
+        } else if (del) {
+            document.getElementById(`${memory.ap.replaceAll(" ", "")}-${memory.apPage.replaceAll(" ", "")}-dataFilter-${memory.filterCol.replaceAll(' ', '')}`).remove()
+            delete _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter[memory.filterCol]
         }
 
         // Update and repopulate modal
