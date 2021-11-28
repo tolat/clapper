@@ -284,9 +284,12 @@ module.exports.isRestrictedItem=function (item, accessProfile) {
 module.exports.isRestrictedColumn=function (col, accessProfile) {
     const isWhitelist=accessProfile.columnFilter.type=='w'
     if (accessProfile.columnFilter.filter.includes(col)) {
+        console.log(`column ${col} found in filter. restricted is ${!isWhitelist}`)
         return !isWhitelist
+    } else {
+        console.log(`column ${col} NOT found in filter. restricted is ${isWhitelist}`)
+        return isWhitelist
     }
-    return isWhitelist
 }
 
 // Checks if item has valid required-for-save fields filled
@@ -302,7 +305,11 @@ module.exports.isValidItem=function (item, RFSkeys, accessProfile) {
                     continue
                 }
             } else {
-                return false
+                if (isWhitelist) {
+                    continue
+                } else {
+                    return false
+                }
             }
         }
     }

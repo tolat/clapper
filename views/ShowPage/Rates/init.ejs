@@ -23,7 +23,7 @@
             isInvalid: function (args, field) {
                 this.validationHeader=`Department '${args.item[field]}' Not Found!`
                 this.validationMessage=`New departments can only be added in the 'Estimates' page.\nDepartments are case-sensitive!`
-                if (args.item[field]==undefined) { args.item[field]="" }
+                if (args.item[field]==undefined) { return false; }
                 let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
                 let dep=false;
                 if (depIdx>=0) {

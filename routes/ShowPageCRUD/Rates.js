@@ -131,9 +131,9 @@ function initializeData(positions, _show, _args, _week, accessProfile) {
         data.push(item);
     }
 
-    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'id')
-    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'id')
-        .filter(item => !restrictedItems.includes(item['id']))
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'Code')
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'Code')
+        .filter(item => !restrictedItems.includes(item['Code']))
 
     return data;
 }

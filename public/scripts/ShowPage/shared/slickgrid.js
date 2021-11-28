@@ -2828,10 +2828,14 @@ hideRestrictedColumns=(columns, IDkey) => {
         }
     }
 
-    // Always show the IDkey column
+    // Always show the IDkey column, but set to uneditable if it is restricted
     if (_displaySettings.setHiddenColumns.includes(IDkey)) {
         _displaySettings.setHiddenColumns.splice(_displaySettings.setHiddenColumns.indexOf(IDkey), 1)
-        columns[columns.indexOf(columns.find(c => c.field==IDkey))].lockHidden=false
+
+        let idCol=columns[columns.indexOf(columns.find(c => c.field==IDkey))]
+        idCol.lockHidden=false
+        idCol.editor=undefined
+        idCol.cssClass+=`\nuneditable`
     }
 
     return columns

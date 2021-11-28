@@ -159,7 +159,7 @@ const seedShows=async () => {
                         }
                     },
                     'Rentals': {
-                        columnFilter: { type: 'b', filter: ['Supplier'] },
+                        columnFilter: { type: 'w', filter: ['Supplier'] },
                         dataFilter: { type: 'b', filter: { 'Department': ['Construction'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
@@ -177,8 +177,8 @@ const seedShows=async () => {
                         }
                     },
                     'Rates': {
-                        columnFilter: { type: 'b', filter: ['Rate'] },
-                        dataFilter: { type: 'w', filter: { Department: ['Construction'] } },
+                        columnFilter: { type: 'w', filter: ['Rate', 'Code'] },
+                        dataFilter: { type: 'b', filter: { Department: ['Construction'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}

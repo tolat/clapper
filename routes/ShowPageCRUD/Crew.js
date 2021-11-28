@@ -301,9 +301,9 @@ function initializeData(crew, _show, week, accessProfile=false) {
     }
 
     if (accessProfile) {
-        let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'id')
-        data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'id')
-            .filter(item => !restrictedItems.includes(item['id']))
+        let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'username')
+        data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'username')
+            .filter(item => !restrictedItems.includes(item['username']))
     }
 
     return data;
