@@ -130,8 +130,8 @@ const seedShows=async () => {
             accessProfiles: {
                 "Test Access": {
                     'Cost Report': {
-                        columnFilter: { type: 'b', filter: [] },
-                        dataFilter: { type: 'b', filter: {} },
+                        columnFilter: { type: 'w', filter: ['Budget', 'Name', 'Episode', 'Set Code'] },
+                        dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 100: {
@@ -151,7 +151,7 @@ const seedShows=async () => {
                     },
                     'Purchases': {
                         columnFilter: { type: 'b', filter: ['Invoice Num'] },
-                        dataFilter: { type: 'b', filter: { 'Set Code': ['103'] } },
+                        dataFilter: { type: 'w', filter: { 'Set Code': ['103', '104', '105'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
@@ -169,7 +169,7 @@ const seedShows=async () => {
                     },
                     'Crew': {
                         columnFilter: { type: 'b', filter: ['Email'] },
-                        dataFilter: { type: 'b', filter: { 'Department': ['Construction', 'Metal Fab', 'Sculptors', 'Greens'] } },
+                        dataFilter: { type: 'w', filter: { 'Department': ['Construction', 'Metal Fab', 'Sculptors', 'Greens'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
@@ -178,7 +178,7 @@ const seedShows=async () => {
                     },
                     'Rates': {
                         columnFilter: { type: 'b', filter: ['Rate'] },
-                        dataFilter: { type: 'b', filter: { Department: ['Construction'] } },
+                        dataFilter: { type: 'w', filter: { Department: ['Construction'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
