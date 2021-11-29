@@ -2736,6 +2736,7 @@ isEmpty=(item) => {
     return true
 }
 
+// Select an entire row
 selectRow=() => {
     let ranges=grid.getSelectionModel().getSelectedRanges()
     let selectedRows=[]
@@ -3054,7 +3055,7 @@ toggleEditDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFil
     }
 }
 
-
+// Cleans up column filter modal input list by removing leading and trailing whitespace, as well as after commas
 cleanUpColumnFilterModalInputValues=(vals) => {
     let newVals=''
     let beforeStart=true
