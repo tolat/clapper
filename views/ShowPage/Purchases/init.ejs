@@ -7,7 +7,7 @@
     let _apName= <%- JSON.stringify(apName)%>;
 
     setWeekEnding()
-    populateAccessProfileModal()
+    populateAccessProfileModal(false, false, true)
 
     let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
     let _extraColumns=_show.purchases.extraColumns;
