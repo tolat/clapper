@@ -2860,9 +2860,9 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
         let apName=ap.replaceAll(" ", "")
 
         // String to put into html to show accordion item for current access profile
-        let isCurrentProfile=""
+        let isCurrentProfile=''
         if (ap==showAp) { isCurrentProfile='show' }
-        else if (ap==_args.accessProfileName) { isCurrentProfile='show' }
+        else if (ap==_args.accessProfileName&&!showAp) { isCurrentProfile='show' }
 
         let apAccordionItem=`
         <div class="accordion-item">
@@ -2883,7 +2883,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             // String to put into html to show accordion item for current access profile
             let isCurrentSection=""
             if (apPage==showPage) { isCurrentSection='show' }
-            else if (apPageName==_args.section) { isCurrentSection='show' }
+            else if (apPageName==_args.section&&!showPage) { isCurrentSection='show' }
 
             // Start sub-accordion item 
             let subAccordionItem=`
