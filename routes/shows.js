@@ -42,36 +42,50 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
             'Cost Report': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Estimate': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Purchases': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Rentals': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Crew': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Rates': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Timesheets': {
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
+                editColumnFilter: { type: 'b', filter: [] },
+                editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             }
 

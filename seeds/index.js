@@ -172,8 +172,8 @@ const seedShows=async () => {
                     'Purchases': {
                         columnFilter: { type: 'b', filter: ['Invoice Num'] },
                         dataFilter: { type: 'w', filter: { 'Set Code': ['103', '104', '105'] } },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
@@ -183,8 +183,8 @@ const seedShows=async () => {
                     'Rentals': {
                         columnFilter: { type: 'w', filter: ['Supplier'] },
                         dataFilter: { type: 'b', filter: { 'Department': ['Construction'] } },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
@@ -194,8 +194,8 @@ const seedShows=async () => {
                     'Crew': {
                         columnFilter: { type: 'b', filter: ['Email'] },
                         dataFilter: { type: 'w', filter: { 'Department': ['Construction', 'Metal Fab', 'Sculptors', 'Greens'] } },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
@@ -205,8 +205,8 @@ const seedShows=async () => {
                     'Rates': {
                         columnFilter: { type: 'w', filter: ['Rate', 'Code'] },
                         dataFilter: { type: 'b', filter: { Department: ['Construction'] } },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 [`${firstWeekId}`]: {}
@@ -216,8 +216,8 @@ const seedShows=async () => {
                     'Timesheets': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {}
                     }
                 },
