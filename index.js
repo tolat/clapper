@@ -136,7 +136,7 @@ app.get('/logout', isLoggedIn, (req, res) => {
 
 // 404 Route / no other route matched
 app.all('*', (req, res, next) => {
-    console.log(`\n\nNo route matched for ${req}\n\n`)
+    console.log(`\n\nNo route matched for ${req.originalUrl}\n\n`)
     next(new ExpressError('Page Not Found', 404))
 })
 

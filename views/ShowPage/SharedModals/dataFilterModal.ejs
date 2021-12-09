@@ -1,0 +1,19 @@
+<div id="data-filter-modal" class="grid-modal" style="min-height: 5rem; min-width: 80px;">
+    <div id="data-filter-modal-message"></div>
+    <label for="data-filter-column-input" id="data-filter-column-input-label"
+        style="display: none; margin-top: 5px;">Enter filter
+        column:</label>
+    <input type="text" id="data-filter-column-input" name="data-filter-column-input" style="width: 100%;">
+    <div id="data-filter-modal-memory" style="display: none;"></div>
+    <div id="data-filter-modal-memory-filterKey" style="display: none;"></div>
+    <label for="data-filter-modal-input" id="data-filter-modal-input-label" style="margin-top: 5px;">Enter
+        filtered
+        values separated by commas:</label>
+    <input id="data-filter-modal-input" name="data-filter-modal-input" style="margin-top: 10px; width: 100%;">
+    <div class="modal-button-container">
+        <button id="data-filter-modal-delete" onclick="toggleDataFilterModal(false,false,false,false,false,false,true)"
+            style="color: red;">Delete</button>
+        <button id="data-filter-modal-save" onclick="toggleDataFilterModal(false,false,false,false,false,true)"
+            style="color: green;">Save</button>
+    </div>
+</div>

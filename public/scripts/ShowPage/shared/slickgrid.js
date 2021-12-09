@@ -2911,68 +2911,23 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
 
             }
 
-            // End checkbox container and Start Data filter container
-            subAccordionItem+=`</div>
-            <div class="ap-filter-container">
-                <div style="margin-top: 5px;">
-                    Data Filter:
-                </div>`
+            // End checkbox container 
+            subAccordionItem+=`</div>`
 
+            // Add items for dataFilter
+            subAccordionItem+=generateDataFilterHtml(_args.accessProfiles[ap][apPage].dataFilter, ap, apPage, apName, apPageName, 'Access Data', 'dataFilter')
 
-            // Set styles for whitelist/blacklist
-            let dataFilterStyle='style="background-color: black; color: white;"'
-            let editButtonColor='white'
-            if (_args.accessProfiles[ap][apPage].dataFilter.type=='w') {
-                dataFilterStyle='style="background-color: white; color: black;"'
-                editButtonColor='black'
-            }
+            // Add items for columnFilter
+            subAccordionItem+=generateColumnFilterItem(_args.accessProfiles[ap][apPage].columnFilter, ap, apPage, apName, apPageName, 'Access Columns', 'columnFilter')
 
-            // Add sub accordion items for the datafilter
-            for (col in _args.accessProfiles[ap][apPage].dataFilter.filter) {
-                let colName=col.replaceAll(' ', '')
-                let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle} id="${apName}-${apPageName}-dataFilter-${colName}">
-                ${col}:<div id="${apName}-${apPageName}-${colName}-data-filter-values" style="margin-left: 5px;">`
+            // Add items for dataFilter
+            subAccordionItem+=generateDataFilterHtml(_args.accessProfiles[ap][apPage].editDataFilter, ap, apPage, apName, apPageName, 'Edit Data', 'editDataFilter')
 
-                for (val of _args.accessProfiles[ap][apPage].dataFilter.filter[col]) {
-                    dataFilterItem+=`${val}`
-                    if (val!=_args.accessProfiles[ap][apPage].dataFilter.filter[col].at(-1)) {
-                        dataFilterItem+=', '
-                    }
-                }
+            // Add items for columnFilter
+            subAccordionItem+=generateColumnFilterItem(_args.accessProfiles[ap][apPage].editColumnFilter, ap, apPage, apName, apPageName, 'Edit Columns', 'editColumnFilter')
 
-
-                dataFilterItem+=`</div><div class="edit-filter-item-button" style = "color: ${editButtonColor};" 
-                onclick="toggleEditDataFilterModal(true, '${ap}', '${apPage}', '${col}')">Edit</div></div>`
-
-                subAccordionItem+=dataFilterItem
-            }
-
-            // End data filter container and start column filter container
-            subAccordionItem+=`
-                <div class="add-filter-item-button" onclick="toggleEditDataFilterModal(true, '${ap}', '${apPage}', '${col}', true)">
-                +
-                </div>
-            </div>
-            <div class="ap-filter-container">
-                        <div style="margin-top: 5px;">
-                            Column Filter:
-                        </div>
-            `
-
-            // Set items to be black if this is a blacklist, or white if it is a whitelist
-            let columnFilterStyle='style="background-color: black; color: white;"'
-            if (_args.accessProfiles[ap][apPage].columnFilter.type=='w') { columnFilterStyle='style="background-color: white; color: black;"' }
-
-            // Add sub accordion items for the columnfilter
-            for (col of _args.accessProfiles[ap][apPage].columnFilter.filter) {
-                let colName=col.replaceAll(' ', '')
-                let columnFilterItem=`<div class="ap-filter-item" id="${apName}-${apPageName}-columnFilter-${colName}" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
-
-                subAccordionItem+=columnFilterItem
-            }
-
-            // End column filter container and entire sub accordion item
-            subAccordionItem+=`<div class="add-filter-item-button">+</div></div></div></div></div>`
+            // End sub-accordion item
+            subAccordionItem+=`</div></div></div>`
 
             // Append sub accordion item to the accordion item for this profile
             apAccordionItem+=subAccordionItem
@@ -2985,71 +2940,78 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
 }
 
 // Hide and shoe the modal to edit a cloumn 
-toggleEditDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false, del=false) => {
+toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false, del=false, filterKey=null) => {
     if (show) {
-        document.getElementById('edit-data-filter-modal').style.display='flex';
+        document.getElementById('data-filter-modal').style.display='flex';
         document.getElementById('access-profiles-modal').style.display=null
-        document.getElementById('edit-data-filter-modal-memory').innerText=JSON.stringify({ ap, apPage, filterCol, newFilter })
+        document.getElementById('data-filter-modal-memory').innerText=JSON.stringify({ ap, apPage, filterCol, newFilter })
+        document.getElementById('data-filter-modal-memory-filterKey').innerText=filterKey
 
         if (newFilter) {
-            document.getElementById('edit-data-filter-modal-message').innerHTML=`Enter filtered values and a filter column for the <b>${apPage}</b> page (Access Profile: <b>${ap}</b>).`
+            document.getElementById('data-filter-modal-message').innerHTML=`Enter filtered values and a filter column for the <b>${apPage}</b> page (Access Profile: <b>${ap}</b>).`
             document.getElementById('data-filter-column-input').style.display='flex'
             document.getElementById('data-filter-column-input-label').style.display='flex'
 
-            document.getElementById('edit-data-filter-modal-delete').style.color='black'
-            document.getElementById('edit-data-filter-modal-delete').innerText='Cancel'
-            document.getElementById('edit-data-filter-modal-delete').setAttribute('onclick', 'toggleEditDataFilterModal(false)')
+            document.getElementById('data-filter-modal-delete').style.color='black'
+            document.getElementById('data-filter-modal-delete').innerText='Cancel'
+            document.getElementById('data-filter-modal-delete').setAttribute('onclick', 'toggleDataFilterModal(false)')
         } else {
             document.getElementById('data-filter-column-input').style.display='none'
             document.getElementById('data-filter-column-input-label').style.display='none'
 
-            let currentValues=document.getElementById(`${ap.replaceAll(" ", "")}-${apPage.replaceAll(" ", "")}-${filterCol.replaceAll(" ", "")}-data-filter-values`).innerText
-            console.log(currentValues)
-            document.getElementById('edit-data-filter-modal-message').innerHTML=`Enter filtered values for <b>${filterCol}</b> column on the <b>${apPage}</b> page (Access Profile: <b>${ap}</b>).`
-            document.getElementById('edit-data-filter-modal-input').value=currentValues
+            let memory=JSON.parse(document.getElementById('data-filter-modal-memory').innerText)
+            let currentValues=_args.accessProfiles[memory.ap][memory.apPage][filterKey].filter[filterCol].join(', ')
+
+            document.getElementById('data-filter-modal-message').innerHTML=`Enter filtered values for <b>${filterCol}</b> column on the <b>${apPage}</b> page (Access Profile: <b>${ap}</b>).`
+            document.getElementById('data-filter-modal-input').value=currentValues
         }
 
     } else {
-        document.getElementById('edit-data-filter-modal').style.display=null;
-        let memory=JSON.parse(document.getElementById('edit-data-filter-modal-memory').innerText)
+        document.getElementById('data-filter-modal').style.display=null;
+        let memory=JSON.parse(document.getElementById('data-filter-modal-memory').innerText)
         let apName=memory.ap.replaceAll(" ", "")
         let apPageName=memory.apPage.replaceAll(" ", "")
         let filterColName=memory.filterCol.replaceAll(' ', '')
 
+        // Reset buttons on edit filter modal
+        document.getElementById('data-filter-modal-delete').style.color='red'
+        document.getElementById('data-filter-modal-delete').innerText='Delete'
+        document.getElementById('data-filter-modal-delete').setAttribute('onclick', 'toggleDataFilterModal(false,false,false,false,false,false,true)')
+
+        // Get filterKey (determines which filter gets edited) from the modal memory div
+        filterKey=document.getElementById('data-filter-modal-memory-filterKey').innerText
+
+        // Save data filter filter 
         if (save) {
             // Trim all whitespaces at beginning and end of value list, as well as after commas
-            let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("edit-data-filter-modal-input").value)
-
+            let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("data-filter-modal-input").value)
             // Handle new filter case
             if (memory.newFilter) {
-                // Reset buttons on edit filter modal
-                document.getElementById('edit-data-filter-modal-delete').style.color='red'
-                document.getElementById('edit-data-filter-modal-delete').innerText='Delete'
-                document.getElementById('edit-data-filter-modal-delete').setAttribute('onclick', 'toggleEditDataFilterModal(false,false,false,false,false,false,true)')
-
                 // Get column name from input
                 filterColName=document.getElementById('data-filter-column-input').value
+                while (filterColName[0]==' ') { filterColName=filterColName.slice(1) }
+                while (filterColName.at(-1)==' '&&filterColName.length>=2) { filterColName=filterColName.slice(0, filterColName.length-1) }
 
                 // If a filter for this column exists, add values to the filter Else create new filter in access profiles and new filter html item
-                let filterForColumn=_args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter[filterColName]
-                if (filterForColumn) { filterForColumn=filterForColumn.concat(newValues.split(',')) }
-                else { _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter[filterColName]=newValues.split(',') }
+                let filter=_args.accessProfiles[memory.ap][memory.apPage][filterKey].filter
+                if (filter[filterColName]) { filter[filterColName]=filter[filterColName].concat(newValues.split(',')) }
+                else { filter[filterColName]=newValues.split(',') }
             }
+            // Else save to existing filter
             else {
-                _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter[filterColName]=newValues.split(',')
+                _args.accessProfiles[memory.ap][memory.apPage][filterKey].filter[filterColName]=newValues.split(',')
             }
         }
         else if (del) {
             document.getElementById(`${apName}-${apPageName}-dataFilter-${filterColName}`).remove()
-            delete _args.accessProfiles[memory.ap][memory.apPage].dataFilter.filter[memory.filterCol]
+            delete _args.accessProfiles[memory.ap][memory.apPage][filterKey].filter[memory.filterCol]
         }
-
 
         // Re-build access profiles modal from _args.accessProfiles
         populateAccessProfileModal(memory.ap, memory.apPage)
 
         document.getElementById('access-profiles-modal').style.display='flex';
-        document.getElementById('edit-data-filter-modal-input').value=null
+        document.getElementById('data-filter-modal-input').value=null
         document.getElementById('data-filter-column-input').value=null
         grid.focus()
     }
@@ -3085,3 +3047,75 @@ cleanUpColumnFilterModalInputValues=(vals) => {
     return newVals
 }
 
+// Generates a data filter html element populated with elements for each data filter item
+generateDataFilterHtml=(dataFilter, ap, apPage, apName, apPageName, filterTitle, filterKey) => {
+    // Set styles for whitelist/blacklist
+    let dataFilterStyle='style="background-color: black; color: white;"'
+    let editButtonColor='white'
+
+    if (dataFilter.type=='w') {
+        dataFilterStyle='style="background-color: white; color: black;"'
+        editButtonColor='black'
+    }
+
+    let filterHtml=`
+    <div class="ap-filter-container">
+        <div style="margin-top: 5px; width: 8rem; height: 100%;">
+            ${filterTitle}:
+        </div>`
+
+    // Add sub accordion items for the datafilter
+    for (col in dataFilter.filter) {
+        let colName=col.replaceAll(' ', '')
+        let dataFilterItem=`<div class="ap-filter-item" ${dataFilterStyle} id="${apName}-${apPageName}-dataFilter-${colName}">
+            ${col}:<div id="${apName}-${apPageName}-${colName}-data-filter-values" style="margin-left: 5px;">`
+
+        for (val of dataFilter.filter[col]) {
+            dataFilterItem+=`${val}`
+            if (val!=dataFilter.filter[col].at(-1)) {
+                dataFilterItem+=', '
+            }
+        }
+
+
+        dataFilterItem+=`</div><div class="edit-filter-item-button" style = "color: ${editButtonColor};" 
+            onclick="toggleDataFilterModal(true, '${ap}', '${apPage}', '${col}',false,false,false,'${filterKey}')">Edit</div></div>`
+
+        filterHtml+=dataFilterItem
+    }
+
+
+    filterHtml+=`
+        <div class="add-filter-item-button" onclick="toggleDataFilterModal(true, '${ap}', '${apPage}', '${col}', true, false, false, '${filterKey}')">+</div></div>`
+
+    return filterHtml
+}
+
+// Generates a column filter html element populated with elements for each column filter item
+generateColumnFilterItem=(columnFilter, ap, apPage, apName, apPageName, filterTitle, filterKey) => {
+    // End data filter container and start column filter container
+    let filterHtml=`
+    <div class="ap-filter-container">
+            <div style="margin-top: 5px; width: 8rem;">
+                ${filterTitle}:
+            </div>
+    `
+
+    // Set items to be black if this is a blacklist, or white if it is a whitelist
+    let columnFilterStyle='style="background-color: black; color: white;"'
+    if (columnFilter.type=='w') { columnFilterStyle='style="background-color: white; color: black;"' }
+
+    // Add sub accordion items for the columnfilter
+    for (col of columnFilter.filter) {
+        let colName=col.replaceAll(' ', '')
+        let columnFilterItem=`<div class="ap-filter-item" id="${apName}-${apPageName}-columnFilter-${colName}" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
+
+        filterHtml+=columnFilterItem
+    }
+
+    // End column filter container and entire sub accordion item
+    filterHtml+=`<div class="add-filter-item-button">+</div></div>`
+
+    return filterHtml
+
+}

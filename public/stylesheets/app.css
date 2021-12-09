@@ -493,6 +493,7 @@ input.department-input:focus{
     border: 1px solid black;
     border-radius: 2px;
     background-color: rgb(226, 226, 226);
+    height: 100%;
 }
 
 .edit-filter-item-button{

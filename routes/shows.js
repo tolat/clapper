@@ -40,38 +40,38 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     show.accessProfiles={
         Owner: {
             'Cost Report': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Estimate': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Purchases': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Rentals': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Crew': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Rates': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             },
             'Timesheets': {
-                columnFilter: [],
-                dataFilter: {},
+                columnFilter: { type: 'b', filter: [] },
+                dataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             }
 
