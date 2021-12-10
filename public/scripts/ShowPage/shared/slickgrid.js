@@ -2918,13 +2918,13 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             subAccordionItem+=generateDataFilterHtml(_args.accessProfiles[ap][apPage].dataFilter, ap, apPage, apName, apPageName, 'Access Data', 'dataFilter')
 
             // Add items for columnFilter
-            subAccordionItem+=generateColumnFilterItem(_args.accessProfiles[ap][apPage].columnFilter, ap, apPage, apName, apPageName, 'Access Columns', 'columnFilter')
+            subAccordionItem+=generateColumnFilterHtml(_args.accessProfiles[ap][apPage].columnFilter, ap, apPage, apName, apPageName, 'Access Columns', 'columnFilter')
 
             // Add items for dataFilter
             subAccordionItem+=generateDataFilterHtml(_args.accessProfiles[ap][apPage].editDataFilter, ap, apPage, apName, apPageName, 'Edit Data', 'editDataFilter')
 
             // Add items for columnFilter
-            subAccordionItem+=generateColumnFilterItem(_args.accessProfiles[ap][apPage].editColumnFilter, ap, apPage, apName, apPageName, 'Edit Columns', 'editColumnFilter')
+            subAccordionItem+=generateColumnFilterHtml(_args.accessProfiles[ap][apPage].editColumnFilter, ap, apPage, apName, apPageName, 'Edit Columns', 'editColumnFilter')
 
             // End sub-accordion item
             subAccordionItem+=`</div></div></div>`
@@ -2939,7 +2939,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
     }
 }
 
-// Hide and shoe the modal to edit a cloumn 
+// Hide and show the modal to edit a cloumn and the restricted values for that column for the data filter 
 toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=false, save=false, del=false, filterKey=null) => {
     if (show) {
         document.getElementById('data-filter-modal').style.display='flex';
@@ -2947,8 +2947,17 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
         document.getElementById('data-filter-modal-memory').innerText=JSON.stringify({ ap, apPage, filterCol, newFilter })
         document.getElementById('data-filter-modal-memory-filterKey').innerText=filterKey
 
+        let memory=JSON.parse(document.getElementById('data-filter-modal-memory').innerText)
+
+        // Set text to describle the filter 
+        let filterActionText='access'
+        let filterListTypeText='not'
+        if (_args.accessProfiles[memory.ap][memory.apPage][filterKey].type=='w') { filterListTypeText='only' }
+        if (filterKey=='editDataFilter') { filterActionText='edit' }
+
         if (newFilter) {
-            document.getElementById('data-filter-modal-message').innerHTML=`Enter filtered values and a filter column for the <b>${apPage}</b> page (Access Profile: <b>${ap}</b>).`
+            document.getElementById('data-filter-modal-message').innerHTML=`
+            Users assigned to the <b>${ap}</b> access profile will <b>${filterListTypeText}</b> be able to <b>${filterActionText}</b> items on the <b>${apPage}</b> with values in the column entered below that match values in the list entered below.`
             document.getElementById('data-filter-column-input').style.display='flex'
             document.getElementById('data-filter-column-input-label').style.display='flex'
 
@@ -2956,14 +2965,15 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
             document.getElementById('data-filter-modal-delete').innerText='Cancel'
             document.getElementById('data-filter-modal-delete').setAttribute('onclick', 'toggleDataFilterModal(false)')
         } else {
-            document.getElementById('data-filter-column-input').style.display='none'
-            document.getElementById('data-filter-column-input-label').style.display='none'
-
-            let memory=JSON.parse(document.getElementById('data-filter-modal-memory').innerText)
             let currentValues=_args.accessProfiles[memory.ap][memory.apPage][filterKey].filter[filterCol].join(', ')
 
-            document.getElementById('data-filter-modal-message').innerHTML=`Enter filtered values for <b>${filterCol}</b> column on the <b>${apPage}</b> page (Access Profile: <b>${ap}</b>).`
+            document.getElementById('data-filter-modal-message').innerHTML=`
+            Users assigned to the <b>${ap}</b> access profile will <b>${filterListTypeText}</b> be able to <b>${filterActionText}</b> items on the <b>${apPage}</b> page that have values in the <b>${filterCol}</b> column matching entries in the list below.`
+
             document.getElementById('data-filter-modal-input').value=currentValues
+            document.getElementById('data-filter-column-input').style.display='none'
+            document.getElementById('data-filter-column-input-label').style.display='none'
+            console.log(document.getElementById('data-filter-column-input').style.display)
         }
 
     } else {
@@ -2984,7 +2994,7 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
         // Save data filter filter 
         if (save) {
             // Trim all whitespaces at beginning and end of value list, as well as after commas
-            let newValues=cleanUpColumnFilterModalInputValues(document.getElementById("data-filter-modal-input").value)
+            let newValues=cleanUpFilterModalInputValues(document.getElementById("data-filter-modal-input").value)
             // Handle new filter case
             if (memory.newFilter) {
                 // Get column name from input
@@ -3017,8 +3027,56 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
     }
 }
 
+// Hide and show the modal to edit a cloumn and the restricted values for that column for the data filter 
+toggleColumnFilterModal=(show, ap=false, apPage=false, save=false, filterKey=null) => {
+    if (show) {
+        document.getElementById('column-filter-modal').style.display='flex';
+        document.getElementById('access-profiles-modal').style.display=null
+        document.getElementById('column-filter-modal-memory').innerText=JSON.stringify({ ap, apPage })
+        document.getElementById('column-filter-modal-memory-filterKey').innerText=filterKey
+
+        console.log(document.getElementById('column-filter-modal-memory').innerText)
+        let memory=JSON.parse(document.getElementById('column-filter-modal-memory').innerText)
+
+        // Set text to describle the filter 
+        let filterActionText='access'
+        let filterListTypeText='not'
+        if (_args.accessProfiles[memory.ap][memory.apPage][filterKey].type=='w') { filterListTypeText='only' }
+        if (filterKey=='editColumnFilter') { filterActionText='edit' }
+
+        document.getElementById('column-filter-modal-message').innerHTML=`
+        Users assigned to the <b>${ap}</b> access profile will <b>${filterListTypeText}</b> be able to <b>${filterActionText}</b> values on the <b>${apPage}</b> page in the column entered below`
+
+        document.getElementById('column-filter-input').style.display='flex'
+        document.getElementById('column-filter-input-label').style.display='flex'
+    } else {
+        let memory=JSON.parse(document.getElementById('column-filter-modal-memory').innerText)
+        document.getElementById('column-filter-modal').style.display=null;
+
+        // Get filterKey (determines which filter gets edited) from the modal memory div
+        filterKey=document.getElementById('column-filter-modal-memory-filterKey').innerText
+
+        // Save data filter filter 
+        if (save) {
+            // Get column name from input and trim leadin g and trailing whitespace
+            let newColName=document.getElementById('column-filter-input').value
+            while (newColName[0]==' ') { newColName=newColName.slice(1) }
+            while (newColName.at(-1)==' '&&newColName.length>=2) { newColName=newColName.slice(0, newColName.length-1) }
+
+            _args.accessProfiles[memory.ap][memory.apPage][filterKey].filter.push(newColName)
+        }
+
+        // Re-build access profiles modal from _args.accessProfiles
+        populateAccessProfileModal(memory.ap, memory.apPage)
+
+        document.getElementById('access-profiles-modal').style.display='flex';
+        document.getElementById('column-filter-input').value=null
+        grid.focus()
+    }
+}
+
 // Cleans up column filter modal input list by removing leading and trailing whitespace, as well as after commas
-cleanUpColumnFilterModalInputValues=(vals) => {
+cleanUpFilterModalInputValues=(vals) => {
     let newVals=''
     let beforeStart=true
     let afterComma=false
@@ -3092,7 +3150,7 @@ generateDataFilterHtml=(dataFilter, ap, apPage, apName, apPageName, filterTitle,
 }
 
 // Generates a column filter html element populated with elements for each column filter item
-generateColumnFilterItem=(columnFilter, ap, apPage, apName, apPageName, filterTitle, filterKey) => {
+generateColumnFilterHtml=(columnFilter, ap, apPage, apName, apPageName, filterTitle, filterKey) => {
     // End data filter container and start column filter container
     let filterHtml=`
     <div class="ap-filter-container">
@@ -3108,14 +3166,22 @@ generateColumnFilterItem=(columnFilter, ap, apPage, apName, apPageName, filterTi
     // Add sub accordion items for the columnfilter
     for (col of columnFilter.filter) {
         let colName=col.replaceAll(' ', '')
-        let columnFilterItem=`<div class="ap-filter-item" id="${apName}-${apPageName}-columnFilter-${colName}" ${columnFilterStyle}>${col}<div class="delete-filter-item-button">x</div></div>`
+        let itemId=`${apName}-${apPageName}-columnFilter-${colName}`
+        let columnFilterItem=`<div class="ap-filter-item" id="${itemId}" ${columnFilterStyle}>${col}
+        <div class="delete-filter-item-button" onclick="deleteColumnFilterEntry('${itemId}', '${col}', '${ap}', '${apPage}', '${filterKey}')">x</div></div>`
 
         filterHtml+=columnFilterItem
     }
 
     // End column filter container and entire sub accordion item
-    filterHtml+=`<div class="add-filter-item-button">+</div></div>`
+    filterHtml+=`<div class="add-filter-item-button" onclick="toggleColumnFilterModal(true, '${ap}', '${apPage}',false,'${filterKey}')">+</div></div>`
 
     return filterHtml
 
+}
+
+// Deletes a column filter html element and updates _args.accessProfiles
+deleteColumnFilterEntry=(eltId, colName, ap, apPage, filterKey) => {
+    document.getElementById(eltId).remove()
+    _args.accessProfiles[ap][apPage][filterKey].filter=_args.accessProfiles[ap][apPage][filterKey].filter.filter(col => col!=colName)
 }

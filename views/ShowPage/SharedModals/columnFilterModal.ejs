@@ -1,0 +1,13 @@
+<div id="column-filter-modal" class="grid-modal" style="min-height: 5rem; min-width: 80px;">
+    <div id="column-filter-modal-message"></div>
+    <label for="column-filter-input" id="column-filter-input-label" style="display: none; margin-top: 5px;">Enter
+        filtered columns:</label>
+    <input type="text" id="column-filter-input" name="column-filter-input" style="width: 100%;">
+    <div id="column-filter-modal-memory" style="display: none;"></div>
+    <div id="column-filter-modal-memory-filterKey" style="display: none;"></div>
+    <div class="modal-button-container">
+        <button id="column-filter-modal-delete" onclick="toggleColumnFilterModal(false)">Cancel</button>
+        <button id="column-filter-modal-save" onclick="toggleColumnFilterModal(false,false,false,true)"
+            style="color: green;">Save</button>
+    </div>
+</div>
