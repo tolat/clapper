@@ -2839,6 +2839,8 @@ hideRestrictedColumns=(columns, IDkey) => {
         idCol.cssClass+=`\nuneditable`
     }
 
+    columns=applyEditColumnFilter(columns)
+
     return columns
 }
 
@@ -3184,4 +3186,21 @@ generateColumnFilterHtml=(columnFilter, ap, apPage, apName, apPageName, filterTi
 deleteColumnFilterEntry=(eltId, colName, ap, apPage, filterKey) => {
     document.getElementById(eltId).remove()
     _args.accessProfiles[ap][apPage][filterKey].filter=_args.accessProfiles[ap][apPage][filterKey].filter.filter(col => col!=colName)
+}
+
+applyEditColumnFilter=(columns) => {
+    for (col of columns) {
+        if (_accessProfile.editColumnFilter.type=='b') {
+            if (_accessProfile.editColumnFilter.filter.includes(col.name)) {
+                delete col.editor
+                col.cssClass+=' uneditable'
+            }
+        } else {
+            if (!_accessProfile.editColumnFilter.filter.includes(col.name)) {
+                delete col.editor
+                col.cssClass+=' uneditable'
+            }
+        }
+    }
+    return columns
 }

@@ -161,8 +161,8 @@ const seedShows=async () => {
                         },
                         columnFilter: { type: 'b', filter: ['Location', 'Notes'] },
                         dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'w', filter: ['Name', 'Episode'] },
+                        editDataFilter: { type: 'b', filter: { 'Episode': ['200'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 100: {}
@@ -225,6 +225,8 @@ const seedShows=async () => {
                     'Cost Report': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 100: {
@@ -236,6 +238,8 @@ const seedShows=async () => {
                     'Estimate': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 100: {}
@@ -245,6 +249,8 @@ const seedShows=async () => {
                     'Purchases': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -254,6 +260,8 @@ const seedShows=async () => {
                     'Rentals': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -263,6 +271,8 @@ const seedShows=async () => {
                     'Crew': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -272,6 +282,8 @@ const seedShows=async () => {
                     'Rates': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -281,6 +293,8 @@ const seedShows=async () => {
                     'Timesheets': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: { 'torin-olat@gmail-com': {} }
                     }
 
