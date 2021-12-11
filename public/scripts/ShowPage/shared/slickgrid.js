@@ -3184,6 +3184,7 @@ generateColumnFilterHtml=(columnFilter, ap, apPage, apName, apPageName, filterTi
 
 // Deletes a column filter html element and updates _args.accessProfiles
 deleteColumnFilterEntry=(eltId, colName, ap, apPage, filterKey) => {
+    updateSaveStatus(false)
     document.getElementById(eltId).remove()
     _args.accessProfiles[ap][apPage][filterKey].filter=_args.accessProfiles[ap][apPage][filterKey].filter.filter(col => col!=colName)
 }
