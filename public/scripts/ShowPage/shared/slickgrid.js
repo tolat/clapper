@@ -200,6 +200,12 @@ createSlickGrid=(data, columns, options) => {
 
     // Update itemBeforeEdit so it can be added to a cell edit command
     grid.onBeforeEditCell.subscribe(function (e, args) {
+
+        // Stop edit event if this is an uneditable cell
+        if (Object.keys(_cellCssStyles['uneditableRow']).includes(args.item.id)) {
+            return false
+        }
+
         let item=args.item;
         _itemBeforeEdit={};
         Object.assign(_itemBeforeEdit, item);
@@ -715,6 +721,10 @@ function executePaste() {
         if (this.rows[i][0]!=undefined) {
             let idx=i+this.startRow
             let item=dataView.getItemByIdx(idx)
+
+            // Do not paste into this item if it is in an uneditable row
+            if (Object.keys(_cellCssStyles['uneditableRow']).includes(item.id)) { continue }
+
             if (_groupedBy) {
                 item=items.find(i => dataView.getRowById(i.id)==idx)
             }
@@ -3204,4 +3214,39 @@ applyEditColumnFilter=(columns) => {
         }
     }
     return columns
+}
+
+// Applies uneditable styles to uneditable row items
+applyEditDataFilter=(data, columns) => {
+    let editDataFilter=_accessProfile.editDataFilter
+    for (item of data) {
+        for (col in editDataFilter.filter) {
+            if (editDataFilter.type=='b') {
+                if (editDataFilter.filter[col].includes(item[col])) {
+                    item=setItemUneditable(item, columns)
+                }
+            } else {
+                if (!editDataFilter.filter[col].includes(item[col])) {
+                    item=setItemUneditable(item, columns)
+                }
+            }
+        }
+    }
+
+    return data
+}
+
+// Helper for applyEditDataFilter to add styles to global _cellCssStyles variable
+setItemUneditable=(item, columns) => {
+    if (!_cellCssStyles['uneditableRow']) {
+        _cellCssStyles['uneditableRow']={}
+    }
+
+    if (!_cellCssStyles['uneditableRow'][item.id]) {
+        _cellCssStyles['uneditableRow'][item.id]={}
+    }
+
+    for (col of columns) {
+        _cellCssStyles['uneditableRow'][item.id][col.field]='uneditable'
+    }
 }

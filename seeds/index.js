@@ -160,9 +160,9 @@ const seedShows=async () => {
                             'Change Manday Rates': true
                         },
                         columnFilter: { type: 'b', filter: ['Location', 'Notes'] },
-                        dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
-                        editColumnFilter: { type: 'w', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'b', filter: { 'Episode': ['200'] } },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
+                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 100: {}

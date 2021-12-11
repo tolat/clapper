@@ -44,14 +44,18 @@
         // Create options
         let options=await initializeOptions();
 
-        // Create grid data
-        let data=<%- JSON.stringify(data)%>;
-
         // Create grid columns
         let columns=await initializeColumns(sets, _show, _args);
 
+        // Create grid data
+        let data=<%- JSON.stringify(data)%>;
+        data=await applyEditDataFilter(data, columns)
+
         // Create data grid
         await createSlickGrid(data, columns, options);
+
+        // Apply cell styles
+        applyCellStyles(_cellCssStyles)
 
         // Recalculate after paste
         grid.recalculate=async function (item, editedfields=false) {
