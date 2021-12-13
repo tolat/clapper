@@ -3053,7 +3053,7 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
             }
             // Else save to existing filter
             else {
-                _args.accessProfiles[memory.ap][memory.apPage][filterKey].filter[filterColName]=newValues.split(',')
+                _args.accessProfiles[memory.ap][memory.apPage][filterKey].filter[memory.filterCol]=newValues.split(',')
             }
         }
         else if (del) {
