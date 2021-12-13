@@ -202,7 +202,7 @@ createSlickGrid=(data, columns, options) => {
     grid.onBeforeEditCell.subscribe(function (e, args) {
 
         // Stop edit event if this is an uneditable cell
-        if (Object.keys(_cellCssStyles['uneditableRow']).includes(args.item.id)) {
+        if (_cellCssStyles['uneditableRow']&&Object.keys(_cellCssStyles['uneditableRow']).includes(args.item.id)) {
             return false
         }
 
@@ -2866,8 +2866,8 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
 
     // Create an accordion item for each accesss profile
     for (ap in _args.accessProfiles) {
-        // Don't show access profiles with same access level
-        if (_args.accessProfiles[ap].accessLevel==_args.accessProfiles[_args.accessProfileName].accessLevel) { continue }
+        // Don't show access profiles with same or higher access level
+        if (_args.accessProfiles[ap].accessLevel<=_args.accessProfiles[_args.accessProfileName].accessLevel) { continue }
 
         let apName=ap.replaceAll(" ", "")
 
@@ -3022,7 +3022,10 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
         let memory=JSON.parse(document.getElementById('data-filter-modal-memory').innerText)
         let apName=memory.ap.replaceAll(" ", "")
         let apPageName=memory.apPage.replaceAll(" ", "")
-        let filterColName=memory.filterCol.replaceAll(' ', '')
+        let filterColName=false
+        if (memory.filterCol) {
+            filterColName=memory.filterCol.replaceAll(' ', '')
+        }
 
         // Reset buttons on edit filter modal
         document.getElementById('data-filter-modal-delete').style.color='red'
@@ -3187,7 +3190,7 @@ generateDataFilterHtml=(dataFilter, ap, apPage, apName, apPageName, filterTitle,
 
 
     filterHtml+=`
-        <div class="add-filter-item-button" onclick="toggleDataFilterModal(true, '${ap}', '${apPage}', '${col}', true, false, false, '${filterKey}')">+</div></div>`
+        <div class="add-filter-item-button" onclick="toggleDataFilterModal(true, '${ap}', '${apPage}', false, true, false, false, '${filterKey}')">+</div></div>`
 
     return filterHtml
 }

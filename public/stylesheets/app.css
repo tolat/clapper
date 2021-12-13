@@ -433,8 +433,7 @@ input.department-input:focus{
 }
 
 #access-profiles-modal{
-    width: 70%;
-    max-width: 70%;
+    width: 50rem;
     max-height: 80%;
 }
 
@@ -460,7 +459,6 @@ input.department-input:focus{
 
 .data-filter-button:hover{
     cursor: pointer;
-    text-decoration: underline;
 }
 
 .data-filter-button.white{

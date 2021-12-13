@@ -347,6 +347,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             departmentColorMap: _show.departmentColorMap,
             isNewVersion: isNewVersion,
             isBlankVersion: isBlankVersion,
+            accessProfiles: _args.accessProfiles,
             displaySettings: {
                 groupBy: _groupedBy,
                 reorderColumns: getColumnOrder(),
