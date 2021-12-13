@@ -269,24 +269,46 @@ module.exports.filterRestrictedColumnData=function (data, accessProfile, IDkey) 
     return data
 }
 
-// Returns true if item has values restricted by the accessProfile
+// Returns true if item has values that are access restricted by the accessProfile
 module.exports.isRestrictedItem=function (item, accessProfile) {
-    const isWhitelist=accessProfile.dataFilter.type=='w'
+
+    // Check if accessing item is restricted by accessProfile
+    let isWhitelist=accessProfile.dataFilter.type=='w'
     for (column in accessProfile.dataFilter.filter) {
         if (accessProfile.dataFilter.filter[column].includes(item[column])) {
             return !isWhitelist
         }
     }
+
+    // Check if editing item is restricted by accessProfile
+    isWhitelist=accessProfile.editDataFilter.type=='w'
+    for (column in accessProfile.editDataFilter.filter) {
+        if (accessProfile.editDataFilter.filter[column].includes(item[column])) {
+            return !isWhitelist
+        }
+    }
+
     return false
 }
 
 // Returns true if column is restricted by the access profile
 module.exports.isRestrictedColumn=function (col, accessProfile) {
-    const isWhitelist=accessProfile.columnFilter.type=='w'
+    let isRestricted=false
+
+    // Check if accessing column is restricted
+    let isWhitelist=accessProfile.columnFilter.type=='w'
     if (accessProfile.columnFilter.filter.includes(col)) {
-        return !isWhitelist
+        isRestricted=!isWhitelist
     } else {
-        return isWhitelist
+        isRestricted=isWhitelist
+    }
+
+    // Check if editing column is restricted
+    isWhitelist=accessProfile.editColumnFilter.type=='w'
+    if (accessProfile.editColumnFilter.filter.includes(col)) {
+        isRestricted=!isWhitelist
+    } else {
+        isRestricted=isWhitelist
     }
 }
 

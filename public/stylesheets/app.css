@@ -458,13 +458,28 @@ input.department-input:focus{
     height: 1rem;
 }
 
+.data-filter-button:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.data-filter-button.white{
+    font-weight: 900;
+    -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black; 
+}
+
+.data-filter-button.black{
+    font-weight: 900;
+    color: black;
+}
+
 #access-profiles-accordion .accordion-button::after{
     background-image: none !important;
 }
 
 .access-profiles-checkbox-container{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     margin-bottom: 5px;
 }
 
@@ -799,6 +814,7 @@ tbody tr{
 .uneditable{
     font-style: italic;
     color: rgb(112, 112, 112);
+    opacity: 0.75;
 }
 
 .week-ending-modal-week{

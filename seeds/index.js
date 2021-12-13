@@ -129,18 +129,22 @@ const seedShows=async () => {
             },
             accessProfiles: {
                 "Test Access": {
+                    accessLevel: 1,
+                    options: {
+                        'Change Week': true,
+                        'Change Estimate Version': true,
+                        'Edit Access Profiles': true,
+                    },
                     'Cost Report': {
-                        'Page Access': true,
+                        pageAccess: true,
                         options: {
                             'Add Columns': true,
-                            'Change Week': true,
-                            'Change Version': true,
-                            'Edit Accesss Profiles': true,
+                            'Add Rows': true,
                         },
-                        columnFilter: { type: 'b', filter: ['Name', 'Episode'] },
+                        columnFilter: { type: 'b', filter: ['Name'] },
                         dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
-                        editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
-                        editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'w', filter: {} },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
                                 100: {
@@ -150,12 +154,10 @@ const seedShows=async () => {
                         }
                     },
                     'Estimate': {
-                        'Page Access': true,
+                        pageAccess: true,
                         options: {
                             'Add Columns': true,
                             'Add Rows': true,
-                            'Change Version': true,
-                            'Edit Accesss Profiles': true,
                             'Change Fringes': true,
                             'Change Manday Rates': true
                         },
@@ -170,6 +172,11 @@ const seedShows=async () => {
                         }
                     },
                     'Purchases': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: ['Invoice Num'] },
                         dataFilter: { type: 'w', filter: { 'Set Code': ['103', '104', '105'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -181,6 +188,11 @@ const seedShows=async () => {
                         }
                     },
                     'Rentals': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'w', filter: ['Supplier'] },
                         dataFilter: { type: 'b', filter: { 'Department': ['Construction'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -192,6 +204,11 @@ const seedShows=async () => {
                         }
                     },
                     'Crew': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: ['Email'] },
                         dataFilter: { type: 'w', filter: { 'Department': ['Construction', 'Metal Fab', 'Sculptors', 'Greens'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -203,6 +220,11 @@ const seedShows=async () => {
                         }
                     },
                     'Rates': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'w', filter: ['Rate', 'Code'] },
                         dataFilter: { type: 'b', filter: { Department: ['Construction'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -214,6 +236,8 @@ const seedShows=async () => {
                         }
                     },
                     'Timesheets': {
+                        pageAccess: false,
+                        options: {},
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -222,6 +246,7 @@ const seedShows=async () => {
                     }
                 },
                 Owner: {
+                    accessLevel: 0,
                     'Cost Report': {
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },

@@ -68,11 +68,12 @@
         // Create options
         let options=await initializeOptions()
 
-        // Create grid data
-        let data=<%- JSON.stringify(data)%>;
-
         // Create grid columns
         let columns=await initializeColumns(crew, _show, _args)
+
+        // Create grid data
+        let data=<%- JSON.stringify(data)%>;
+        data=await applyEditDataFilter(data, columns)
 
         // Create data grid
         await createSlickGrid(data, columns, options, _show, _args)

@@ -2866,12 +2866,12 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
 
     // Create an accordion item for each accesss profile
     for (ap in _args.accessProfiles) {
-        // Don't show owner access profile
-        if (ap=='Owner') { continue }
+        // Don't show access profiles with same access level
+        if (_args.accessProfiles[ap].accessLevel==_args.accessProfiles[_args.accessProfileName].accessLevel) { continue }
 
         let apName=ap.replaceAll(" ", "")
 
-        // String to put into html to show accordion item for current access profile
+        // Begin html for access profile
         let isCurrentProfile=''
         if (ap==showAp) { isCurrentProfile='show' }
         else if (ap==_args.accessProfileName&&!showAp) { isCurrentProfile='show' }
@@ -2879,31 +2879,60 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
         let apAccordionItem=`
         <div class="accordion-item">
             <h2 class="accordion-header access-profiles-accordion-header" id="heading${apName}">
-                <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}">
-                    ${ap}
-                </button>
+                 <div style="display: flex; justify-content: space-between;">
+                    <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}">
+                       ${ap} 
+                    </button>
+                    <div style="color: green; white-space: nowrap; font-size: 1rem;">(Level ${_args.accessProfiles[ap].accessLevel})</div>
+                </div>
+                <div>
             </h2>
             <div id="collapse${apName}" class="accordion-collapse collapse ${isCurrentProfile}" data-bs-parent="#access-profiles-accordion">
                 <div class="accordion-body" style="display: flex; flex-direction: column;">
-                    <div class=" accordion" id="ap-sub-accordion-${apName}">`
+                    <div class=" accordion" id="ap-sub-accordion-${apName}">
+                        <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr">`
+
+        // Add checkbox options for accessProfile options
+        for (option in _args.accessProfiles[ap].options) {
+            let optionName=option.replaceAll(" ", "")
+            let value=''
+            if (_args.accessProfiles[ap].options[option]) { value='checked' }
+            apAccordionItem+=`
+                    <div class="access-profiles-checkbox" id="${apName}-${optionName}-checkbox">
+                        <input type="checkbox" style="margin-right: 5px" ${value}>
+                        ${option}
+                    </div>`
+        }
+
+        apAccordionItem+='</div>'
 
 
         // Generate html for each page in access profile
         for (apPage in _args.accessProfiles[ap]) {
             let apPageName=apPage.replaceAll(" ", "")
+            if (['options', 'accessLevel'].includes(apPage)) { continue }
 
             // String to put into html to show accordion item for current access profile
             let isCurrentSection=""
             if (apPage==showPage) { isCurrentSection='show' }
             else if (apPageName==_args.section&&!showPage) { isCurrentSection='show' }
 
+            // Get value for page access checkbox
+            let pageAccess='checked'
+            if (!_args.accessProfiles[ap][apPage].pageAccess) {
+                pageAccess=''
+            }
+
             // Start sub-accordion item 
             let subAccordionItem=`
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading${apName}-${apPageName}">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}-${apPageName}">
-                        ${apPage}
+            <div class="accordion-item" >
+                <h2 class="accordion-header" id="heading${apName}-${apPageName}" style="flex-grow: 3;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}-${apPageName}">
+                         ${apPage}
                     </button>
+                    <input id="${apName}-${apPageName}-pageAccess-checkbox" type="checkbox" ${pageAccess}>
+                </div>
                 </h2>
                 <div id="collapse${apName}-${apPageName}" class="accordion-collapse collapse ${isCurrentSection}" data-bs-parent="#ap-sub-accordion-${apName}">
                     <div class="accordion-body ap-sub-accordion-page-container">
@@ -3122,15 +3151,17 @@ generateDataFilterHtml=(dataFilter, ap, apPage, apName, apPageName, filterTitle,
     // Set styles for whitelist/blacklist
     let dataFilterStyle='style="background-color: black; color: white;"'
     let editButtonColor='white'
+    let profileTypeButtonColor='black'
 
     if (dataFilter.type=='w') {
         dataFilterStyle='style="background-color: white; color: black;"'
         editButtonColor='black'
+        profileTypeButtonColor='white'
     }
 
     let filterHtml=`
     <div class="ap-filter-container">
-        <div style="margin-top: 5px; width: 8rem; height: 100%;">
+        <div class="data-filter-button ${profileTypeButtonColor}" style="margin-top: 5px; width: 10rem; height: 100%;" onclick="toggleFilterType('${ap}', '${apPage}', '${filterKey}')">
             ${filterTitle}:
         </div>`
 
@@ -3163,10 +3194,16 @@ generateDataFilterHtml=(dataFilter, ap, apPage, apName, apPageName, filterTitle,
 
 // Generates a column filter html element populated with elements for each column filter item
 generateColumnFilterHtml=(columnFilter, ap, apPage, apName, apPageName, filterTitle, filterKey) => {
+
+    let profileTypeButtonColor='white'
+    if (columnFilter.type=='b') {
+        profileTypeButtonColor='black'
+    }
+
     // End data filter container and start column filter container
     let filterHtml=`
     <div class="ap-filter-container">
-            <div style="margin-top: 5px; width: 8rem;">
+            <div class="data-filter-button ${profileTypeButtonColor}" style="margin-top: 5px; width: 10rem;" onclick="toggleFilterType('${ap}', '${apPage}', '${filterKey}')">
                 ${filterTitle}:
             </div>
     `
@@ -3249,4 +3286,14 @@ setItemUneditable=(item, columns) => {
     for (col of columns) {
         _cellCssStyles['uneditableRow'][item.id][col.field]='uneditable'
     }
+}
+
+// toggle filter type from blacklist to whitelist
+toggleFilterType=(ap, apPage, filterKey) => {
+    if (_args.accessProfiles[ap][apPage][filterKey].type=='w') {
+        _args.accessProfiles[ap][apPage][filterKey].type='b'
+    } else {
+        _args.accessProfiles[ap][apPage][filterKey].type='w'
+    }
+    populateAccessProfileModal(ap, apPage)
 }
