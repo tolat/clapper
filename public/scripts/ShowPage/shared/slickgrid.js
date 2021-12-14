@@ -2876,6 +2876,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
         if (ap==showAp) { isCurrentProfile='show' }
         else if (ap==_args.accessProfileName&&!showAp) { isCurrentProfile='show' }
 
+        // Start creating html for this access profile accordion item up to the checkbox container
         let apAccordionItem=`
         <div class="accordion-item">
             <h2 class="accordion-header access-profiles-accordion-header" id="heading${apName}">
@@ -2890,6 +2891,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             <div id="collapse${apName}" class="accordion-collapse collapse ${isCurrentProfile}" data-bs-parent="#access-profiles-accordion">
                 <div class="accordion-body" style="display: flex; flex-direction: column;">
                     <div class=" accordion" id="ap-sub-accordion-${apName}">
+                    <div style="display: flex; justify-content: space-between;">
                         <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr">`
 
         // Add checkbox options for accessProfile options
@@ -2904,7 +2906,16 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                     </div>`
         }
 
-        apAccordionItem+='</div>'
+        apAccordionItem+=`</div>
+        <div style="display: flex; flex-direction: column">
+            Assigned Users:
+            <div class="access-profile-uname-container">`
+
+        for (uName of Object.keys(_args.accessMap).filter(key => _args.accessMap[key].profile==ap)) {
+            apAccordionItem+=`<div>${uName.replaceAll('-', '.')}</div>`
+        }
+
+        apAccordionItem+=`</div></div></div>`
 
 
         // Generate html for each page in access profile
