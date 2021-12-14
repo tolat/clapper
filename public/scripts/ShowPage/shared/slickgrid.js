@@ -2907,10 +2907,10 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
         }
 
         apAccordionItem+=`</div>
-        <div style="display: flex; flex-direction: column">
+        <div style="display: flex; flex-direction: column; width: 50%;">
             <div style="display: flex; flex-direction: row;">
                 <div style="line-height: 2rem;">Assigned Users</div>
-                <div style="margin-left: 5px; font-weight: bold; font-size: 1.3rem;">+</div>
+                <div class="add-user-to-access-profile-button" onclick="toggleAddUserToApModal(true)">+</div>
             </div>
             <div class="access-profile-uname-container">`
 
@@ -3313,4 +3313,9 @@ toggleFilterType=(ap, apPage, filterKey) => {
         _args.accessProfiles[ap][apPage][filterKey].type='w'
     }
     populateAccessProfileModal(ap, apPage)
+}
+
+// hide and show modal for adding a user to the access profile
+toggleAddUserToApModal=(show) => {
+    // FINISH
 }

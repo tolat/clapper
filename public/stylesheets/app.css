@@ -457,11 +457,21 @@ input.department-input:focus{
     border: 1px solid black;
     background-color: white;
     height: 5rem;
-    width: 25rem;
+    width: 100%;
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
     overflow-x: scroll;
+}
+
+.add-user-to-access-profile-button{
+    margin-left: 5px; 
+    font-weight: bold; 
+    font-size: 1.3rem;
+}
+
+.add-user-to-access-profile-button:hover{
+    cursor: pointer;
 }
 
 .accordion-button{
