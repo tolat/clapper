@@ -2892,7 +2892,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                 <div class="accordion-body" style="display: flex; flex-direction: column;">
                     <div class=" accordion" id="ap-sub-accordion-${apName}">
                     <div style="display: flex; justify-content: space-between;">
-                        <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr">`
+                        <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 1rem;">`
 
         // Add checkbox options for accessProfile options
         for (option in _args.accessProfiles[ap].options) {
@@ -2909,7 +2909,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
         apAccordionItem+=`</div>
         <div style="display: flex; flex-direction: column">
             <div style="display: flex; flex-direction: row;">
-                <div style="text-align: center;">Assigned Users</div>
+                <div style="line-height: 2rem;">Assigned Users</div>
                 <div style="margin-left: 5px; font-weight: bold; font-size: 1.3rem;">+</div>
             </div>
             <div class="access-profile-uname-container">`
