@@ -2908,7 +2908,10 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
 
         apAccordionItem+=`</div>
         <div style="display: flex; flex-direction: column">
-            Assigned Users:
+            <div style="display: flex; flex-direction: row;">
+                <div style="text-align: center;">Assigned Users</div>
+                <div style="margin-left: 5px; font-weight: bold; font-size: 1.3rem;">+</div>
+            </div>
             <div class="access-profile-uname-container">`
 
         for (uName of Object.keys(_args.accessMap).filter(key => _args.accessMap[key].profile==ap)) {

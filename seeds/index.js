@@ -8,12 +8,13 @@ const { getDescription }=require('./sets');
 const userSeeds=require('./users');
 const { genInvoiceNo, genSupplier }=require('./purchases');
 const { randInt, genUniqueId }=require('../utils/numberUtils');
+const dbUrl=process.env.DB_URL
 
 const oneDay=24*60*60*1000;
 const firstWeekId=genUniqueId()
 
 // Connect to the database and handle connection errors
-mongoose.connect('mongodb://localhost:27017/FilmApp_develop', {
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
