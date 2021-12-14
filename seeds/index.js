@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV!=='production') {
+    process.env.DB_URL='mongodb://localhost:27017/FilmApp_develop'
+}
 
 const mongoose=require('mongoose');
 const Show=require('../models/show');
@@ -416,7 +419,7 @@ const seedUsers=async () => {
     for (s of shows) {
         let show=await Show.findById(s._id)
         let startIdx=randInt(0, users.length);
-        for (let i=startIdx; i<startIdx+10; i++) {
+        for (let i=startIdx; i<startIdx+40; i++) {
             let user=users[i%users.length];
             let joinDate=genDateBetween(new Date(show.weeks[0].end.getTime()-(7*oneDay)), show.weeks[0].end);
             let posCodes=Object.keys(show.weeks[0].positions.positionList)

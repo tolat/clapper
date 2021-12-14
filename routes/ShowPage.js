@@ -13,6 +13,7 @@ const router=express.Router({ mergeParams: true })
 const { populateShow }=require('../utils/schemaUtils')
 const Queue=require('bull')
 const Show=require('../models/show')
+const User=require('../models/user')
 const crudUtils=require('../routes/ShowPageCRUD/utils')
 const schemaUtils=require('../utils/schemaUtils')
 
@@ -32,14 +33,17 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     const { id, section }=req.params;
     const query=req.query;
     let show=await Show.findById(id)
+
     let args={
         section: section,
+        showid: id,
         server: req.app.get('server'),
         weekList: show.weeks.map(w => { return { _id: w._id, end: w.end } }),
         week: show.weeks.find(w => w._id==show.accessMap[apName].currentWeek),
         accessProfileName: show.accessMap[apName].profile,
         accessProfiles: show.accessProfiles,
-        accessMap: show.accessMap
+        accessMap: show.accessMap,
+        username: req.user.username
     };
 
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error
@@ -52,6 +56,28 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
 
     // Render ShowPage section
     return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
+}))
+
+// Send list of dropdown names to browser
+router.get('/getDropdownNames', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
+    const { id, section }=req.params;
+    let show=await Show.findById(id)
+
+    let crewIds=await crudUtils.getAllCrewIDs(id)
+    let allCrew=await crudUtils.getAllCrewUsers(crewIds)
+    let dropdownNames=await allCrew.map(user => `${user['Name']} [${user['username']}]`)
+
+    // Add users from accessMap
+    for (key in show.accessMap) {
+        while (key.includes('-')) { key=key.replace('-', '.') }
+        let usr=await User.findOne({ username: key })
+        let usrDropdownName=`${usr['Name']} [${usr['username']}]`
+        if (!dropdownNames.includes(usrDropdownName)) {
+            dropdownNames.push(usrDropdownName)
+        }
+    }
+
+    res.send({ dropdownNames })
 }))
 
 // Delete route for ShowPage sections

@@ -5,8 +5,8 @@
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
     let _currentVersionSetCodes= <%- JSON.stringify(currentVersionSetCodes)%>;
-    let _dropdownNames= <%- JSON.stringify(dropdownNames)%>;
-    let _allUsernames= <%- JSON.stringify(allUsernames)%>;
+    let _dropdownNames=_args.dropdownNames
+    let _allUsernames=_args.allUsernames
 
     setWeekEnding()
     populateAccessProfileModal(false, false, true)
