@@ -87,7 +87,7 @@ router.delete('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) =>
     res.send(responseData);
 }))
 
-// 
+// Update access profiles route
 router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     // Sanitize incoming data
     req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
@@ -97,13 +97,6 @@ router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (
     // Only save profiles if this user has the ability to
     let userAp=show.accessProfiles[show.accessMap[apName].profile]
     if (userAp.options['Edit Access Profiles']) {
-        // Save access map. only users assigned to access profiles with lower clearance can be saved.
-        for (uName in show.accessMap) {
-            if (show.accessProfiles[show.accessMap[uName].profile].accessLevel>userAp.accessLevel) {
-                show.accessMap[uName]=req.body.accessMap[uName]
-            }
-        }
-
         // Save access Profiles
         for (key in req.body.accessProfiles) {
             // Save existing access profile if it is a lower clearance level than user's profile
@@ -119,6 +112,17 @@ router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (
                 show.accessProfiles[key]=req.body.accessProfiles[key]
             }
         }
+
+        // Save access map. only users assigned to access profiles with lower clearance can be saved.
+        for (uName in req.body.accessMap) {
+            let profile=req.body.accessProfiles[req.body.accessMap[uName].profile]
+            if (profile.accessLevel>userAp.accessLevel) {
+                show.accessMap[uName]=req.body.accessMap[uName]
+            }
+        }
+
+
+        // NEED TO DELETE PROFILES THAT NO LONGER EXIST
     }
 
     show.markModified('accessMap')

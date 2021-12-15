@@ -2890,7 +2890,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                     <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}">
                        ${ap} 
                     </button>
-                    <div style="color: green; white-space: nowrap; font-size: 1rem;">(Level ${_args.accessProfiles[ap].accessLevel})</div>
+                    <div style="color: green; white-space: nowrap; font-size: 1rem; margin-top:0.5rem;">(Level ${_args.accessProfiles[ap].accessLevel})</div>
                 </div>
                 <div>
             </h2>
@@ -3619,10 +3619,9 @@ toggleAddAccessProfileModal=(show, save) => {
     }
 }
 
+// Save Access Profiles on server
 saveAccessProfiles=() => {
     parseApCheckboxes()
-
-    console.log(_args.accessProfiles)
 
     fetch(server+`/shows/${_args.showid}/Estimate/updateAccessProfiles`, {
         method: 'POST',
