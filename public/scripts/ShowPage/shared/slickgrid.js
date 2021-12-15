@@ -2860,6 +2860,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
     if (!initialLoad) {
         document.getElementById('access-profile-display').innerText=`${_args.accessProfileName} (unsaved)`
         document.getElementById('access-profile-display').style.color='red'
+        document.querySelector("#access-profiles-modal-message h4").innerText='Access Profiles (unsaved)'
 
         // Update options from checkboxes
         parseApCheckboxes()
@@ -3636,6 +3637,7 @@ saveAccessProfiles=() => {
         .then(data => {
             document.getElementById('access-profile-display').innerText=_args.accessProfileName
             document.getElementById('access-profile-display').style.color='rgb(255, 229, 81)'
+            document.querySelector("#access-profiles-modal-message h4").innerText='Access Profiles'
         })
 }
 
