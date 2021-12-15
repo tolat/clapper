@@ -1,13 +1,14 @@
 <div id="access-profiles-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
-    <div id="access-profiles-modal-message"
-        style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-        <h4>Access Profiles</h4>
+    <div id="access-profiles-modal-message" style="display: flex; width: 100%; align-items: center;">
+        <h4 style="margin-top: 0.5rem;">Access Profiles</h4>
+        <button id="access-profiles-modal-new" onclick="toggleAddAccessProfileModal(true, false)"
+            style="color: black; font-size: 1.5rem;">+</button>
     </div>
     <div class="accordion accordion-flush" id="access-profiles-accordion">
     </div>
     <div class="modal-button-container">
         <button id="access-profiles-modal-close" onclick="toggleAccessProfilesModal(false)"
             style="color: black;">Done</button>
-        <button id="access-profiles-modal-new" onclick="" style="color: green;">Add</button>
+        <button id="access-profiles-modal-new" onclick="saveAccessProfiles()" style=" color: green;">Save</button>
     </div>
 </div>

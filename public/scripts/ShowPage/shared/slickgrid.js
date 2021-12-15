@@ -2856,18 +2856,23 @@ hideRestrictedColumns=(columns, IDkey) => {
 
 // Populates access profiles modal 
 populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => {
+    // If this is not the initial load of the page, set saveStatus to false
+    if (!initialLoad) {
+        document.getElementById('access-profile-display').innerText=`${_args.accessProfileName} (unsaved)`
+        document.getElementById('access-profile-display').style.color='red'
+
+        // Update options from checkboxes
+        parseApCheckboxes()
+    }
+
     //Clear access profiles modal accordion
     let accessProfileAccordion=document.getElementById('access-profiles-accordion')
     accessProfileAccordion.innerHTML=''
 
-    // If this is not the initial load of the page, set saveStatus to false
-    if (!initialLoad)
-        updateSaveStatus(false)
-
     // Create an accordion item for each accesss profile
     for (ap in _args.accessProfiles) {
         // Don't show access profiles with same or higher access level
-        if (_args.accessProfiles[ap].accessLevel<=_args.accessProfiles[_args.accessProfileName].accessLevel) { continue }
+        if (_args.accessProfiles[ap].accessLevel<=_args.accessLevel) { continue }
 
         let apName=ap.replaceAll(" ", "")
 
@@ -2900,8 +2905,8 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             let value=''
             if (_args.accessProfiles[ap].options[option]) { value='checked' }
             apAccordionItem+=`
-                    <div class="access-profiles-checkbox" id="${apName}-${optionName}-checkbox">
-                        <input type="checkbox" style="margin-right: 5px" ${value}>
+                    <div class="access-profiles-checkbox">
+                        <input id="${apName}-${optionName}-checkbox" type="checkbox" style="margin-right: 5px" ${value}>
                         ${option}
                     </div>`
         }
@@ -2959,8 +2964,8 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                 let value=''
                 if (_args.accessProfiles[ap][apPage].options[option]) { value='checked' }
                 subAccordionItem+=`
-                    <div class="access-profiles-checkbox" id="${apName}-${apPageName}-${optionName}-checkbox">
-                        <input type="checkbox" style="margin-right: 5px" ${value}>
+                    <div class="access-profiles-checkbox">
+                        <input id="${apName}-${apPageName}-${optionName}-checkbox" type="checkbox" style="margin-right: 5px" ${value}>
                         ${option}
                     </div>`
 
@@ -3341,6 +3346,7 @@ toggleAddUserToApModal=(show, ap=false, save=false) => {
 
             // Do not do anything if trying changing user's own profile
             if (uName!=_args.username) {
+                uName=uName.replaceAll('.', '-')
                 // Create accessMap entry if there is non for this user
                 if (!_args.accessMap[uName]) {
                     _args.accessMap[uName]={
@@ -3457,4 +3463,210 @@ function autocomplete(inp, arr) {
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
+}
+
+toggleAddAccessProfileModal=(show, save) => {
+    if (show) {
+        document.getElementById('add-access-profile-modal').style.display='flex'
+        document.getElementById('access-profiles-modal').style.display=null
+
+        // Set dropdown options for copying exisitng access profile
+        let apKeys=Object.keys(_args.accessProfiles).filter(k => _args.accessProfiles[k].accessLevel>_args.accessLevel)
+        let apOptions=`<option>Create New Profile</option>`
+        for (key of apKeys) {
+            apOptions+=`<option>${key}</option>`
+        }
+        document.getElementById('new-ap-copy-input').innerHTML=apOptions
+
+    } else {
+        document.getElementById('add-access-profile-modal').style.display=null
+        document.getElementById('access-profiles-modal').style.display='flex'
+
+        if (save) {
+            let copyProfile=document.getElementById('new-ap-copy-input').value
+            let newProfileName=document.getElementById('new-ap-name').value
+            let newProfileLevel=document.getElementById('new-ap-level').value
+            if (!newProfileLevel||newProfileLevel<=_args.accessLevel) { newProfileLevel=_args.accessLevel+1 }
+            let newAccessProfile
+
+            if (copyProfile!='Create New Profile') {
+                newAccessProfile=JSON.parse(JSON.stringify(_args.accessProfiles[copyProfile]))
+            } else {
+                newAccessProfile={
+                    accessLevel: _args.accessLevel+1,
+                    options: {
+                        'Change Week': true,
+                        'Change Estimate Version': true,
+                        'Edit Access Profiles': true,
+                    },
+                    'Cost Report': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: {
+                            [`${_args.username.replaceAll('.', '-')}`]: {
+                                [`${_args.accessMap[_args.username.replaceAll('.', '-')].estimateVersion}`]: {
+                                    [`${_week._id}`]: {}
+                                }
+                            }
+                        }
+                    },
+                    'Estimate': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: {
+                            [`${_args.username.replaceAll('.', '-')}`]: {
+                                [`${_args.accessMap[_args.username.replaceAll('.', '-')].estimateVersion}`]: {}
+                            }
+                        }
+                    },
+                    'Purchases': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: {
+                            [`${_args.username.replaceAll('.', '-')}`]: {
+                                [`${_args.accessMap[_args.username.replaceAll('.', '-')].currentWeek}`]: {}
+                            }
+                        }
+                    },
+                    'Rentals': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: {
+                            [`${_args.username.replaceAll('.', '-')}`]: {
+                                [`${_args.accessMap[_args.username.replaceAll('.', '-')].currentWeek}`]: {}
+                            }
+                        }
+                    },
+                    'Crew': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: {
+                            [`${_args.username.replaceAll('.', '-')}`]: {
+                                [`${_args.accessMap[_args.username.replaceAll('.', '-')].currentWeek}`]: {}
+                            }
+                        }
+                    },
+                    'Rates': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: {
+                            [`${_args.username.replaceAll('.', '-')}`]: {
+                                [`${_args.accessMap[_args.username.replaceAll('.', '-')].currentWeek}`]: {}
+                            }
+                        }
+                    },
+                    'Timesheets': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': false,
+                            'Add Rows': false,
+                        },
+                        columnFilter: { type: 'b', filter: [] },
+                        dataFilter: { type: 'b', filter: {} },
+                        editColumnFilter: { type: 'b', filter: [] },
+                        editDataFilter: { type: 'b', filter: {} },
+                        displaySettings: { [`${_args.username.replaceAll('.', '-')}`]: {} }
+                    }
+                }
+            }
+            newAccessProfile.accessLevel=newProfileLevel
+            _args.accessProfiles[newProfileName]=newAccessProfile
+            populateAccessProfileModal(newProfileName)
+        }
+    }
+}
+
+saveAccessProfiles=() => {
+    parseApCheckboxes()
+
+    console.log(_args.accessProfiles)
+
+    fetch(server+`/shows/${_args.showid}/Estimate/updateAccessProfiles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            accessProfiles: _args.accessProfiles,
+            accessMap: _args.accessMap
+        }),
+        credentials: 'include'
+    })
+        .then(response => { return response.json() })
+        .then(data => {
+            document.getElementById('access-profile-display').innerText=_args.accessProfileName
+            document.getElementById('access-profile-display').style.color='rgb(255, 229, 81)'
+        })
+}
+
+// Pareses Ap modal checkboxes and applies their values to the corresponding options in _args.accessProfiles
+parseApCheckboxes=() => {
+    for (ap in _args.accessProfiles) {
+        let profile=_args.accessProfiles[ap]
+        let apName=ap.replaceAll(' ', '')
+        let showPages=['Cost Report', 'Crew', 'Estimate', 'Purchases', 'Rates', 'Rentals', 'Timesheets']
+
+        // Update access profile options from checkboxes
+        for (opt in profile.options) {
+            let optionName=opt.replaceAll(' ', '')
+            let optionElt=document.getElementById(`${apName}-${optionName}-checkbox`)
+            if (optionElt)
+                profile.options[opt]=optionElt.checked
+        }
+
+        for (page of showPages) {
+            apPageName=page.replaceAll(' ', '')
+            let optionElt=document.getElementById(`${apName}-${apPageName}-pageAccess-checkbox`)
+            if (optionElt)
+                profile[page].pageAccess=optionElt.checked
+
+            // Update page in access profile options from checkboxes
+            for (opt in profile[page].options) {
+                let optionName=opt.replaceAll(' ', '')
+                let optionElt=document.getElementById(`${apName}-${apPageName}-${optionName}-checkbox`)
+                if (optionElt)
+                    profile[page].options[opt]=optionElt.checked
+            }
+        }
+    }
 }

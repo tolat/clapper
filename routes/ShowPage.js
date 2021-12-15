@@ -43,7 +43,8 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         accessProfileName: show.accessMap[apName].profile,
         accessProfiles: show.accessProfiles,
         accessMap: show.accessMap,
-        username: req.user.username
+        username: req.user.username,
+        accessLevel: show.accessProfiles[show.accessMap[apName].profile].accessLevel
     };
 
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error
@@ -84,6 +85,47 @@ router.get('/getDropdownNames', isLoggedIn, hasShowAccess, tryCatch(async (req, 
 router.delete('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     let responseData=await ShowPageCRUD[sanitizeHtml(req.params.section)].delete(req.body, req.params.id);
     res.send(responseData);
+}))
+
+// 
+router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
+    // Sanitize incoming data
+    req.body=JSON.parse(sanitizeHtml(JSON.stringify(req.body)))
+    let show=await Show.findById(req.params.id)
+    const apName=crudUtils.getAccessProfileName(req.user)
+
+    // Only save profiles if this user has the ability to
+    let userAp=show.accessProfiles[show.accessMap[apName].profile]
+    if (userAp.options['Edit Access Profiles']) {
+        // Save access map. only users assigned to access profiles with lower clearance can be saved.
+        for (uName in show.accessMap) {
+            if (show.accessProfiles[show.accessMap[uName].profile].accessLevel>userAp.accessLevel) {
+                show.accessMap[uName]=req.body.accessMap[uName]
+            }
+        }
+
+        // Save access Profiles
+        for (key in req.body.accessProfiles) {
+            // Save existing access profile if it is a lower clearance level than user's profile
+            if (show.accessProfiles[key]) {
+                if (show.accessProfiles[key].accessLevel>userAp.accessLevel) {
+                    show.accessProfiles[key]=req.body.accessProfiles[key]
+                }
+            } else {
+                // Set minimum new access profile level to one above user's ap level
+                if (req.body.accessProfiles[key].accessLevel<=userAp.accessLevel) {
+                    req.body.accessProfiles[key].accessLevel=userAp.accessLevel+1
+                }
+                show.accessProfiles[key]=req.body.accessProfiles[key]
+            }
+        }
+    }
+
+    show.markModified('accessMap')
+    show.markModified('accessProfiles')
+    await show.save()
+
+    res.send({ success: 'true' })
 }))
 
 // Post (update) route for ShowPage sections

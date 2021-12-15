@@ -1,0 +1,20 @@
+<div id="add-access-profile-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
+    <div id="add-access-profile-modal-message"
+        style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+    </div>
+    <div id="add-access-profile-modal-input-container">
+        <label for="new-ap-name">New access profile name:</label>
+        <input id="new-ap-name" name="new-ap-name">
+        <label for="new-ap-level" style="padding-top: 10px;">New access profile level:</label>
+        <input type="number" id="new-ap-level" name="new-ap-leve;">
+        <label for="new-ap-copy-input" style="padding-top: 10px;">Copy from existing profile:</label>
+        <select id="new-ap-copy-input" name="new-ap-copy-input"></select>
+    </div>
+    <div id="add-access-profile-modal-memory" style="display: none;"></div>
+    <div class="modal-button-container">
+        <button id="add-access-profile-modal-close" onclick="toggleAddAccessProfileModal(false)"
+            style="color: black;">Cancel</button>
+        <button id="add-access-profile-modal-new" onclick="toggleAddAccessProfileModal(false, true)"
+            style="color: green;">Create</button>
+    </div>
+</div>

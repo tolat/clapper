@@ -251,11 +251,21 @@ const seedShows=async () => {
                 },
                 Owner: {
                     accessLevel: 0,
+                    options: {
+                        'Change Week': true,
+                        'Change Estimate Version': true,
+                        'Edit Access Profiles': true,
+                    },
                     'Cost Report': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 100: {
@@ -265,10 +275,15 @@ const seedShows=async () => {
                         }
                     },
                     'Estimate': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 100: {}
@@ -276,10 +291,15 @@ const seedShows=async () => {
                         }
                     },
                     'Purchases': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -287,10 +307,15 @@ const seedShows=async () => {
                         }
                     },
                     'Rentals': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -298,10 +323,15 @@ const seedShows=async () => {
                         }
                     },
                     'Crew': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -309,10 +339,15 @@ const seedShows=async () => {
                         }
                     },
                     'Rates': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': true,
+                            'Add Rows': true,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
                                 [`${firstWeekId}`]: {}
@@ -320,13 +355,17 @@ const seedShows=async () => {
                         }
                     },
                     'Timesheets': {
+                        pageAccess: true,
+                        options: {
+                            'Add Columns': false,
+                            'Add Rows': false,
+                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
-                        editDataFilter: { type: 'w', filter: {} },
+                        editDataFilter: { type: 'b', filter: {} },
                         displaySettings: { 'torin-olat@gmail-com': {} }
                     }
-
                 }
             },
         })
