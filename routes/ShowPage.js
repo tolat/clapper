@@ -113,18 +113,31 @@ router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (
             }
         }
 
+        // Delete deleted profiles
+        for (key in show.accessProfiles) {
+            if (!req.body.accessProfiles[key]) {
+                delete show.accessProfiles[key]
+            }
+        }
+
         // Save access map. only users assigned to access profiles with lower clearance can be saved.
         for (uName in req.body.accessMap) {
-            // Update profile for user with uName only if trying to change it to a profile that is a lower clearance level than that of user making request
+            // Delete deleted maps
+            if (req.body.accessMap[uName].profile=='_*DELETED*_'&&show.accessMap[uName]) {
+                delete show.accessMap[uName]
+                continue;
+            }
+
+            // Skip this uName if there is no access profile with the specified .profile name
             let profile=show.accessProfiles[req.body.accessMap[uName].profile]
             if (!profile) { continue }
+
+            // Update profile for user with uName only if trying to change it to a profile that is a lower clearance level than that of user making request
             if (profile.accessLevel>userAp.accessLevel) {
                 show.accessMap[uName]=req.body.accessMap[uName]
 
-
-                /*  Make sure there is a displaySettings object in every accessProfile showpage 
-                    that has a value for each week and estimate version for user with uName
-                */
+                //  Make sure there is a displaySettings object in every accessProfile showpage 
+                //  that has a value for each week and estimate version for user with uName
                 for (page of crudUtils.showPages) {
                     let displaySettings=show.accessProfiles[req.body.accessMap[uName].profile][page].displaySettings
                     if (!displaySettings[uName]) { displaySettings[uName]={} }

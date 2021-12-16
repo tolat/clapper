@@ -472,6 +472,25 @@ input.department-input:focus{
     font-size: 1.3rem;
 }
 
+.delete-access-profile-button{
+    margin-top: 5px;
+    color: red;
+    align-self: flex-end;
+    font-weight: bold;
+}
+
+.delete-access-profile-button:hover{
+    cursor: pointer;
+}
+
+.delete-access-profile-button:active{
+    opacity: 0.5;
+}
+
+button:active{
+    opacity: 0.5;
+}
+
 #add-user-to-ap-modal-input{
     width: 100%;
 }

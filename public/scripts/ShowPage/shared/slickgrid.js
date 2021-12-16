@@ -2890,7 +2890,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                     <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}">
                        ${ap} 
                     </button>
-                    <div style="color: green; white-space: nowrap; font-size: 1rem; margin-top:0.5rem;">(Level ${_args.accessProfiles[ap].accessLevel})</div>
+                    <div style="color: green; white-space: nowrap; font-size: 1rem; margin-top:5px;">(Level ${_args.accessProfiles[ap].accessLevel})</div>
                 </div>
                 <div>
             </h2>
@@ -2924,7 +2924,11 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             apAccordionItem+=`<div>${uName.replaceAll('-', '.')}</div>`
         }
 
-        apAccordionItem+=`</div></div></div>`
+        apAccordionItem+=`</div>`
+
+        apAccordionItem+=`<div class="delete-access-profile-button" onclick="toggleDeleteAccessProfileModal(true, '${ap}')">Delete Access Profile</div>`
+
+        apAccordionItem+=`</div></div>`
 
 
         // Generate html for each page in access profile
@@ -3618,6 +3622,31 @@ parseApCheckboxes=() => {
             let optionElt=document.getElementById(`${apName}-${apPageName}-pageAccess-checkbox`)
             if (optionElt)
                 profile[page].pageAccess=optionElt.checked
+        }
+    }
+}
+
+toggleDeleteAccessProfileModal=(show, ap=false, del=false) => {
+    if (show) {
+        document.getElementById('delete-access-profile-modal').style.display='flex'
+        document.getElementById('access-profiles-modal').style.display=null
+        document.getElementById('delete-access-profile-modal-memory').innerText=ap
+        document.getElementById('delete-access-profile-modal-message').innerText=`Deleting access profile '${ap}' will cause all users who are still assigned to this access profile to lose access to the show until they are added to another access profile.`
+    } else {
+        document.getElementById('delete-access-profile-modal').style.display=null
+        document.getElementById('access-profiles-modal').style.display='flex'
+        let ap=document.getElementById('delete-access-profile-modal-memory').innerText
+
+        if (del) {
+            delete _args.accessProfiles[ap]
+            for (uName in _args.accessMap) {
+                let map=_args.accessMap[uName]
+                if (map.profile==ap) {
+                    _args.accessMap[uName].profile='_*DELETED*_'
+                }
+            }
+
+            populateAccessProfileModal()
         }
     }
 }
