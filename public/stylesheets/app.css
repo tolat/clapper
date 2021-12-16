@@ -865,9 +865,8 @@ tbody tr{
 }
 
 .uneditable{
-    font-style: italic;
-    color: rgb(112, 112, 112);
-    opacity: 0.75;
+    background-color: rgb(247, 247, 247);
+    color: rgb(65, 65, 65);
 }
 
 .week-ending-modal-week{

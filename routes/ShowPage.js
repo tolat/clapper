@@ -64,9 +64,8 @@ router.get('/getDropdownNames', isLoggedIn, hasShowAccess, tryCatch(async (req, 
     const { id, section }=req.params;
     let show=await Show.findById(id)
 
-    let crewIds=await crudUtils.getAllCrewIDs(id)
-    let allCrew=await crudUtils.getAllCrewUsers(crewIds)
-    let dropdownNames=await allCrew.map(user => `${user['Name']} [${user['username']}]`)
+    let users=await User.find({})
+    let dropdownNames=await users.map(user => `${user['Name']} [${user['username']}]`)
 
     // Add users from accessMap
     for (key in show.accessMap) {
