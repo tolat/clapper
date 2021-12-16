@@ -2898,7 +2898,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                 <div class="accordion-body" style="display: flex; flex-direction: column;">
                     <div class=" accordion" id="ap-sub-accordion-${apName}">
                     <div style="display: flex; justify-content: space-between;">
-                        <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 1rem;">`
+                        <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr;">`
 
         // Add checkbox options for accessProfile options
         for (option in _args.accessProfiles[ap].options) {
@@ -2955,25 +2955,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                 </div>
                 </h2>
                 <div id="collapse${apName}-${apPageName}" class="accordion-collapse collapse ${isCurrentSection}" data-bs-parent="#ap-sub-accordion-${apName}">
-                    <div class="accordion-body ap-sub-accordion-page-container">
-                        <div class="access-profiles-checkbox-container">`
-
-
-            // Add checkbox options for accessProfile options
-            for (option in _args.accessProfiles[ap][apPage].options) {
-                let optionName=option.replaceAll(" ", "")
-                let value=''
-                if (_args.accessProfiles[ap][apPage].options[option]) { value='checked' }
-                subAccordionItem+=`
-                    <div class="access-profiles-checkbox">
-                        <input id="${apName}-${apPageName}-${optionName}-checkbox" type="checkbox" style="margin-right: 5px" ${value}>
-                        ${option}
-                    </div>`
-
-            }
-
-            // End checkbox container 
-            subAccordionItem+=`</div>`
+                    <div class="accordion-body ap-sub-accordion-page-container">`
 
             // Add items for dataFilter
             subAccordionItem+=generateDataFilterHtml(_args.accessProfiles[ap][apPage].dataFilter, ap, apPage, apName, apPageName, 'Access Data', 'dataFilter')
@@ -3360,10 +3342,11 @@ toggleAddUserToApModal=(show, ap=false, save=false) => {
                 // Save new setting to _args.accessMap
                 _args.accessMap[uName].profile=ap
             }
-        }
 
-        let memory=JSON.parse(document.getElementById('add-user-to-ap-modal-memory').innerText)
-        populateAccessProfileModal(memory.ap)
+            // Re-populate access profile
+            let memory=JSON.parse(document.getElementById('add-user-to-ap-modal-memory').innerText)
+            populateAccessProfileModal(memory.ap)
+        }
 
         document.getElementById('add-user-to-ap-modal-input').value=null
     }
@@ -3499,13 +3482,12 @@ toggleAddAccessProfileModal=(show, save) => {
                         'Change Week': true,
                         'Change Estimate Version': true,
                         'Edit Access Profiles': true,
+                        'Change Fringes': true,
+                        'Change Manday Rates': true,
+                        'Change Multipliers': true
                     },
                     'Cost Report': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3520,10 +3502,6 @@ toggleAddAccessProfileModal=(show, save) => {
                     },
                     'Estimate': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3536,10 +3514,6 @@ toggleAddAccessProfileModal=(show, save) => {
                     },
                     'Purchases': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3552,10 +3526,6 @@ toggleAddAccessProfileModal=(show, save) => {
                     },
                     'Rentals': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3568,10 +3538,6 @@ toggleAddAccessProfileModal=(show, save) => {
                     },
                     'Crew': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3584,10 +3550,6 @@ toggleAddAccessProfileModal=(show, save) => {
                     },
                     'Rates': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3600,10 +3562,6 @@ toggleAddAccessProfileModal=(show, save) => {
                     },
                     'Timesheets': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': false,
-                            'Add Rows': false,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -3660,14 +3618,6 @@ parseApCheckboxes=() => {
             let optionElt=document.getElementById(`${apName}-${apPageName}-pageAccess-checkbox`)
             if (optionElt)
                 profile[page].pageAccess=optionElt.checked
-
-            // Update page in access profile options from checkboxes
-            for (opt in profile[page].options) {
-                let optionName=opt.replaceAll(' ', '')
-                let optionElt=document.getElementById(`${apName}-${apPageName}-${optionName}-checkbox`)
-                if (optionElt)
-                    profile[page].options[opt]=optionElt.checked
-            }
         }
     }
 }

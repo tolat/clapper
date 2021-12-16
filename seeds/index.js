@@ -138,13 +138,12 @@ const seedShows=async () => {
                         'Change Week': true,
                         'Change Estimate Version': true,
                         'Edit Access Profiles': true,
+                        'Change Fringes': true,
+                        'Change Manday Rates': true,
+                        'Change Multipliers': true,
                     },
                     'Cost Report': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: ['Name'] },
                         dataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -159,12 +158,6 @@ const seedShows=async () => {
                     },
                     'Estimate': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                            'Change Fringes': true,
-                            'Change Manday Rates': true
-                        },
                         columnFilter: { type: 'b', filter: ['Location', 'Notes'] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: ['Name', 'Episode'] },
@@ -177,10 +170,6 @@ const seedShows=async () => {
                     },
                     'Purchases': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: ['Invoice Num'] },
                         dataFilter: { type: 'w', filter: { 'Set Code': ['103', '104', '105'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -193,10 +182,6 @@ const seedShows=async () => {
                     },
                     'Rentals': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'w', filter: ['Supplier'] },
                         dataFilter: { type: 'b', filter: { 'Department': ['Construction'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -209,10 +194,6 @@ const seedShows=async () => {
                     },
                     'Crew': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: ['Email'] },
                         dataFilter: { type: 'w', filter: { 'Department': ['Construction', 'Metal Fab', 'Sculptors', 'Greens'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -225,10 +206,6 @@ const seedShows=async () => {
                     },
                     'Rates': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'w', filter: ['Rate', 'Code'] },
                         dataFilter: { type: 'b', filter: { Department: ['Construction'] } },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -241,7 +218,6 @@ const seedShows=async () => {
                     },
                     'Timesheets': {
                         pageAccess: false,
-                        options: {},
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -255,13 +231,12 @@ const seedShows=async () => {
                         'Change Week': true,
                         'Change Estimate Version': true,
                         'Edit Access Profiles': true,
+                        'Change Fringes': true,
+                        'Change Manday Rates': true,
+                        'Change Multipliers': true,
                     },
                     'Cost Report': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -276,10 +251,6 @@ const seedShows=async () => {
                     },
                     'Estimate': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -292,10 +263,6 @@ const seedShows=async () => {
                     },
                     'Purchases': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -308,10 +275,6 @@ const seedShows=async () => {
                     },
                     'Rentals': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -324,10 +287,6 @@ const seedShows=async () => {
                     },
                     'Crew': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -340,10 +299,6 @@ const seedShows=async () => {
                     },
                     'Rates': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': true,
-                            'Add Rows': true,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },
@@ -356,10 +311,6 @@ const seedShows=async () => {
                     },
                     'Timesheets': {
                         pageAccess: true,
-                        options: {
-                            'Add Columns': false,
-                            'Add Rows': false,
-                        },
                         columnFilter: { type: 'b', filter: [] },
                         dataFilter: { type: 'b', filter: {} },
                         editColumnFilter: { type: 'b', filter: [] },

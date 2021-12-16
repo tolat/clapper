@@ -39,7 +39,16 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     let apName=await crudUtils.getAccessProfileName(req.user)
     show.accessProfiles={
         Owner: {
+            options: {
+                'Change Week': true,
+                'Change Estimate Version': true,
+                'Edit Access Profiles': true,
+                'Change Fringes': true,
+                'Change Manday Rates': true,
+                'Change Multipliers': true,
+            },
             'Cost Report': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
@@ -47,6 +56,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 displaySettings: { [`${apName}`]: {} }
             },
             'Estimate': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
@@ -54,6 +64,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 displaySettings: { [`${apName}`]: {} }
             },
             'Purchases': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
@@ -61,6 +72,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 displaySettings: { [`${apName}`]: {} }
             },
             'Rentals': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
@@ -68,6 +80,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 displaySettings: { [`${apName}`]: {} }
             },
             'Crew': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
@@ -75,6 +88,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 displaySettings: { [`${apName}`]: {} }
             },
             'Rates': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
@@ -82,13 +96,13 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 displaySettings: { [`${apName}`]: {} }
             },
             'Timesheets': {
+                pageAccess: true,
                 columnFilter: { type: 'b', filter: [] },
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
                 editDataFilter: { type: 'b', filter: {} },
                 displaySettings: { [`${apName}`]: {} }
             }
-
         }
     }
     show.accessMap={

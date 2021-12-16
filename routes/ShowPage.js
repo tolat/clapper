@@ -94,7 +94,7 @@ router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (
     let show=await Show.findById(req.params.id)
     const apName=crudUtils.getAccessProfileName(req.user)
 
-    // Only save profiles if this user has the ability to
+    // Only save profiles if this user has the ability to edit accessprofiles
     let userAp=show.accessProfiles[show.accessMap[apName].profile]
     if (userAp.options['Edit Access Profiles']) {
         // Save access Profiles
@@ -115,9 +115,41 @@ router.post('/updateAccessProfiles', isLoggedIn, hasShowAccess, tryCatch(async (
 
         // Save access map. only users assigned to access profiles with lower clearance can be saved.
         for (uName in req.body.accessMap) {
-            let profile=req.body.accessProfiles[req.body.accessMap[uName].profile]
+            // Update profile for user with uName only if trying to change it to a profile that is a lower clearance level than that of user making request
+            let profile=show.accessProfiles[req.body.accessMap[uName].profile]
+            if (!profile) { continue }
             if (profile.accessLevel>userAp.accessLevel) {
                 show.accessMap[uName]=req.body.accessMap[uName]
+
+
+                /*  Make sure there is a displaySettings object in every accessProfile showpage 
+                    that has a value for each week and estimate version for user with uName
+                */
+                for (page of crudUtils.showPages) {
+                    let displaySettings=show.accessProfiles[req.body.accessMap[uName].profile][page].displaySettings
+                    if (!displaySettings[uName]) { displaySettings[uName]={} }
+                    for (estVer in show.estimateVersions) {
+                        for (week of show.weeks) {
+                            let weekId=week._id
+                            if (page=='Cost Report') {
+                                if (!displaySettings[uName][estVer]) {
+                                    displaySettings[uName][estVer]={}
+                                }
+                                if (!displaySettings[uName][estVer][weekId]) {
+                                    displaySettings[uName][estVer][weekId]={}
+                                }
+                            } else if (page=='Estimate') {
+                                if (!displaySettings[uName][estVer]) {
+                                    displaySettings[uName][estVer]={}
+                                }
+                            } else {
+                                if (!displaySettings[uName][weekId]) {
+                                    displaySettings[uName][weekId]={}
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

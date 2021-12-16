@@ -419,4 +419,6 @@ module.exports.parseValueMap=function (items) {
     return cellValueMap
 }
 
+module.exports.showPages=['Cost Report', 'Crew', 'Estimate', 'Purchases', 'Rentals', 'Rates', 'Timesheets']
+
 
