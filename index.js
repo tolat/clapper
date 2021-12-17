@@ -49,12 +49,11 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize())
 
-
 // Helmet
 const contentSecurityPolicy={
     directives: {
         defaultSrc: [],
-        connectSrc: ["'self'"],
+        connectSrc: ["'self'", "clapper.ca"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         workerSrc: ["'self'"],
@@ -74,7 +73,6 @@ const secret=process.env.SECRET
 const sessionConfig={
     store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 3600*24, secret: secret }),
     name: 'filmApp_session',
-    //httpOnly: true,
     secure: true,
     secret: secret,
     resave: false,
