@@ -358,7 +358,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
         }),
         credentials: 'include'
     })
-        .then(response => { console.log(response); return response.json(); })
+        .then(response => { return response.json() })
         .then(responseData => {
             // Update _savingUnderway to false once save is complete
             _savingUnderway=false
