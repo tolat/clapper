@@ -53,7 +53,9 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     try {
         sharedModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/SharedModals`));
         pageModals=await fs.readdirSync(path.join(__dirname, `../views/ShowPage/${section}/Modals`));
-    } catch (e) { }
+    } catch (e) {
+        // Do Nothing
+    }
 
     // Render ShowPage section
     return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)

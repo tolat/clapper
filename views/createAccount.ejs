@@ -44,6 +44,13 @@
                         Please enter a valid password.
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label for="VerifyPassword" class="form-label">Re-Enter Password</label>
+                    <input type="password" class="form-control" id="VerifyPassword" required>
+                    <div class="invalid-feedback">
+                        Passwords do not match.
+                    </div>
+                </div>
 
                 <button type="submit" class="btn btn-success" style="width: 100%;">Submit</button>
                 <button type="button" class="btn button-secondary" onclick="location.href = '/login';"
@@ -59,6 +66,15 @@
 
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms=document.querySelectorAll('.needs-validation')
+
+        // Add password verification
+        let pwElt=document.getElementById('InputPassword')
+        let vpwElt=document.getElementById('VerifyPassword')
+        vpwElt.addEventListener('change', function (e) {
+            pwElt.value!=vpwElt.value?
+                this.setCustomValidity("Passwords don't match!"):
+                this.setCustomValidity("")
+        })
 
         // Loop over them and prevent submission
         Array.from(forms)
