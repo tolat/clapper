@@ -74,7 +74,7 @@ const secret=process.env.SECRET
 const sessionConfig={
     store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 3600*24, secret: secret }),
     name: 'filmApp_session',
-    //httpOnly: true,
+    httpOnly: true,
     secure: true,
     secret: secret,
     resave: false,
@@ -82,14 +82,6 @@ const sessionConfig={
     expires: Date.now()+1000*60*60*24
 }
 app.use(session(sessionConfig));
-
-// Force HTTPS
-app.use(function (request, response, next) {
-    if (process.env.NODE_ENV!='develop_local'&&!request.secure) {
-        return response.redirect("https://"+request.headers.host+request.url);
-    }
-    next();
-})
 
 // Passport
 app.use(passport.initialize())
