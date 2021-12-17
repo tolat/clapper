@@ -52,8 +52,7 @@ app.use(mongoSanitize())
 // Helmet
 const contentSecurityPolicy={
     directives: {
-        defaultSrc: [],
-        connectSrc: ["'self'", "*.clapper.ca"],
+        defaultSrc: ['self', "http://www.clapper.ca", "https://www.clapper.ca"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         workerSrc: ["'self'"],
