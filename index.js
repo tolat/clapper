@@ -53,7 +53,7 @@ app.use(mongoSanitize())
 const contentSecurityPolicy={
     directives: {
         defaultSrc: [],
-        connectSrc: ["'self'", "https://www.clapper.ca"],
+        connectSrc: ["'self'", "http://www.clapper.ca"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         workerSrc: ["'self'"],
