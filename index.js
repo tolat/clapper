@@ -83,6 +83,14 @@ const sessionConfig={
 }
 app.use(session(sessionConfig));
 
+// Force HTTPS
+app.use(function (request, response, next) {
+    if (process.env.NODE_ENV!='develop_local'&&!request.secure) {
+        return response.redirect("https://"+request.headers.host+request.url);
+    }
+    next();
+})
+
 // Passport
 app.use(passport.initialize())
 app.use(passport.session())
