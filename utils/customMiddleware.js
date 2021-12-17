@@ -47,9 +47,6 @@ module.exports.hasShowAccess=async (req, res, next) => {
 module.exports.handleCORS=async (req, res, next) => {
     // allow requests from http version of secure origin
     let server=process.env.SERVER
-    if (server.includes('https')) {
-        server='http'+server.slice(5)
-    }
 
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', server);
