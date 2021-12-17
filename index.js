@@ -51,7 +51,19 @@ app.use(mongoSanitize())
 
 
 // Helmet
-app.use(helmet())
+const contentSecurityPolicy={
+    directives: {
+        defaultSrc: [],
+        connectSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        workerSrc: ["'self'"],
+        objectSrc: [],
+        imgSrc: ["'self'", 'data:'],
+        fontSrc: ["'self'"]
+    }
+}
+app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
 // Morgan logger
 //const morgan=require('morgan');
