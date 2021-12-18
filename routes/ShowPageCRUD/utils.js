@@ -431,4 +431,3 @@ module.exports.parseValueMap=function (items) {
 
 module.exports.showPages=['Cost Report', 'Crew', 'Estimate', 'Purchases', 'Rentals', 'Rates', 'Timesheets']
 
-

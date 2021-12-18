@@ -57,8 +57,14 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         // Do Nothing
     }
 
-    // Render ShowPage section
-    return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
+    // Render ShowPage section if user has access to that page, otherwise redirect to original url
+    let pageName=section
+    if (pageName=='CostReport') { pageName='Cost Report' }
+    if (show.accessProfiles[show.accessMap[apName].profile][pageName].pageAccess) {
+        return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
+    } else {
+        res.redirect('back')
+    }
 }))
 
 // Send list of dropdown names to browser
