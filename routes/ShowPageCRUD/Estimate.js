@@ -211,29 +211,31 @@ module.exports.update=async function (body, showId, user) {
     // Set original estimate version sets to be updatedList
     show.estimateVersions[ov].sets=updatedList
 
-    // Handle new version or version rename
-    if (v!=ov) {
-        show.estimateVersions[v]=JSON.parse(JSON.stringify(show.estimateVersions[ov]))
-        if (isBlankVersion) {
-            accessProfile.displaySettings[apName][`${v}`]={}
-            for (set of show.estimateVersions[v].sets) {
-                for (key in set.departmentValues) {
-                    set.departmentValues[key]=null
+    // Handle new version or version rename if it is allowed by access profile
+    if (apOptions['Change Estimate Version']) {
+        if (v!=ov) {
+            show.estimateVersions[v]=JSON.parse(JSON.stringify(show.estimateVersions[ov]))
+            if (isBlankVersion) {
+                accessProfile.displaySettings[apName][`${v}`]={}
+                for (set of show.estimateVersions[v].sets) {
+                    for (key in set.departmentValues) {
+                        set.departmentValues[key]=null
+                    }
+                    set.extraColumnValues={}
                 }
-                set.extraColumnValues={}
+                show.estimateVersions[v].extraColumns=[]
             }
-            show.estimateVersions[v].extraColumns=[]
-        }
-        // Delete old version if this is not a new version (i.e. this is a rename)
-        if (!isNewVersion) { delete show.estimateVersions[ov] }
-        else {
-            show.estimateVersions[v].dateCreated=new Date(Date.now())
+            // Delete old version if this is not a new version (i.e. this is a rename)
+            if (!isNewVersion) { delete show.estimateVersions[ov] }
+            else {
+                show.estimateVersions[v].dateCreated=new Date(Date.now())
 
-            // Add displaysettings for cost report page 
-            show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][v]={
-                [`${show.accessMap[apName].currentWeek}`]: {}
+                // Add displaysettings for cost report page 
+                show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][v]={
+                    [`${show.accessMap[apName].currentWeek}`]: {}
+                }
+                show.markModified('accessProfiles')
             }
-            show.markModified('accessProfiles')
         }
     }
 

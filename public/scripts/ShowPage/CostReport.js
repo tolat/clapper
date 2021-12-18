@@ -278,6 +278,7 @@ toggleOpenVersionModal=(show) => {
     }
     // Show modal
     else {
+        if (!_args.apOptions['Change Estimate Version']) { return }
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('open-version-modal').style.display='flex';
         document.getElementById('open-version-modal').focus()

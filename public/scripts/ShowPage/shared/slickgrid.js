@@ -1887,6 +1887,8 @@ toggleWeekEndingModal=(show) => {
     }
     // Show modal
     else if (_args.section!='Estimate') {
+        // Prevent week changing if it is blocked by the access profile
+        if (!_args.apOptions['Change Week']) { return }
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('week-ending-modal').style.display='flex';
         document.getElementById('week-ending-modal').focus();

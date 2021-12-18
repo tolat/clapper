@@ -13,15 +13,17 @@
             style="background-image: url('/public/images/undo.png'); "></button>
         <button type="button" onclick="redoCellEdit()" class="toolbar-icon"
             style="background-image: url('/public/images/redo.png'); "></button>
-        <div class="grid-toolbar-item" id="multipliers-button" onclick="toggleMultipliersModal(true)">
-            Multipliers
-        </div>
-        <div class="grid-toolbar-item" id="save-status"
-            style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
-            saved
-        </div>
-        <div class=" grid-toolbar-searchbar">
-            Filter:
-            <input id="textsearch" style="width: 150px; margin-left: 5px;">
-        </div>
+        <% if (args.apOptions['Change Multipliers']) {%>
+            <div class="grid-toolbar-item" id="multipliers-button" onclick="toggleMultipliersModal(true)">
+                Multipliers
+            </div>
+            <% } %>
+                <div class="grid-toolbar-item" id="save-status"
+                    style="color: rgb(24, 135, 86); margin-left: 5px; font-weight: bold;">
+                    saved
+                </div>
+                <div class=" grid-toolbar-searchbar">
+                    Filter:
+                    <input id="textsearch" style="width: 150px; margin-left: 5px;">
+                </div>
 </div>

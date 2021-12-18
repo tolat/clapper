@@ -33,7 +33,17 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     const { id, section }=req.params;
     const query=req.query;
     let show=await Show.findById(id)
+    let accessProfile=show.accessProfiles[show.accessMap[apName].profile]
 
+    // Set accessProfiles to empty object if user is not alllowed to edit access profiles
+    let accessProfiles=show.accessProfiles
+    let accessMap=show.accessMap
+    if (!accessProfile.options['Edit Access Profiles']) {
+        accessProfiles={}
+        accessMap={}
+    }
+
+    // Set args
     let args={
         section: section,
         showid: id,
@@ -41,10 +51,11 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         weekList: show.weeks.map(w => { return { _id: w._id, end: w.end } }),
         week: show.weeks.find(w => w._id==show.accessMap[apName].currentWeek),
         accessProfileName: show.accessMap[apName].profile,
-        accessProfiles: show.accessProfiles,
-        accessMap: show.accessMap,
+        accessProfiles,
+        accessMap,
         username: req.user.username,
-        accessLevel: show.accessProfiles[show.accessMap[apName].profile].accessLevel
+        accessLevel: accessProfile.accessLevel,
+        apOptions: accessProfile.options
     };
 
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error
