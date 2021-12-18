@@ -42,6 +42,7 @@
         // Create grid data
         let data=<%- JSON.stringify(data)%>;
         data=await applyEditDataFilter(data, columns)
+        console.log(data)
 
         // Create data grid
         await createSlickGrid(data, columns, options);
