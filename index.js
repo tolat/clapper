@@ -131,6 +131,11 @@ app.get('/logout', isLoggedIn, (req, res) => {
     res.redirect('/login')
 })
 
+// Serve favicon image
+app.get('/favicon.ico', isLoggedIn, (req, res) => {
+    res.send(fs.readFileSync('/favicon.ico'))
+})
+
 // 404 Route / no other route matched
 app.all('*', (req, res, next) => {
     console.log(`\n\nNo route matched for ${req.originalUrl}\n\n`)
