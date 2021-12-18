@@ -39,6 +39,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     let apName=await crudUtils.getAccessProfileName(req.user)
     show.accessProfiles={
         Owner: {
+            accessLevel: 0,
             options: {
                 'Change Week': true,
                 'Change Estimate Version': true,

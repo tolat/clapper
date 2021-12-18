@@ -723,7 +723,7 @@ function executePaste() {
             let item=dataView.getItemByIdx(idx)
 
             // Do not paste into this item if it is in an uneditable row
-            if (Object.keys(_cellCssStyles['uneditableRow']).includes(item.id)) { continue }
+            if (_cellCssStyles['uneditableRow']&&Object.keys(_cellCssStyles['uneditableRow']).includes(item.id)) { continue }
 
             if (_groupedBy) {
                 item=items.find(i => dataView.getRowById(i.id)==idx)
