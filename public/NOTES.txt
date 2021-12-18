@@ -10,6 +10,7 @@ TASKS
 -   Preliminarily need to solve issues with working on pc
 
 TORIN:
+-   DATES ARE SHIFTED ON WEB VERSION
 -   Remove _show variable
 -   Finish access profiles
 -   Allow versios to be named with letters and chosen manually for comparison (modal can sort by date asc/desc)

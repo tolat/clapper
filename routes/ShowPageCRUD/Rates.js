@@ -36,6 +36,7 @@ module.exports.update=async function (body, showId, user) {
     // Get access profile
     let apName=await crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile].Rates
+    let apOptions=show.accessProfiles[show.accessMap[apName].profile].options
 
     // Set week
     let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
@@ -48,9 +49,11 @@ module.exports.update=async function (body, showId, user) {
     week.positions.extraColumns=body.extraColumns;
     show.markModified('positions.extraColumns');
 
-    // Save multipliers to week
-    week.multipliers=body.multipliers;
-    show.markModified('weeks');
+    // Save multipliers to week if it is allowed by access profile
+    if (apOptions['Change Multipliers']) {
+        week.multipliers=body.multipliers;
+        show.markModified('weeks');
+    }
 
     // Save items
     let updatedList={}

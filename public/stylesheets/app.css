@@ -434,8 +434,8 @@ input.department-input:focus{
 
 #access-profiles-modal{
     width: 50rem;
-    max-height: 90%;
-    zoom: 0.8;
+    max-height: 80%;
+    font-size: 0.8rem;
 }
 
 #access-profiles-accordion{
@@ -463,7 +463,6 @@ input.department-input:focus{
     flex-direction: column;
     overflow-y: scroll;
     overflow-x: scroll;
-    font-size: 1rem;
 }
 
 .add-user-to-access-profile-button{
@@ -472,18 +471,11 @@ input.department-input:focus{
     font-size: 1.3rem;
 }
 
-.delete-access-profile-button{
-    margin-top: 5px;
-    color: red;
-    align-self: flex-end;
-    font-weight: bold;
-}
-
-.delete-access-profile-button:hover{
+.access-profile-modal-button:hover{
     cursor: pointer;
 }
 
-.delete-access-profile-button:active{
+.access-profile-modal-button:active{
     opacity: 0.5;
 }
 

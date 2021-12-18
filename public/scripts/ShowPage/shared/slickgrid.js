@@ -20,6 +20,8 @@ let _headerDblCLick=false
 let _colSortMap={}
 let _userYesNo=true
 let _savingUnderway=false
+let _accessProfilesSaved=true
+let _initialAccessProfiles
 
 // Edit History Buffer
 let undoRedoBuffer={
@@ -50,6 +52,9 @@ createSlickGrid=(data, columns, options) => {
             { id: 'empty_3', editedfields: [] },
             { id: 'empty_4', editedfields: [] }])
     }
+
+    // Save initial access profiles
+    _initialAccessProfiles=JSON.parse(JSON.stringify(_args.accessProfiles))
 
     // Set server
     server=_args.server;
@@ -283,7 +288,7 @@ createSlickGrid=(data, columns, options) => {
 
     // Warn before navigating away from page
     window.onbeforeunload=function () {
-        if (!_dataSaved) {
+        if (!_dataSaved||!_accessProfilesSaved) {
             return true;
         }
     };
@@ -2855,15 +2860,14 @@ hideRestrictedColumns=(columns, IDkey) => {
 }
 
 // Populates access profiles modal 
-populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => {
+populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, parseCheckboxes=true) => {
     // If this is not the initial load of the page, set saveStatus to false
     if (!initialLoad) {
-        document.getElementById('access-profile-display').innerText=`${_args.accessProfileName} (unsaved)`
-        document.getElementById('access-profile-display').style.color='red'
-        document.querySelector("#access-profiles-modal-message h4").innerText='Access Profiles (unsaved)'
-
+        updateApSaveStatus(false)
         // Update options from checkboxes
-        parseApCheckboxes()
+        if (parseCheckboxes) {
+            parseApCheckboxes()
+        }
     }
 
     //Clear access profiles modal accordion
@@ -2907,7 +2911,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             if (_args.accessProfiles[ap].options[option]) { value='checked' }
             apAccordionItem+=`
                     <div class="access-profiles-checkbox">
-                        <input id="${apName}-${optionName}-checkbox" type="checkbox" style="margin-right: 5px" ${value}>
+                        <input id="${apName}-${optionName}-checkbox" onclick="updateApSaveStatus(false)" type="checkbox" style="margin-right: 5px" ${value}>
                         ${option}
                     </div>`
         }
@@ -2924,12 +2928,13 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
             apAccordionItem+=`<div>${uName.replaceAll('-', '.')}</div>`
         }
 
-        apAccordionItem+=`</div>`
-
-        apAccordionItem+=`<div class="delete-access-profile-button" onclick="toggleDeleteAccessProfileModal(true, '${ap}')">Delete Access Profile</div>`
-
-        apAccordionItem+=`</div></div>`
-
+        // Add delete access profile button
+        apAccordionItem+=`</div>
+        <div style="display: flex; justify-content: space-between;">
+            <div class="access-profile-modal-button" onclick="toggleDeleteAccessProfileModal(true, '${ap}')" style="margin-top: 7px; font-weight: bold; color: red;">Delete Profile</div>
+            <div class="access-profile-modal-button" onclick="revertAccessProfile('${ap}')" style="margin-top: 7px; font-weight: bold;">Revert Profile</div>
+        </div>
+        </div></div>`
 
         // Generate html for each page in access profile
         for (apPage in _args.accessProfiles[ap]) {
@@ -2955,7 +2960,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false) => 
                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}-${apPageName}">
                          ${apPage}
                     </button>
-                    <input id="${apName}-${apPageName}-pageAccess-checkbox" type="checkbox" ${pageAccess}>
+                    <input id="${apName}-${apPageName}-pageAccess-checkbox" onclick="updateApSaveStatus(false)" type="checkbox" ${pageAccess}>
                 </div>
                 </h2>
                 <div id="collapse${apName}-${apPageName}" class="accordion-collapse collapse ${isCurrentSection}" data-bs-parent="#ap-sub-accordion-${apName}">
@@ -3453,6 +3458,7 @@ function autocomplete(inp, arr) {
     });
 }
 
+// Hide and show modal to add a new access profile
 toggleAddAccessProfileModal=(show, save) => {
     if (show) {
         document.getElementById('add-access-profile-modal').style.display='flex'
@@ -3596,9 +3602,7 @@ saveAccessProfiles=() => {
     })
         .then(response => { return response.json() })
         .then(data => {
-            document.getElementById('access-profile-display').innerText=_args.accessProfileName
-            document.getElementById('access-profile-display').style.color='rgb(255, 229, 81)'
-            document.querySelector("#access-profiles-modal-message h4").innerText='Access Profiles'
+            updateApSaveStatus(true)
         })
 }
 
@@ -3650,3 +3654,19 @@ toggleDeleteAccessProfileModal=(show, ap=false, del=false) => {
         }
     }
 }
+
+updateApSaveStatus=(saved) => {
+    _accessProfilesSaved=saved
+    if (saved) {
+        document.getElementById('access-profile-display').innerText=_args.accessProfileName
+        document.querySelector("#access-profiles-modal-message h4").innerText='Access Profiles'
+    } else {
+        document.getElementById('access-profile-display').innerHTML=`${_args.accessProfileName}<sup style="font-size: 1.2rem; color: red;">*</sup>`
+        document.querySelector("#access-profiles-modal-message h4").innerText='Access Profiles (unsaved)'
+    }
+}
+
+revertAccessProfile=(ap) => {
+    _args.accessProfiles[ap]=JSON.parse(JSON.stringify(_initialAccessProfiles[ap]))
+    populateAccessProfileModal(ap, false, false, false)
+}   

@@ -52,6 +52,7 @@ module.exports.update=async function (body, showId, user) {
     // Get accessProfile
     let apName=await crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile]['Cost Report']
+    let apOptions=show.accessProfiles[show.accessMap[apName].profile].options
 
     // Get current Week
     let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
@@ -68,16 +69,18 @@ module.exports.update=async function (body, showId, user) {
     show.markModified('costReport.extraColumns');
 
     // Handle changing estimate versions
-    if (body.updateVersion) {
-        if (!accessProfile.displaySettings[apName][body.updateVersion]) {
-            accessProfile.displaySettings[apName][body.updateVersion]={
-                [`${week._id}`]: {}
+    if (apOptions['Change Estimate Version']) {
+        if (body.updateVersion) {
+            if (!accessProfile.displaySettings[apName][body.updateVersion]) {
+                accessProfile.displaySettings[apName][body.updateVersion]={
+                    [`${week._id}`]: {}
+                }
             }
-        }
 
-        show.accessMap[apName].estimateVersion=body.updateVersion
-        show.markModified('accessMap')
-        show.markModified('accessProfiles')
+            show.accessMap[apName].estimateVersion=body.updateVersion
+            show.markModified('accessMap')
+            show.markModified('accessProfiles')
+        }
     }
 
     // Save total and budget to show

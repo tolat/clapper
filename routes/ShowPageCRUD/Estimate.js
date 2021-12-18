@@ -10,6 +10,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     // Initialize data for grid based on user access profile
     let apName=await crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile][section]
+    let apOptions=show.accessProfiles[show.accessMap[apName].profile].options
 
     // Create a list of estimateVersion keys sorted by date
     let sortedVersionKeys=Object.keys(show.estimateVersions)
@@ -21,8 +22,16 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     if (!Object.keys(show.estimateVersions).length) { args.isFirstEstimate=true }
     // Case: requesting specific estimate version
     else if (query.version) {
-        args.version=query.version;
-        args.weekEnding=show.estimateVersions[query.version].weekEnding;
+        // Only got to query version if it is allowed by the accesss profile, otherwise default to the user's saved estimate version
+        if (apOptions['Change Estimate Version']) {
+            args.version=query.version;
+            args.weekEnding=show.estimateVersions[query.version].weekEnding;
+        } else {
+            let version=show.accessMap[apName].estimateVersion
+            version? args.version=version:args.version=sortedVersionKeys[0]
+            args.weekEnding=show.estimateVersions[args.version].weekEnding;
+        }
+
     }
     //Case: no specified version, default to the cost report's version
     else {
@@ -89,6 +98,7 @@ module.exports.update=async function (body, showId, user) {
     // Get access profile
     let apName=await crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile].Estimate
+    let apOptions=show.accessProfiles[show.accessMap[apName].profile].options
 
     // First blank estimate case 
     if (!ov) {
@@ -116,13 +126,17 @@ module.exports.update=async function (body, showId, user) {
     show.estimateVersions[ov].extraColumns=body.extraColumns;
     show.markModified(`estimateVersions.${ov}.extraColumns`);
 
-    // Update Manday rates
-    show.estimateVersions[ov].mandayRates=body.mandayRates;
-    show.markModified(`estimateVersions.${ov}.mandayRates`);
+    // Update Manday rates if it is allowed by the access profile
+    if (apOptions['Change Manday Rates']) {
+        show.estimateVersions[ov].mandayRates=body.mandayRates;
+        show.markModified(`estimateVersions.${ov}.mandayRates`);
+    }
 
     // Update fringes
-    show.estimateVersions[ov].fringes=body.fringes;
-    show.markModified(`estimateVersions.${ov}.fringes`);
+    if (apOptions['Change Fringes']) {
+        show.estimateVersions[ov].fringes=body.fringes;
+        show.markModified(`estimateVersions.${ov}.fringes`);
+    }
 
     // Update departments
     show.departments=body.departments;
@@ -131,8 +145,10 @@ module.exports.update=async function (body, showId, user) {
     show.departmentColorMap=body.departmentColorMap;
 
     // Set this user's active version
-    show.accessMap[apName].estimateVersion=`${v}`
-    show.markModified('accessMap')
+    if (apOptions['Change Estimate Version']) {
+        show.accessMap[apName].estimateVersion=`${v}`
+        show.markModified('accessMap')
+    }
 
     // Save show
     await show.save();

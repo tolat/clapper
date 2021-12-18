@@ -17,6 +17,11 @@ module.exports.getDaysOfWeekEnding=(date) => {
 
 // Deletes all records of a week in all show's User showrecords
 module.exports.deleteWeek=async function (weekId, show, newWeeks) {
+    // DO Nothing if changing week is not allowed by the access profile
+    if (!show.accessProfiles[show.accessMap[apName].profile].options['Change Week']) {
+        return
+    }
+
     // Update show weeks 
     show.weeks.splice(show.weeks.indexOf(show.weeks.find(w => w._id==weekId)), 1)
     await show.save()
@@ -33,6 +38,11 @@ module.exports.deleteWeek=async function (weekId, show, newWeeks) {
 
 // Creates a new week for the show
 module.exports.createWeek=async function (body, show, newWeekId, apName) {
+    // DO Nothing if changing week is not allowed by the access profile
+    if (!show.accessProfiles[show.accessMap[apName].profile].options['Change Week']) {
+        return
+    }
+
     show=await Show.findById(show._id)
     let currentWeekId=show.accessMap[apName].currentWeek
     // Just update show's current week if not creating a new week
