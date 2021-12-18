@@ -21,8 +21,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
 
     args.reloadOnWeekChange=true;
     let allUsers=await User.find({});
-    let dropdownNames=await allUsers.map(user => `${user['Name']} [${user['username']}]`)
-    let allUsernames=await allUsers.map(user => user['username'])
+    args.dropdownNames=await allUsers.map(user => `${user['Name']} [${user['username']}]`)
+    args.allUsernames=await allUsers.map(user => user['username'])
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
