@@ -35,8 +35,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         apName,
         user,
         currentVersionSetCodes,
-        dropdownNames,
-        allUsernames,
         accessProfile
     })
 }
