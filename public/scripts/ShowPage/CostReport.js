@@ -244,7 +244,7 @@ saveData=(reload=false, updateVersion=false) => {
                 setFrozenColumns: _frozenColumns,
             }
         }),
-        //credentials: 'include',
+        credentials: 'include',
         mode: 'no-cors'
     })
         .then(response => { return response.text(); })
