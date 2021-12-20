@@ -5,12 +5,16 @@
             File
         </button>
         <ul class="dropdown-menu grid-toolbar-dropdown" aria-labelledby="dropdownMenuButton1">
-            <li><a class="dropdown-item" onclick="toggleEnterVersionModal(true, true, true)">New version</a></li>
-            <li><a class="dropdown-item" onclick="saveData()">Save</a></li>
-            <li><a class="dropdown-item" onclick="toggleOpenVersionModal(true)">Open</a></li>
-            <li><a class="dropdown-item" onclick="toggleDeleteVersionModal(true)">Delete</a></li>
-            <li><a class="dropdown-item" onclick="toggleEnterVersionModal(true)">Rename</a>
-            </li>
+            <% if(args.apOptions['Edit Estimate Versions']){%>
+                <li><a class="dropdown-item" onclick="toggleEnterVersionModal(true, true, true)">New version</a></li>
+                <%}%>
+                    <li><a class="dropdown-item" onclick="saveData()">Save</a></li>
+                    <li><a class="dropdown-item" onclick="toggleOpenVersionModal(true)">Open</a></li>
+                    <% if(args.apOptions['Edit Estimate Versions']){%>
+                        <li><a class="dropdown-item" onclick="toggleDeleteVersionModal(true)">Delete</a></li>
+                        <li><a class="dropdown-item" onclick="toggleEnterVersionModal(true)">Rename</a>
+                            <%}%>
+                        </li>
         </ul>
     </div>
     <%- include('ShowPage/toolbarEditFeatures') %>

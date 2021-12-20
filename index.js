@@ -64,8 +64,8 @@ const contentSecurityPolicy={
 app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
 // Morgan logger
-//const morgan=require('morgan');
-//app.use(morgan('dev'));
+// const morgan=require('morgan');
+// app.use(morgan('dev'));
 
 // Session
 const secret=process.env.SECRET

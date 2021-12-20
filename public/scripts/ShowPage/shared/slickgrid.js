@@ -3638,6 +3638,7 @@ parseApCheckboxes=() => {
     }
 }
 
+// Hide and show modal to delete access profiles
 toggleDeleteAccessProfileModal=(show, ap=false, del=false) => {
     if (show) {
         document.getElementById('delete-access-profile-modal').style.display='flex'
@@ -3663,7 +3664,10 @@ toggleDeleteAccessProfileModal=(show, ap=false, del=false) => {
     }
 }
 
+// Update save status for access profiles
 updateApSaveStatus=(saved) => {
+    // Do not update if user is not allowed to edit access profiles
+    if (!_args.apOptions['Edit Access Profiles']) { return }
     _accessProfilesSaved=saved
     if (saved) {
         document.getElementById('access-profile-display').innerText=_args.accessProfileName
@@ -3674,6 +3678,7 @@ updateApSaveStatus=(saved) => {
     }
 }
 
+// Revert access profile to it's state at page load
 revertAccessProfile=(ap) => {
     _args.accessProfiles[ap]=JSON.parse(JSON.stringify(_initialAccessProfiles[ap]))
     populateAccessProfileModal(ap, false, false, false)

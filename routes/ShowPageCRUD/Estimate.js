@@ -23,10 +23,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     // Case: requesting specific estimate version
     else if (query.version) {
         // Only go to query version if it is allowed by the accesss profile, otherwise default to the user's saved estimate version
-        if (apOptions['View Estimate Versions']) {
+        if (apOptions['View Estimate Versions']&&show.estimateVersions[query.version]) {
             args.version=query.version;
             args.weekEnding=show.estimateVersions[query.version].weekEnding;
         } else {
+            console.log(show.accessMap[apName].estimateVersion)
             let version=show.accessMap[apName].estimateVersion
             version? args.version=version:args.version=sortedVersionKeys[0]
             args.weekEnding=show.estimateVersions[args.version].weekEnding;
@@ -146,7 +147,9 @@ module.exports.update=async function (body, showId, user) {
 
     // Set this user's active version
     if (apOptions['View Estimate Versions']) {
-        show.accessMap[apName].estimateVersion=`${v}`
+        !apOptions['Edit Estimate Versions']&&v!=ov?
+            show.accessMap[apName].estimateVersion=`${ov}`:
+            show.accessMap[apName].estimateVersion=`${v}`
         show.markModified('accessMap')
     }
 
