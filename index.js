@@ -49,7 +49,7 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize())
-app.use(favicon(__dirname+'/public/favicon.ico'));
+app.use(favicon(__dirname+'/public/images/favicon.ico'));
 
 // Helmet
 const contentSecurityPolicy={
