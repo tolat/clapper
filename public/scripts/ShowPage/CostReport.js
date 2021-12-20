@@ -245,7 +245,6 @@ saveData=(reload=false, updateVersion=false) => {
             }
         }),
         credentials: 'include',
-        mode: 'no-cors'
     })
         .then(response => { return response.text(); })
         .then(responseData => {
