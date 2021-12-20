@@ -20,6 +20,7 @@ const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
 const MongoStore=require("connect-mongo")
 const GridStream=require('gridfs-stream')
+const favicon=require('serve-favicon')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -48,6 +49,7 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize())
+app.use(favicon(__dirname+'/public/favicon.ico'));
 
 // Helmet
 const contentSecurityPolicy={
@@ -133,7 +135,7 @@ app.get('/logout', isLoggedIn, (req, res) => {
 
 // Serve favicon image
 app.get('/favicon.ico', isLoggedIn, (req, res) => {
-    res.send(fs.readFileSync('/favicon.ico'))
+    res.sendFile(path.join(__dirname, '/favicon.ico'))
 })
 
 // 404 Route / no other route matched

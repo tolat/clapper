@@ -10,9 +10,13 @@ TASKS
 -   Preliminarily need to solve issues with working on pc
 
 TORIN:
+Bugs:
 -   DATES ARE SHIFTED ON WEB VERSION
+-   Saving when hour set columns restricted in crew sheet deletes all hours
+
+-   Remove users from access profile
+-   Change access profile level
 -   Remove _show variable
--   Finish access profiles
 -   Allow versios to be named with letters and chosen manually for comparison (modal can sort by date asc/desc)
 -   Copy display settings for version or week when creating new
 -   Update changing the week to be its own call to the server, and prompt if use wants to save data on week change
