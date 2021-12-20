@@ -73,7 +73,7 @@ app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 const secret=process.env.SECRET
 const sessionConfig={
     store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 3600*24, secret: secret }),
-    name: 'filmApp_session',
+    name: 'clapper_session',
     secure: true,
     secret: secret,
     resave: false,
@@ -121,6 +121,13 @@ app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 app.use(timesheetRoutes)
+
+app.use(function (request, response, next) {
+    if (process.env.NODE_ENV!='develop_local') {
+        return response.redirect("https://"+request.headers.host+request.url);
+    }
+    next();
+})
 
 // global variables for timesheet generation
 global.generatedTimesheets=[]
