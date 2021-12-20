@@ -5,6 +5,8 @@
     <br>
     <div class="modal-button-container">
         <button onclick="toggleWeekEndingModal(false)" style="color: black;">Close</button>
-        <button onclick="toggleAddWeekModal(true)" style="color: green">New Week</button>
+        <%if (args.apOptions['Edit Weeks']){%>
+            <button onclick="toggleAddWeekModal(true)" style="color: green">New Week</button>
+            <%}%>
     </div>
 </div>

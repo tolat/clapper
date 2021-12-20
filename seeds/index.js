@@ -121,7 +121,7 @@ const seedShows=async () => {
             },
             accessMap: {
                 'pigsinpyjamas@yahoo-ca': {
-                    profile: 'Test Access',
+                    profile: 'Kit Access',
                     currentWeek: firstWeekId,
                     estimateVersion: '100'
                 },
@@ -132,15 +132,21 @@ const seedShows=async () => {
                 }
             },
             accessProfiles: {
-                "Test Access": {
+                "Kit Access": {
                     accessLevel: 1,
                     options: {
-                        'Change Week': true,
-                        'Change Estimate Version': true,
-                        'Edit Access Profiles': true,
-                        'Change Fringes': true,
-                        'Change Manday Rates': true,
-                        'Change Multipliers': true,
+                        'View Weeks': false,
+                        'Edit Weeks': false,
+                        'View Estimate Versions': false,
+                        'Edit Estimate Versions': false,
+                        'View Access Profiles': false,
+                        'Edit Access Profiles': false,
+                        'View Fringes': false,
+                        'Edit Fringes': false,
+                        'View Manday Rates': false,
+                        'Edit Manday Rates': false,
+                        'View Multipliers': false,
+                        'Edit Multipliers': false,
                     },
                     'Cost Report': {
                         pageAccess: true,
@@ -228,12 +234,18 @@ const seedShows=async () => {
                 Owner: {
                     accessLevel: 0,
                     options: {
-                        'Change Week': true,
-                        'Change Estimate Version': true,
+                        'View Weeks': true,
+                        'Edit Weeks': true,
+                        'View Estimate Versions': true,
+                        'Edit Estimate Versions': true,
+                        'View Access Profiles': true,
                         'Edit Access Profiles': true,
-                        'Change Fringes': true,
-                        'Change Manday Rates': true,
-                        'Change Multipliers': true,
+                        'View Fringes': true,
+                        'Edit Fringes': true,
+                        'View Manday Rates': true,
+                        'Edit Manday Rates': true,
+                        'View Multipliers': true,
+                        'Edit Multipliers': true,
                     },
                     'Cost Report': {
                         pageAccess: true,

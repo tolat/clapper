@@ -22,8 +22,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     if (!Object.keys(show.estimateVersions).length) { args.isFirstEstimate=true }
     // Case: requesting specific estimate version
     else if (query.version) {
-        // Only got to query version if it is allowed by the accesss profile, otherwise default to the user's saved estimate version
-        if (apOptions['Change Estimate Version']) {
+        // Only go to query version if it is allowed by the accesss profile, otherwise default to the user's saved estimate version
+        if (apOptions['View Estimate Versions']) {
             args.version=query.version;
             args.weekEnding=show.estimateVersions[query.version].weekEnding;
         } else {
@@ -127,13 +127,13 @@ module.exports.update=async function (body, showId, user) {
     show.markModified(`estimateVersions.${ov}.extraColumns`);
 
     // Update Manday rates if it is allowed by the access profile
-    if (apOptions['Change Manday Rates']) {
+    if (apOptions['Edit Manday Rates']) {
         show.estimateVersions[ov].mandayRates=body.mandayRates;
         show.markModified(`estimateVersions.${ov}.mandayRates`);
     }
 
     // Update fringes
-    if (apOptions['Change Fringes']) {
+    if (apOptions['Edit Fringes']) {
         show.estimateVersions[ov].fringes=body.fringes;
         show.markModified(`estimateVersions.${ov}.fringes`);
     }
@@ -145,7 +145,7 @@ module.exports.update=async function (body, showId, user) {
     show.departmentColorMap=body.departmentColorMap;
 
     // Set this user's active version
-    if (apOptions['Change Estimate Version']) {
+    if (apOptions['View Estimate Versions']) {
         show.accessMap[apName].estimateVersion=`${v}`
         show.markModified('accessMap')
     }
@@ -212,7 +212,7 @@ module.exports.update=async function (body, showId, user) {
     show.estimateVersions[ov].sets=updatedList
 
     // Handle new version or version rename if it is allowed by access profile
-    if (apOptions['Change Estimate Version']) {
+    if (apOptions['Edit Estimate Versions']) {
         if (v!=ov) {
             show.estimateVersions[v]=JSON.parse(JSON.stringify(show.estimateVersions[ov]))
             if (isBlankVersion) {

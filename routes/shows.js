@@ -41,12 +41,18 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
         Owner: {
             accessLevel: 0,
             options: {
-                'Change Week': true,
-                'Change Estimate Version': true,
+                'View Weeks': true,
+                'Edit Weeks': true,
+                'View Estimate Versions': true,
+                'Edit Estimate Versions': true,
+                'View Access Profiles': true,
                 'Edit Access Profiles': true,
-                'Change Fringes': true,
-                'Change Manday Rates': true,
-                'Change Multipliers': true,
+                'View Fringes': true,
+                'Edit Fringes': true,
+                'View Manday Rates': true,
+                'Edit Manday Rates': true,
+                'View Multipliers': true,
+                'Edit Multipliers': true,
             },
             'Cost Report': {
                 pageAccess: true,

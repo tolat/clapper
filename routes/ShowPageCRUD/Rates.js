@@ -50,7 +50,7 @@ module.exports.update=async function (body, showId, user) {
     show.markModified('positions.extraColumns');
 
     // Save multipliers to week if it is allowed by access profile
-    if (apOptions['Change Multipliers']) {
+    if (apOptions['Edit Multipliers']) {
         week.multipliers=body.multipliers;
         show.markModified('weeks');
     }
@@ -82,14 +82,15 @@ module.exports.update=async function (body, showId, user) {
         }
     }
 
-    // Add old values for restricted items to the updated List
+    // Add old values for restricted items to the updated List *** THIS ISN'T WORKING ***
     let positionItems=await Object.keys(week.positions.positionList)
         .map(pCode => { let p=week.positions.positionList[pCode]; p.Code=pCode; return p })
     let restrictedItems=await crudUtils.getRestrictedItems(positionItems, accessProfile, 'Code')
-    for (item of restrictedItems) {
-        updatedList[item.Code]=week.positions.positionList[item.Code]
+    for (posCode of restrictedItems) {
+        updatedList[posCode]=week.positions.positionList[posCode]
     }
 
+    show.markModified('weeks')
     week.positions.positionList=updatedList
     await show.save();
 
@@ -115,6 +116,7 @@ function initializeData(positions, _show, _args, _week, accessProfile) {
     let posCodes=Object.keys(positions)
 
     for (let i=0; i<posCodes.length; i++) {
+        if (!positions[posCodes[i]]) { continue }
         let item={
             id: 'id_'+i,
             'Name': positions[posCodes[i]]['Name'],

@@ -1888,7 +1888,7 @@ toggleWeekEndingModal=(show) => {
     // Show modal
     else if (_args.section!='Estimate') {
         // Prevent week changing if it is blocked by the access profile
-        if (!_args.apOptions['Change Week']) { return }
+        if (!_args.apOptions['View Weeks']) { return }
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('week-ending-modal').style.display='flex';
         document.getElementById('week-ending-modal').focus();
@@ -1905,7 +1905,7 @@ toggleWeekEndingModal=(show) => {
 
             // Add delete button to weeks if there is more than one week
             let deleteButton=''
-            if (_args.weekList.length>1) {
+            if (_args.weekList.length>1&&_args.apOptions['Edit Weeks']) {
                 deleteButton=`<button style='color: red' onclick='toggleDeleteWeekWarningModal(true, ${parseInt(i)+1}, "${week._id}")'>Delete</button>`
             }
 
@@ -2903,8 +2903,8 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, par
             <div id="collapse${apName}" class="accordion-collapse collapse ${isCurrentProfile}" data-bs-parent="#access-profiles-accordion">
                 <div class="accordion-body" style="display: flex; flex-direction: column;">
                     <div class=" accordion" id="ap-sub-accordion-${apName}">
-                    <div style="display: flex; justify-content: space-between;">
-                        <div class="access-profiles-checkbox-container" style="grid-template-columns: 1fr 1fr 1fr;">`
+                    <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 5px;">`
 
         // Add checkbox options for accessProfile options
         for (option in _args.accessProfiles[ap].options) {
@@ -2919,7 +2919,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, par
         }
 
         apAccordionItem+=`</div>
-        <div style="display: flex; flex-direction: column; width: 50%;">
+        <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="display: flex; flex-direction: row;">
                 <div style="line-height: 2rem;">Assigned Users</div>
                 <div class="add-user-to-access-profile-button" onclick="toggleAddUserToApModal(true, '${ap}')">+</div>
@@ -2933,8 +2933,8 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, par
         // Add delete access profile button
         apAccordionItem+=`</div>
         <div style="display: flex; justify-content: space-between;">
-            <div class="access-profile-modal-button" onclick="toggleDeleteAccessProfileModal(true, '${ap}')" style="margin-top: 7px; font-weight: bold; color: red;">Delete Profile</div>
             <div class="access-profile-modal-button" onclick="revertAccessProfile('${ap}')" style="margin-top: 7px; font-weight: bold;">Revert Profile</div>
+            <div class="access-profile-modal-button" onclick="toggleDeleteAccessProfileModal(true, '${ap}')" style="margin-top: 7px; font-weight: bold; color: red;">Delete Profile</div>
         </div>
         </div></div>`
 
@@ -3491,12 +3491,18 @@ toggleAddAccessProfileModal=(show, save) => {
                 newAccessProfile={
                     accessLevel: _args.accessLevel+1,
                     options: {
-                        'Change Week': true,
-                        'Change Estimate Version': true,
+                        'View Weeks': true,
+                        'View Estimate Versions': true,
+                        'View Access Profiles': true,
+                        'View Fringes': true,
+                        'View Manday Rates': true,
+                        'View Multipliers': true,
+                        'Edit Weeks': true,
+                        'Edit Estimate Versions': true,
                         'Edit Access Profiles': true,
-                        'Change Fringes': true,
-                        'Change Manday Rates': true,
-                        'Change Multipliers': true
+                        'Edit Fringes': true,
+                        'Edit Manday Rates': true,
+                        'Edit Multipliers': true,
                     },
                     'Cost Report': {
                         pageAccess: true,

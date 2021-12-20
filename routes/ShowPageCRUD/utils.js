@@ -17,8 +17,8 @@ module.exports.getDaysOfWeekEnding=(date) => {
 
 // Deletes all records of a week in all show's User showrecords
 module.exports.deleteWeek=async function (weekId, show, newWeeks) {
-    // DO Nothing if changing week is not allowed by the access profile
-    if (!show.accessProfiles[show.accessMap[apName].profile].options['Change Week']) {
+    // DO Nothing if editing week is not allowed by the access profile
+    if (!show.accessProfiles[show.accessMap[apName].profile].options['Edit Weeks']) {
         return
     }
 
@@ -39,7 +39,7 @@ module.exports.deleteWeek=async function (weekId, show, newWeeks) {
 // Creates a new week for the show
 module.exports.createWeek=async function (body, show, newWeekId, apName) {
     // DO Nothing if changing week is not allowed by the access profile
-    if (!show.accessProfiles[show.accessMap[apName].profile].options['Change Week']) {
+    if (!show.accessProfiles[show.accessMap[apName].profile].options['View Weeks']) {
         return
     }
 
@@ -48,7 +48,7 @@ module.exports.createWeek=async function (body, show, newWeekId, apName) {
     // Just update show's current week if not creating a new week
     if (!body.newWeek.isNewWeek) {
         show.accessMap[apName].currentWeek=body.newWeek.weekId
-    } else {
+    } else if (show.accessProfiles[show.accessMap[apName].profile].options['Edit Weeks']) {
         // Create a new week for the show
         let newWeek={
             crew: {
@@ -301,25 +301,28 @@ module.exports.isRestrictedItem=function (item, accessProfile) {
     return false
 }
 
-// Returns true if column is restricted by the access profile
+// Returns true if editing column is restricted by the access profile
 module.exports.isRestrictedColumn=function (col, accessProfile) {
-    let isRestricted=false
+    let noAccess=false
+    let noEdit=false
 
     // Check if accessing column is restricted
     let isWhitelist=accessProfile.columnFilter.type=='w'
     if (accessProfile.columnFilter.filter.includes(col)) {
-        isRestricted=!isWhitelist
+        noAccess=!isWhitelist
     } else {
-        isRestricted=isWhitelist
+        noAccess=isWhitelist
     }
 
     // Check if editing column is restricted
     isWhitelist=accessProfile.editColumnFilter.type=='w'
     if (accessProfile.editColumnFilter.filter.includes(col)) {
-        isRestricted=!isWhitelist
+        noEdit=!isWhitelist
     } else {
-        isRestricted=isWhitelist
+        noEdit=isWhitelist
     }
+
+    return noAccess||noEdit
 }
 
 // Checks if item has valid required-for-save fields filled

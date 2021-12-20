@@ -4,7 +4,7 @@
         <a class="navbar-brand"><b id="username">
                 <%= currentUser.Name %>
             </b></a>
-        <div id="access-profile-display" <% if (args.apOptions['Edit Access Profiles']){%>
+        <div id="access-profile-display" <% if (args.apOptions && args.apOptions['View Access Profiles']){%>
             onclick="toggleAccessProfilesModal(true)"<% }%>>
                 <% if (['CostReport','Estimate','Rates','Crew','Rentals','Purchases','Timesheets'].filter(t=>
                     title.includes(t))[0]){ %>

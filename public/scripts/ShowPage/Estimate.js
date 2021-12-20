@@ -148,7 +148,7 @@ toggleOpenVersionModal=(show) => {
     }
     // Show modal
     else {
-        if (!_args.apOptions['Change Estimate Version']) { return }
+        if (!_args.apOptions['View Estimate Versions']) { return }
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('open-version-modal').style.display='flex';
         document.getElementById('open-version-modal').focus()
@@ -188,7 +188,7 @@ toggleManDayRatesModal=(show, setRates) => {
     }
     // Show modal
     else {
-        if (!_args.apOptions['Change Manday Rates']) { return }
+        if (!_args.apOptions['View Manday Rates']) { return }
         if (_show.departments.length==0) { return }
         populateMandayRates();
         document.getElementById('grid-modal-container').style.display='flex';
@@ -225,7 +225,7 @@ toggleFringesModal=(show, setFringes=false) => {
     }
     // Show modal
     else {
-        if (!_args.apOptions['Change Fringes']) { return }
+        if (!_args.apOptions['View Fringes']) { return }
         populateFringes();
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('fringes-modal').style.display='flex';

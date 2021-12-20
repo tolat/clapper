@@ -35,10 +35,10 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     let show=await Show.findById(id)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile]
 
-    // Set accessProfiles to empty object if user is not alllowed to edit access profiles
+    // Set accessProfiles to empty object if user is not alllowed to view access profiles
     let accessProfiles=show.accessProfiles
     let accessMap=show.accessMap
-    if (!accessProfile.options['Edit Access Profiles']) {
+    if (!accessProfile.options['View Access Profiles']) {
         accessProfiles={}
         accessMap={}
     }
