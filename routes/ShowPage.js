@@ -76,8 +76,9 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     if (!accessiblePages[0]) { res.redirect('back') }
     else if (!accessiblePages.includes(pageName)) {
         section=accessiblePages[0].replace(' ', '')
-        return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
     }
+    return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
+
 }))
 
 // Send list of dropdown names to browser
