@@ -124,7 +124,7 @@ app.use(timesheetRoutes)
 
 // Redirect all incoming requests to https if not in local dev
 app.all('/', function (request, response, next) {
-    if (process.env.NODE_ENV!='develop_local') {
+    if (process.env.NODE_ENV!='develop_local'&&!request.secure) {
         return response.redirect("https://"+request.headers.host+request.url);
     }
     next();
