@@ -29,9 +29,9 @@ const ShowPageCRUD={
 
 // Load a Show Page section
 router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
-    const apName=crudUtils.getAccessProfileName(req.user)
-    const { id, section }=req.params;
-    const query=req.query;
+    let apName=crudUtils.getAccessProfileName(req.user)
+    let { id, section }=req.params;
+    let query=req.query;
     let show=await Show.findById(id)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile]
 
@@ -71,10 +71,11 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     // Render ShowPage section if user has access to that page, otherwise redirect to original url
     let pageName=section
     if (pageName=='CostReport') { pageName='Cost Report' }
-    if (show.accessProfiles[show.accessMap[apName].profile][pageName].pageAccess) {
+    let accessiblePages=crudUtils.showPages.filter(pn => show.accessProfiles[show.accessMap[apName].profile][pn].pageAccess)
+    if (!accessiblePages[0]) { res.redirect('back') }
+    else if (!accessiblePages.includes(pageName)) {
+        section=accessiblePages[0].replace(' ', '')
         return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
-    } else {
-        res.redirect('back')
     }
 }))
 

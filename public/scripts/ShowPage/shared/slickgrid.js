@@ -22,6 +22,7 @@ let _userYesNo=true
 let _savingUnderway=false
 let _accessProfilesSaved=true
 let _initialAccessProfiles
+let _swipeVector={ x: 0, y: 0 }
 
 // Edit History Buffer
 let undoRedoBuffer={
@@ -426,6 +427,42 @@ createSlickGrid=(data, columns, options) => {
 
     // Initialize column sort map
     for (col of grid.getColumns()) { _colSortMap[col.field]=2 }
+
+    document.addEventListener('touchstart', handleSwipe)
+    window.addEventListener('scroll', function (e) {
+        // NOT WORKING
+        //console.log(e)
+    })
+}
+
+function handleSwipe(e) {
+    updateSwipeVector(e)
+
+    document.addEventListener('touchmove', swipe2scroll)
+    document.addEventListener('touchend', endSwipe)
+
+    function updateSwipeVector(e) {
+        _swipeVector.x=e.changedTouches[0].screenX
+        _swipeVector.y=e.changedTouches[0].screenY
+    }
+
+    function endSwipe(e) {
+        document.removeEventListener('touchmove', swipe2scroll)
+        document.removeEventListener('touchend', endSwipe)
+    }
+
+    function swipe2scroll(e) {
+        let scrollX=e.changedTouches[0].screenX-_swipeVector.x
+        let scrollY=e.changedTouches[0].screenY-_swipeVector.y
+
+        // Create scroll event with scrollX and scrollY
+
+        console.log(scrollX, scrollY)
+
+        updateSwipeVector(e)
+    }
+
+
 }
 
 // Sort column and reapply grid styles
@@ -3057,7 +3094,7 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
                 // Get column name from input
                 filterColName=document.getElementById('data-filter-column-input').value
                 while (filterColName[0]==' ') { filterColName=filterColName.slice(1) }
-                while (filterColName.at(-1)==' '&&filterColName.length>=2) { filterColName=filterColName.slice(0, filterColName.length-1) }
+                while (filterColName[filterColName.length-1]==' '&&filterColName.length>=2) { filterColName=filterColName.slice(0, filterColName.length-1) }
 
                 // If a filter for this column exists, add values to the filter Else create new filter in access profiles and new filter html item
                 let filter=_args.accessProfiles[memory.ap][memory.apPage][filterKey].filter
@@ -3117,7 +3154,7 @@ toggleColumnFilterModal=(show, ap=false, apPage=false, save=false, filterKey=nul
             // Get column name from input and trim leadin g and trailing whitespace
             let newColName=document.getElementById('column-filter-input').value
             while (newColName[0]==' ') { newColName=newColName.slice(1) }
-            while (newColName.at(-1)==' '&&newColName.length>=2) { newColName=newColName.slice(0, newColName.length-1) }
+            while (newColName[newColName.length-1]==' '&&newColName.length>=2) { newColName=newColName.slice(0, newColName.length-1) }
 
             _args.accessProfiles[memory.ap][memory.apPage][filterKey].filter.push(newColName)
         }
@@ -3188,7 +3225,7 @@ generateDataFilterHtml=(dataFilter, ap, apPage, apName, apPageName, filterTitle,
 
         for (val of dataFilter.filter[col]) {
             dataFilterItem+=`${val}`
-            if (val!=dataFilter.filter[col].at(-1)) {
+            if (val!=dataFilter.filter[col][dataFilter.filter[col].length-1]) {
                 dataFilterItem+=', '
             }
         }
