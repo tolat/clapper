@@ -1828,8 +1828,6 @@ setWeekEnding=() => {
 
     } else {
         let weekEnd=new Date(_week.end)
-        console.log(_week.end)
-        console.log(weekEnd)
         let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
         if (_args.weekList[_args.weekList.length-1]._id==_week._id) {
             document.getElementById('week-ending-latest-indicator').style.display='flex'

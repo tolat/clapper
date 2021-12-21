@@ -2,6 +2,7 @@
     <form action="/shows" id="newShowForm" method="POST">
         <label for="name" class="form-label">Show Name</label>
         <input type="text" id="name" class="form-control" aria-describedby="name" name="show[Name]">
+        <input type="text" id="tzone" name="show[tzone]" style="display: none;">
         <label for="first-week-ending" class="form-label" style="margin-top: 10px;">First Week Ending</label>
         <input type="date" id="first-week-ending" class="form-control" placeholder="yyyy-mm-dd" aria-describedby="name"
             name="show[firstweekending]">

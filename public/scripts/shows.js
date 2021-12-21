@@ -1,6 +1,7 @@
 
 // Displays and hides the 'Create Show' modal 
 toggleCreateShow=(value) => {
+    document.getElementById('tzone').value=-new Date().getTimezoneOffset()/60;
     document.getElementById("grid-modal-container").style.display=value;
     document.getElementById("create-show-container").style.display=value;
     if (value!=null) {

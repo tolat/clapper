@@ -123,7 +123,7 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
     // Create first week
     let newWeek={
         _id: show.currentWeek,
-        end: new Date(req.body.show.firstweekending+'T07:00'),
+        end: new Date(req.body.show.firstweekending+`GMT${req.body.show.tzone}`),
         multipliers: {
             0: {
                 Mon: 1,
