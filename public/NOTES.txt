@@ -11,7 +11,6 @@ TASKS
 
 TORIN:
 Bugs:
--   DATES ARE SHIFTED ON WEB VERSION
 -   Saving when hour set columns restricted in crew sheet deletes all hours
 
 -   Remove users from access profile
