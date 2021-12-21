@@ -11,7 +11,7 @@ TASKS
 
 TORIN:
 Bugs:
--   Saving when hour set columns restricted in crew sheet deletes all hours
+-   Saving when hour set columns restricted in crew sheet deletes all hours CAN'T REPLICATE
 
 -   Remove users from access profile
 -   Change access profile level
