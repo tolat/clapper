@@ -80,10 +80,13 @@ module.exports.update=async function (body, showId, user) {
                 user=new User();
                 user.username=item['username']
                 user.showrecords=[{
+                    showid: show._id,
+                    showname: show['Name'],
+                    'Date Joined': new Date(body.currentTime),
                     positions: [],
                     weeksWorked: {},
                 }]
-                user.showrecords[0].weeksWorked[_cw]={
+                user.showrecords[0].weeksWorked[week._id]={
                     extraColumnValues: {},
                     taxColumnValues: {}
                 }
