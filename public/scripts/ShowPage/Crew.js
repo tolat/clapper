@@ -92,7 +92,7 @@ saveData=(reload=false) => {
             weeks: _show.weeks,
             taxColumns: _taxColumns,
             deletedWeek: _deletedWeek,
-            currentTime: new Date(Date.now().getTime()),
+            currentTime: new Date(Date.now()).getTime(),
             displaySettings: {
                 groupBy: _groupedBy,
                 reorderColumns: getColumnOrder(),
