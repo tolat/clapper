@@ -3,9 +3,11 @@
         <div class="modal-button-container">
             <button id="multipliers-modal-cancel" onclick="toggleMultipliersModal(false)"
                 style="color: black;">Cancel</button>
-            <button id="multipliers-modal-add" onclick="toggleAddMultiplierModal(true)"
-                style="font-size: 1.5rem;">+</button>
-            <button id="multipliers-modal-submit" onclick="toggleMultipliersModal(false, true)"
-                style="color: green">Set</button>
+            <%if(args.apOptions['Edit Multipliers']){%>
+                <button id="multipliers-modal-add" onclick="toggleAddMultiplierModal(true)"
+                    style="font-size: 1.5rem;">+</button>
+                <button id="multipliers-modal-submit" onclick="toggleMultipliersModal(false, true)"
+                    style="color: green">Set</button>
+                <%}%>
         </div>
 </div>
