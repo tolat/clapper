@@ -202,7 +202,11 @@ loadMultipliersModal=() => {
     // Populate table with multiplier data
     for (m of mRowKeys) {
         for (day of days) {
-            document.getElementById(`${m}`).innerHTML+=`<td><input onkeydown="validateModalInput(event, 'number'); refocusElement(this)" class='multiplier-input' id='${m}-${day}' value='${_multipliers[m][day]}'></td>`
+            if (!_args.apOptions['Edit Multipliers']) {
+                document.getElementById(`${m}`).innerHTML+=`<td><div>${_multipliers[m][day]}</div></td>`
+            } else {
+                document.getElementById(`${m}`).innerHTML+=`<td><input onkeydown="validateModalInput(event, 'number'); refocusElement(this)" class='multiplier-input' id='${m}-${day}' value='${_multipliers[m][day]}'></td>`
+            }
         }
     }
 

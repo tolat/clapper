@@ -72,7 +72,6 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     let pageName=section
     if (pageName=='CostReport') { pageName='Cost Report' }
     let accessiblePages=crudUtils.showPages.filter(pn => show.accessProfiles[show.accessMap[apName].profile][pn].pageAccess)
-    console.log(`\n\n${accessiblePages}\n\n`)
     if (!accessiblePages[0]) { res.redirect('back') }
     else if (!accessiblePages.includes(pageName)) {
         section=accessiblePages[0].replace(' ', '')
