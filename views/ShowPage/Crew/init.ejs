@@ -78,6 +78,9 @@
         // Create data grid
         await createSlickGrid(data, columns, options, _show, _args)
 
+        // Apply cell styles
+        applyCellStyles(_cellCssStyles)
+
         // Add a listener to prevent day and set columns from being interrupted by other columns
         grid.onColumnsReordered.subscribe(function (e, args) {
             let currentCols=grid.getColumns().map(col => col.name)
