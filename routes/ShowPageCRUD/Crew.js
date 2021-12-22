@@ -147,18 +147,22 @@ module.exports.update=async function (body, showId, user) {
             }
 
             // Update date joined
-            let date=new Date(item['Date Joined']);
-            if (date!='Invalid Date') { record['Date Joined']=date }
-            else { record['Date Joined']=new Date(Date.now()) }
+            if (!crudUtils.isRestrictedColumn('Date Joined', accessProfile)) {
+                let date=new Date(item['Date Joined']);
+                if (date!='Invalid Date') { record['Date Joined']=date }
+                else { record['Date Joined']=new Date(Date.now()) }
+            }
 
             // Update position
-            let recordPosition=record.positions.find(p => p.code==item['Position'])
-            if (!recordPosition) {
-                recordPosition={
-                    code: item['Position'],
-                    daysWorked: {}
+            if (!crudUtils.isRestrictedColumn('Position', accessProfile)) {
+                let recordPosition=record.positions.find(p => p.code==item['Position'])
+                if (!recordPosition) {
+                    recordPosition={
+                        code: item['Position'],
+                        daysWorked: {}
+                    }
+                    record.positions.push(recordPosition)
                 }
-                record.positions.push(recordPosition)
             }
 
             // Update the hours and set for each day worked
@@ -166,13 +170,15 @@ module.exports.update=async function (body, showId, user) {
                 let dayString=new Date(day).toString().slice(0, 3);
                 let dateKey=day
 
-                // If no day exists in the daysWorked record, create one
-                if (!recordPosition.daysWorked[`${dateKey}`]) {
-                    recordPosition.daysWorked[`${dateKey}`]={}
-                }
-                recordPosition.daysWorked[`${dateKey}`]={
-                    hours: parseFloat(item[`${dayString}`]),
-                    set: item[`${dayString}_set`]
+                if (!crudUtils.isRestrictedColumn(dateKey, accessProfile)&&!crudUtils.isRestrictedColumn(`${dayString}_set`, accessProfile)) {
+                    // If no day exists in the daysWorked record, create one
+                    if (!recordPosition.daysWorked[`${dateKey}`]) {
+                        recordPosition.daysWorked[`${dateKey}`]={}
+                    }
+                    recordPosition.daysWorked[`${dateKey}`]={
+                        hours: parseFloat(item[`${dayString}`]),
+                        set: item[`${dayString}_set`]
+                    }
                 }
             }
 
