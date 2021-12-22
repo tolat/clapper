@@ -58,6 +58,16 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         apOptions: accessProfile.options
     };
 
+
+    // Render ShowPage section if user has access to that page, otherwise redirect to original url
+    let pageName=section
+    if (pageName=='CostReport') { pageName='Cost Report' }
+    let accessiblePages=crudUtils.showPages.filter(pn => show.accessProfiles[show.accessMap[apName].profile][pn].pageAccess)
+    if (!accessiblePages[0]) { res.redirect('back') }
+    else if (!accessiblePages.includes(pageName)) {
+        section=accessiblePages[0].replace(' ', '')
+    }
+
     // Get shared and page-specific modals to include in rendered template. If no file at path do nothing with error
     let sharedModals=[]
     let pageModals=[]
@@ -68,14 +78,6 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         // Do Nothing
     }
 
-    // Render ShowPage section if user has access to that page, otherwise redirect to original url
-    let pageName=section
-    if (pageName=='CostReport') { pageName='Cost Report' }
-    let accessiblePages=crudUtils.showPages.filter(pn => show.accessProfiles[show.accessMap[apName].profile][pn].pageAccess)
-    if (!accessiblePages[0]) { res.redirect('back') }
-    else if (!accessiblePages.includes(pageName)) {
-        section=accessiblePages[0].replace(' ', '')
-    }
     return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
 
 }))
