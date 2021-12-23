@@ -1192,6 +1192,11 @@ tbody tr{
     #grid-footer-totals-container{
         display: none !important;
     }
+
+    .grid-modal{
+        width: 90%;
+        min-width: 95%;
+    }
 }
 
 
