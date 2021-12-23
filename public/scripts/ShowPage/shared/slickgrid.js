@@ -22,7 +22,7 @@ let _userYesNo=true
 let _savingUnderway=false
 let _accessProfilesSaved=true
 let _initialAccessProfiles
-let _swipeVector={ x: 0, y: 0 }
+let _scrollVector={ x: 0, y: 0 }
 
 // Edit History Buffer
 let undoRedoBuffer={
@@ -428,41 +428,43 @@ createSlickGrid=(data, columns, options) => {
     // Initialize column sort map
     for (col of grid.getColumns()) { _colSortMap[col.field]=2 }
 
-    document.addEventListener('touchstart', handleSwipe)
-    window.addEventListener('scroll', function (e) {
-        // NOT WORKING
-        //console.log(e)
-    })
+    // Handle scrolling on mobile
+    document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchstart', handleSwipe)
 }
 
 function handleSwipe(e) {
-    updateSwipeVector(e)
+    console.log('swipe started')
+    const touchStart=e.changedTouches[0]
+    let scrollVectoAcc={ x: 0, y: 0 }
 
-    document.addEventListener('touchmove', swipe2scroll)
-    document.addEventListener('touchend', endSwipe)
-
-    function updateSwipeVector(e) {
-        _swipeVector.x=e.changedTouches[0].screenX
-        _swipeVector.y=e.changedTouches[0].screenY
-    }
+    document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchmove', swipe2scroll)
+    document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchend', endSwipe)
 
     function endSwipe(e) {
-        document.removeEventListener('touchmove', swipe2scroll)
-        document.removeEventListener('touchend', endSwipe)
+        console.log('swipe finished')
+        document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').removeEventListener('touchmove', swipe2scroll)
+        document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').removeEventListener('touchend', endSwipe)
+
+        updateScrollVector(scrollVectoAcc.x, scrollVectoAcc.y)
+    }
+
+    function updateScrollVector(x, y) {
+        _scrollVector.x=x
+        _scrollVector.y=y
     }
 
     function swipe2scroll(e) {
-        let scrollX=e.changedTouches[0].screenX-_swipeVector.x
-        let scrollY=e.changedTouches[0].screenY-_swipeVector.y
+        let offsetTop=document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').getBoundingClientRect().top
+        console.log(e.changedTouches[0].clientX, touchStart.clientX, _scrollVector.x, e.changedTouches[0].clientX-touchStart.clientX)
+        let scrollX=-(e.changedTouches[0].clientX-touchStart.clientX)+_scrollVector.x
+        let scrollY=-(e.changedTouches[0].clientY-touchStart.clientY)+_scrollVector.y
 
         // Create scroll event with scrollX and scrollY
+        document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').scrollTo(scrollX, scrollY)
 
-        console.log(scrollX, scrollY)
-
-        updateSwipeVector(e)
+        scrollVectoAcc.x=scrollX
+        scrollVectoAcc.y=scrollY
     }
-
-
 }
 
 // Sort column and reapply grid styles
