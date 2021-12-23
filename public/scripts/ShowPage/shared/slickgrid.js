@@ -433,6 +433,7 @@ createSlickGrid=(data, columns, options) => {
 }
 
 function handleSwipe(e) {
+    if (e.changedTouches.length>1) { return }
     const touchStart=e.changedTouches[0]
     let scrollVectoAcc={ x: 0, y: 0 }
 
