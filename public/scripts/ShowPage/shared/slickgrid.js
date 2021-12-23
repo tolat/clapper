@@ -895,8 +895,14 @@ function undoAddRow() {
     applyCellStyles(this.prevCellStyles)
 }
 
+// Returns true if a grid cell is uneditable
+function isUneditableCell(item, col) {
+    return (col.cssClass&&(col.cssClass.includes('uneditable')||col.cssClass.includes('hidden-column')))||
+        (_cellCssStyles.uneditableRow&&_cellCssStyles.uneditableRow[item.id]&&_cellCssStyles.uneditableRow[item.id][`${col.field}`]=="uneditable")
+}
+
 // Clears cells in selected range (called on delete key pressed)
-clearCells=() => {
+function clearCells() {
     if (!_contextCell) {
         let range=grid.getSelectionModel().getSelectedRanges()[0]
         _contextCell={}
@@ -924,23 +930,22 @@ clearCells=() => {
     // Set editedfields for use in grid.recalculate function
     editCommand.editedfields=cols.filter(c => cols.indexOf(c)>=startCol&&cols.indexOf(c)<=endCol).map(c => c.field)
 
-    // Exit if editing all ueditable cells
-    if (!cols.slice(startCol, endCol+1).find(c => !c.cssClass||!c.cssClass.includes('uneditable'))) { return }
-
     if (range&&range.fromCell) {
         row=range.fromRow
         cell=range.fromCell
     }
 
+    let editableCount=0
     for (let i=0; i<prevItems.length; i++) {
         let item={}
         Object.assign(item, prevItems[i])
         for (let j=startCol; j<=endCol; j++) {
             let col=cols[j];
-            // Do not change cell if column has uneditable class
-            if (col.cssClass&&col.cssClass.includes('uneditable')) {
+            // Do not change cell if it is uneditable
+            if (isUneditableCell(item, col)) {
                 continue
             }
+            editableCount++;
             item[cols[j].field]=undefined
             if (!item.editedfields) {
                 item.editedfields=[]
@@ -949,6 +954,9 @@ clearCells=() => {
         }
         newItems.push(item)
     }
+
+    // Exit if no cells in range are editable 
+    if (editableCount==0) { return }
 
     editCommand.startCol=startCol
     editCommand.endCol=endCol
@@ -3722,4 +3730,5 @@ updateApSaveStatus=(saved) => {
 revertAccessProfile=(ap) => {
     _args.accessProfiles[ap]=JSON.parse(JSON.stringify(_initialAccessProfiles[ap]))
     populateAccessProfileModal(ap, false, false, false)
-}   
+}
+

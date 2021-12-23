@@ -164,7 +164,6 @@ calculateWeeklyRentals=(item) => {
     if (item['username']&&item['Position']) {
         let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Supplier Code']==item['Position'])
         for (rental of rentals) {
-            console.log(rental)
             let tax=0;
             for (t of _week.rentals.taxColumns) {
                 tax+=parseFloat(rental.taxColumnValues[t])||0
