@@ -1156,7 +1156,7 @@ tbody tr{
 }
 
 /* Styles for portrait mobile */
-@media (max-width:700px)  { 
+@media (max-width:800px)  { 
     .navbar-brand{
         display: none;
     }

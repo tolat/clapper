@@ -433,7 +433,6 @@ createSlickGrid=(data, columns, options) => {
 }
 
 function handleSwipe(e) {
-    console.log('swipe started')
     const touchStart=e.changedTouches[0]
     let scrollVectoAcc={ x: 0, y: 0 }
 
@@ -441,7 +440,6 @@ function handleSwipe(e) {
     document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchend', endSwipe)
 
     function endSwipe(e) {
-        console.log('swipe finished')
         document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').removeEventListener('touchmove', swipe2scroll)
         document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').removeEventListener('touchend', endSwipe)
 
@@ -454,8 +452,6 @@ function handleSwipe(e) {
     }
 
     function swipe2scroll(e) {
-        let offsetTop=document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').getBoundingClientRect().top
-        console.log(e.changedTouches[0].clientX, touchStart.clientX, _scrollVector.x, e.changedTouches[0].clientX-touchStart.clientX)
         let scrollX=-(e.changedTouches[0].clientX-touchStart.clientX)+_scrollVector.x
         let scrollY=-(e.changedTouches[0].clientY-touchStart.clientY)+_scrollVector.y
 
