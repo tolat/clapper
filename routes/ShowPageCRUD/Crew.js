@@ -147,15 +147,15 @@ module.exports.update=async function (body, showId, user) {
             }
 
             // Update date joined
+            let date=new Date(item['Date Joined']);
             if (!crudUtils.isRestrictedColumn('Date Joined', accessProfile)) {
-                let date=new Date(item['Date Joined']);
                 if (date!='Invalid Date') { record['Date Joined']=date }
                 else { record['Date Joined']=new Date(Date.now()) }
             }
 
             // Update position
+            let recordPosition=record.positions.find(p => p.code==item['Position'])
             if (!crudUtils.isRestrictedColumn('Position', accessProfile)) {
-                let recordPosition=record.positions.find(p => p.code==item['Position'])
                 if (!recordPosition) {
                     recordPosition={
                         code: item['Position'],
