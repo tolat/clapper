@@ -15,9 +15,10 @@
         <%- include("partials/navbar") %>
             <div id="main-container">
                 <%- include("partials/flash") %>
-                    <h3>My Shows
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 1.7rem;">My Shows</div>
                         <a id="create-show-button" onclick="toggleCreateShow('flex')">Create Show</a>
-                    </h3>
+                    </div>
                     <%- include('partials/showsTable') %>
             </div>
 </body>

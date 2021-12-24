@@ -1,40 +1,35 @@
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Title</th>
-            <th scope="col">First Week Ending</th>
-            <th scope="col">Budget</th>
-            <th scope="col">To Date</th>
-            <th scope="col">Remaining</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody id="showsTable">
-        <% for (let show of shows){%>
-            <tr id="<%=show.id%>_row">
-                <th class="first-column-header" scope="row">
-                    <a href="/shows/<%=show._id%>/0" id="<%=show.id%>_name">
-                        <%=show['Name']%>
-                    </a>
-                </th>
-                <td>
-                    <%=show.weeks.find(w=> w._id == show.accessMap[apName].currentWeek).end.toString().slice(0,15)%>
-                </td>
-                <td>
-                    <%=show.costReport.budget%>
-                </td>
-                <td>
-                    <%=show.costReport.toDate%>
-                </td>
-                <td>
-                    <%=show.costReport.remaining%>
-                </td>
-                <td>
-                    <div class="shows-table-delete-button"
-                        onclick="toggleDeleteShowWarningModal(true, false,'<%=show._id%>')">
-                        Delete</div>
-                </td>
-            </tr>
-            <% }%>
-    </tbody>
-</table>
+<div id="shows-list-container">
+    <% for (show of shows) {%>
+        <div class="show-list-item-container" id="<%=show._id%>-table-item">
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <div id="<%=show.id%>_name" style="font-size: 1.3rem; width: 100%;"
+                    onclick="window.location = ('/shows/<%=show._id%>/0')">
+                    <%=show['Name']%>
+                </div>
+                <div class="shows-table-delete-button"
+                    onclick="toggleDeleteShowWarningModal(true, false,'<%=show._id%>')">
+                    Delete</div>
+            </div>
+            <div style="display:flex; flex-direction: row;">
+                <div class="show-data-item">
+                    <div>Budget:</div>
+                    <div>
+                        <%=show.costReport.budget%>
+                    </div>
+                </div>
+                <div class="show-data-item">
+                    <div>To Date:</div>
+                    <div>
+                        <%=show.costReport.toDate%>
+                    </div>
+                </div>
+                <div class="show-data-item">
+                    <div>Remaining:</div>
+                    <div>
+                        <%=show.costReport.remaining%>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%}%>
+</div>

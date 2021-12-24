@@ -75,7 +75,7 @@ deleteShow=(showid) => {
             if (responseData.redirect) {
                 window.location=responseData.redirect
             } else {
-                document.getElementById(`${showid}_row`).remove()
+                document.getElementById(`${showid}-table-item`).remove()
             }
         })
 

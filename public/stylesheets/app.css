@@ -55,6 +55,7 @@ button.navbar-toggler{
     padding: 2% 2% 2% 2%;
     margin-top: 3.5rem;
     flex: 1;
+    overflow-y: scroll;
 }
 
 #nav-tabContent{
@@ -123,6 +124,36 @@ button.navbar-toggler{
 
 .table tr:hover{
 cursor: pointer;
+}
+
+#shows-list-container{
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.show-list-item-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid lightgray;
+    border-radius: 2px;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgb(239,239,239);
+}
+.show-list-item-container:hover{
+    cursor: pointer;
+    background-color: rgb(223, 223, 223);
+}
+
+.show-data-item{
+    padding: 10px;
+    font-size: 0.9rem;
+    margin-left: 15px;
+    background-color: rgb(255, 248, 231);
+    border: 1px solid lightgray;
+    border-radius: 2px;
 }
 
 #create-show-button{
@@ -1201,6 +1232,11 @@ tbody tr{
     #create-account-container{
         width: 80%;
         margin-left: 10%;
+    }
+
+    #create-show-container{
+        width: 90%;
+        left: 5%;
     }
 }
 
