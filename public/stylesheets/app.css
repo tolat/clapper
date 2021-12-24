@@ -1240,4 +1240,10 @@ tbody tr{
     }
 }
 
+@media (max-width:430px)  {
+    .show-data-item{
+        font-size: 0.7rem;
+    }
+} 
+
 
