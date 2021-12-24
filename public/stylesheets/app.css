@@ -1197,6 +1197,11 @@ tbody tr{
         width: 90%;
         min-width: 95%;
     }
+
+    #create-account-container{
+        width: 80%;
+        margin-left: 10%;
+    }
 }
 
 
