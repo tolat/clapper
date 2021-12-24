@@ -428,21 +428,27 @@ createSlickGrid=(data, columns, options) => {
     // Initialize column sort map
     for (col of grid.getColumns()) { _colSortMap[col.field]=2 }
 
-    // Handle scrolling on mobile
-    document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchstart', handleSwipe)
+    // Handle scrolling on mobile for all slick viewports
+    for (vp of document.querySelectorAll('.slick-viewport')) {
+        vp.addEventListener('touchstart', handleSwipe)
+    }
 }
 
 function handleSwipe(e) {
+    console.log('touchstart!')
     if (e.changedTouches.length>1) { return }
     const touchStart=e.changedTouches[0]
     let scrollVectoAcc={ x: 0, y: 0 }
 
-    document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchmove', swipe2scroll)
-    document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').addEventListener('touchend', endSwipe)
-
+    for (vp of document.querySelectorAll('.slick-viewport')) {
+        vp.addEventListener('touchmove', swipe2scroll)
+        vp.addEventListener('touchend', endSwipe)
+    }
     function endSwipe(e) {
-        document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').removeEventListener('touchmove', swipe2scroll)
-        document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').removeEventListener('touchend', endSwipe)
+        for (vp of document.querySelectorAll('.slick-viewport')) {
+            vp.removeEventListener('touchmove', swipe2scroll)
+            vp.removeEventListener('touchend', endSwipe)
+        }
 
         updateScrollVector(scrollVectoAcc.x, scrollVectoAcc.y)
     }
@@ -457,7 +463,10 @@ function handleSwipe(e) {
         let scrollY=-(e.changedTouches[0].clientY-touchStart.clientY)+_scrollVector.y
 
         // Create scroll event with scrollX and scrollY
-        document.querySelector('.slick-viewport.slick-viewport-top.slick-viewport-left').scrollTo(scrollX, scrollY)
+
+        for (vp of document.querySelectorAll('.slick-viewport')) {
+            vp.scrollTo(scrollX, scrollY)
+        }
 
         scrollVectoAcc.x=scrollX
         scrollVectoAcc.y=scrollY
@@ -1170,6 +1179,12 @@ createAutoNumberListener=() => {
 
 // Sets 'numCols' frozen column at left of grid
 setFrozenColumns=(numCols) => {
+
+    // Remove old scroll listeners
+    for (vp of document.querySelectorAll('.slick-viewport')) {
+        vp.removeEventListener('touchstart', handleSwipe)
+    }
+
     // Update global variable
     _frozenColumns=numCols;
 
@@ -1195,6 +1210,11 @@ setFrozenColumns=(numCols) => {
 
     // Clear input field
     document.getElementById('auto-number-input').value=null;
+
+    // Add new scroll listeners
+    for (vp of document.querySelectorAll('.slick-viewport')) {
+        vp.addEventListener('touchstart', handleSwipe)
+    }
 }
 
 // Add listener to frozen-columns input 
