@@ -132,6 +132,10 @@ cursor: pointer;
     margin: 5px;
 }
 
+.cursor-pointer:hover{
+    cursor: pointer;
+}
+
 .show-list-item-container{
     width: 100%;
     display: flex;

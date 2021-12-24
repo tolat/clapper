@@ -56,6 +56,7 @@ createSlickGrid=(data, columns, options) => {
 
     // Save initial access profiles
     _initialAccessProfiles=JSON.parse(JSON.stringify(_args.accessProfiles))
+    _initialAccessMap=JSON.parse(JSON.stringify(_args.accessMap))
 
     // Set server
     server=_args.server;
@@ -2925,6 +2926,13 @@ hideRestrictedColumns=(columns, IDkey) => {
     return columns
 }
 
+removeUserFromAp=(ap, uName) => {
+    uName=uName.replaceAll('.', '-')
+    _args.accessMap[uName].profile=null
+
+    populateAccessProfileModal(ap)
+}
+
 // Populates access profiles modal 
 populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, parseCheckboxes=true) => {
     // If this is not the initial load of the page, set saveStatus to false
@@ -2960,7 +2968,7 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, par
                     <button class="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${apName}">
                        ${ap} 
                     </button>
-                    <div style="color: green; white-space: nowrap; font-size: 1rem; margin-top:5px;">(Level ${_args.accessProfiles[ap].accessLevel})</div>
+                    <div class="cursor-pointer" style="color: green; white-space: nowrap; font-size: 1rem; margin-top:5px;" onclick="toggleApLevelModal(true, '${ap}')">(Level ${_args.accessProfiles[ap].accessLevel})</div>
                 </div>
                 <div>
             </h2>
@@ -2991,7 +2999,10 @@ populateAccessProfileModal=(showAp=false, showPage=false, initialLoad=false, par
             <div class="access-profile-uname-container">`
 
         for (uName of Object.keys(_args.accessMap).filter(key => _args.accessMap[key].profile==ap)) {
-            apAccordionItem+=`<div>${uName.replaceAll('-', '.')}</div>`
+            apAccordionItem+=`<div style="display: flex; justify-content: space-between;">
+            <div>${uName.replaceAll('-', '.')}</div>
+            <div class="cursor-pointer" style="color: red;" onclick="removeUserFromAp('${ap}', '${uName}')">Remove</div>
+            </div>`
         }
 
         // Add delete access profile button
@@ -3747,7 +3758,37 @@ updateApSaveStatus=(saved) => {
 
 // Revert access profile to it's state at page load
 revertAccessProfile=(ap) => {
+    // Reset access profile
     _args.accessProfiles[ap]=JSON.parse(JSON.stringify(_initialAccessProfiles[ap]))
+    // Reset ussers assigned to that access profile
+    for (uName in _initialAccessMap) {
+        if (_initialAccessMap[uName].profile==ap) {
+            _args.accessMap[uName].profile=ap
+        }
+    }
     populateAccessProfileModal(ap, false, false, false)
 }
+
+// Hide and show modal to change access profile level
+toggleApLevelModal=(show, ap=false, save=false) => {
+    if (show) {
+        document.getElementById('ap-level-modal').style.display='flex'
+        document.getElementById('access-profiles-modal').style.display=null
+        document.getElementById('ap-level-modal-memory').innerText=ap
+    } else {
+        document.getElementById('ap-level-modal').style.display=null
+        document.getElementById('access-profiles-modal').style.display='flex'
+
+        if (save) {
+            let ap=document.getElementById('ap-level-modal-memory').innerText
+            let newLevel=document.getElementById('ap-level-modal-input').value
+            if (newLevel<=_args.accessLevel) { newLevel=_args.accessLevel+1 }
+            _args.accessProfiles[ap].accessLevel=newLevel
+
+            populateAccessProfileModal(ap)
+        }
+    }
+}
+
+
 

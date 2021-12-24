@@ -1,0 +1,13 @@
+<div id="ap-level-modal" class="grid-modal" style="min-height: 5rem;">
+    <div id="ap-level-modal-message" style="display: flex; width: 100%; align-items: center;">
+        Enter level for access profile <br> (must be an integer greater than <%=args.accessLevel%> (your access level))
+    </div>
+    <div id="ap-level-modal-memory"></div>
+    <input type="number" style="width: 100%;" id="ap-level-modal-input">
+    <div class="accordion accordion-flush" id="access-profiles-accordion"></div>
+    <div class="modal-button-container">
+        <button id="ap-level-modal-close" onclick="toggleApLevelModal(false)" style="color: black;">Cancel</button>
+        <button id="ap-level-modal-new" onclick="toggleApLevelModal(false, false, true)"
+            style=" color: green;">Save</button>
+    </div>
+</div>
