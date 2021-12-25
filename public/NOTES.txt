@@ -11,11 +11,12 @@ TASKS
 
 TORIN:
 Bugs:
--   Get working on mobile
--   Remove users from access profile
--   Change access profile level
+-   Get working on mobile (DONE)
+-   Remove users from access profile (DONE)
+-   Change access profile level (DONE)
+
 -   Remove _show variable
--   Allow versios to be named with letters and chosen manually for comparison (modal can sort by date asc/desc)
+-   Allow versions to be named with letters and chosen manually for comparison (modal can sort by date asc/desc)
 -   Copy display settings for version or week when creating new
 -   Update changing the week to be its own call to the server, and prompt if use wants to save data on week change
     ** Fix for the problem when changing weeks is not possible due to sets that have been deleted in current estimate version

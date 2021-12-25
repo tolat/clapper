@@ -1876,11 +1876,8 @@ setWeekEnding=() => {
     }
     _week=_args.week
 
-    // If in estimate page, show the version in the week ending display, and the date created in the toolbar
+    // If in estimate page, show the version in the week ending display
     if (_args.section=='Estimate') {
-        let dateCreatedText=`Date Created: ${new Date(_show.estimateVersions[_version].dateCreated).toLocaleDateString('en-US')}`
-        document.getElementById("date-created-display").innerText=dateCreatedText
-
         document.getElementById('week-ending-display').style.color='black'
         document.getElementById('week-ending-display').innerText=`Estimate Version: ${_version}`
         document.getElementById('week-ending-display-container').onclick=function () { toggleOpenVersionModal(true) }
@@ -2838,13 +2835,13 @@ validateModalInput=(e, type) => {
     let navKeys=['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight', 'Tab']
 
     // Integer Validator
-    if (type=='integer'&&!navKeys.includes(e.key)) {
+    if (type=='integer'&&!navKeys.includes(e.key)&&!['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].includes(e.key)) {
         e.target.value=zeroNanToNull(parseInt(e.target.value))
         e.preventDefault()
     }
 
     // Number Validator
-    if (type=='number'&&!navKeys.includes(e.key)) {
+    if (type=='number'&&!navKeys.includes(e.key)&&!['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'].includes(e.key)) {
         if (e.key=='.'&&!e.target.value.includes('.')) { return }
         else if (e.key=='-'&&!e.target.value.includes('-')) { return }
         else if ('1234567890'.split("").includes(e.key)) {
@@ -3788,6 +3785,11 @@ toggleApLevelModal=(show, ap=false, save=false) => {
             populateAccessProfileModal(ap)
         }
     }
+}
+
+// Satisficing function since comparison version is in display settings and display settings keys are handled as functions
+comparisonVersion=() => {
+    // Do Nothing
 }
 
 

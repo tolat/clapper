@@ -69,7 +69,7 @@ module.exports.update=async function (body, showId, user) {
     show.markModified('costReport.extraColumns');
 
     // Handle changing estimate versions
-    if (apOptions['Change Estimate Version']) {
+    if (apOptions['View Estimate Versions']||apOptions['Edit Estimate Versions']) {
         if (body.updateVersion) {
             if (!accessProfile.displaySettings[apName][body.updateVersion]) {
                 accessProfile.displaySettings[apName][body.updateVersion]={

@@ -60,6 +60,12 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         await show.save()
     }
 
+    // Set Comaprison Version if not loading page before versions exist
+    let comparisonVersion=false
+    if (args.version) {
+        comparisonVersion=accessProfile.displaySettings[apName][args.version].comparisonVersion||false
+    }
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show,
@@ -71,7 +77,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         accessProfile,
         user,
         apName,
-        sortedVersionKeys
+        sortedVersionKeys,
+        comparisonVersion
     })
 }
 
@@ -108,12 +115,14 @@ module.exports.update=async function (body, showId, user) {
             displaySettings: {},
             mandayRates: {},
             fringes: {},
-            dateCreated: new Date(Date.now()),
+            dateCreated: new Date(Date.now()).getTime(),
             sets: []
         }
 
         show.accessMap[apName].estimateVersion=`${v}`
+        accessProfile.displaySettings[apName][v].comparisonVersion=false
         show.markModified('accessMap')
+        show.markModified('accessProfiles')
         show.markModified('estimateVersions');
         await show.save();
         return { latestVersion: getLatestVersion(show) };
@@ -214,12 +223,25 @@ module.exports.update=async function (body, showId, user) {
     // Set original estimate version sets to be updatedList
     show.estimateVersions[ov].sets=updatedList
 
+    // Create a list of estimateVersion keys sorted by date
+    let sortedVersionKeys=Object.keys(show.estimateVersions)
+        .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
+        .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
+        .map(ev => ev.key)
+
     // Handle new version or version rename if it is allowed by access profile
     if (apOptions['Edit Estimate Versions']) {
         if (v!=ov) {
             show.estimateVersions[v]=JSON.parse(JSON.stringify(show.estimateVersions[ov]))
+
+            // Copy display settings to new version and set comparison version to most recent version
+            accessProfile.displaySettings[apName][`${v}`]=JSON.parse(JSON.stringify(accessProfile.displaySettings[apName][`${ov}`]))
+            accessProfile.displaySettings[apName][`${v}`].comparisonVersion=sortedVersionKeys[0]
+
             if (isBlankVersion) {
-                accessProfile.displaySettings[apName][`${v}`]={}
+                accessProfile.displaySettings[apName][`${v}`]={
+                    comparisonVersion: sortedVersionKeys[0]
+                }
                 for (set of show.estimateVersions[v].sets) {
                     for (key in set.departmentValues) {
                         set.departmentValues[key]=null
@@ -237,8 +259,8 @@ module.exports.update=async function (body, showId, user) {
                 show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][v]={
                     [`${show.accessMap[apName].currentWeek}`]: {}
                 }
-                show.markModified('accessProfiles')
             }
+            show.markModified('accessProfiles')
         }
     }
 
@@ -251,7 +273,7 @@ module.exports.update=async function (body, showId, user) {
 
 // Return the latest estimate verison
 function getLatestVersion(show) {
-    return Object.keys(show.estimateVersions).sort((a, b) => { return (parseFloat(b.replace('_', '.'))-parseFloat(a.replace('_', '.'))) })[0];
+    return Object.keys(show.estimateVersions).sort((a, b) => { return (show.estimateVersions[a].dateCreated-show.estimateVersions[b].dateCreated) })[0];
 }
 
 // Returns an array of keys that correspond to the grid's department value fields

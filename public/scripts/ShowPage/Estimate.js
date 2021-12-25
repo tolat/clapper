@@ -357,6 +357,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
                 setColumnWidths: getColumnWidths(),
                 setHiddenColumns: getHiddenColumns(),
                 setFrozenColumns: _frozenColumns,
+                comparisonVersion: _comparisonVersion
             }
         }),
         credentials: 'include'
@@ -392,33 +393,26 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
 // Update Math column data
 updateEstimateMathColumns=() => {
     let items=dataView.getItems();
-    let prevVer=false
 
     // Get previous version totals. save in 'prevTotals' object
     let prevTotals={};
-    if (Object.keys(_show.estimateVersions).length>1) {
-        let versions=Object.keys(_show.estimateVersions).sort((a, b) => {
-            return (parseFloat(b.replace("_", "."))-parseFloat(a.replace("_", ".")));
-        })
-        prevVer=versions[versions.indexOf(_version)+1]||false
-        if (prevVer) {
-            for (set of _show.estimateVersions[_version].sets) {
-                let prevSet=_show.estimateVersions[prevVer].sets.find(s => s['Set Code']==set['Set Code'])
-                if (prevSet) {
-                    let prevFringes=_show.estimateVersions[prevVer].fringes
-                    let prevMandayRates=_show.estimateVersions[prevVer].mandayRates
-                    let prevDepartments=_show.departments
-                    let prevItem={}
-                    for (dep of prevDepartments) {
-                        prevItem[`${dep} Man Days`]=prevSet.departmentValues[`${dep} Man Days`]
-                        prevItem[`${dep} Materials`]=prevSet.departmentValues[`${dep} Materials`]
-                        prevItem[`${dep} Rentals`]=prevSet.departmentValues[`${dep} Rentals`]
-
-                    }
-                    calculateTotals(prevItem, prevFringes, prevDepartments, prevMandayRates)
-                    prevTotals[set['Set Code']]=prevItem['Current']
+    if (_comparisonVersion) {
+        for (set of _show.estimateVersions[_version].sets) {
+            let prevSet=_show.estimateVersions[_comparisonVersion].sets.find(s => s['Set Code']==set['Set Code'])
+            if (prevSet) {
+                let prevFringes=_show.estimateVersions[_comparisonVersion].fringes
+                let prevMandayRates=_show.estimateVersions[_comparisonVersion].mandayRates
+                let prevDepartments=_show.departments
+                let prevItem={}
+                for (dep of prevDepartments) {
+                    prevItem[`${dep} Man Days`]=prevSet.departmentValues[`${dep} Man Days`]
+                    prevItem[`${dep} Materials`]=prevSet.departmentValues[`${dep} Materials`]
+                    prevItem[`${dep} Rentals`]=prevSet.departmentValues[`${dep} Rentals`]
 
                 }
+                calculateTotals(prevItem, prevFringes, prevDepartments, prevMandayRates)
+                prevTotals[set['Set Code']]=prevItem['Current']
+
             }
         }
     }
@@ -427,7 +421,7 @@ updateEstimateMathColumns=() => {
     for (item of items) {
         calculateTotals(item, _fringes, _show.departments, _mandayRates)
         // Set Previous version cost if there is a previous version
-        if (prevVer&&item['Set Code']) {
+        if (_comparisonVersion&&item['Set Code']) {
             item['Previous']=zeroNanToNull(prevTotals[item['Set Code']]);
             item['Variance']=zeroNanToNull((item['Current']-item['Previous']).toFixed(2));
         }

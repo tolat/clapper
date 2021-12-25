@@ -170,7 +170,9 @@ const seedShows=async () => {
                         editDataFilter: { type: 'w', filter: { 'Episode': ['200'] } },
                         displaySettings: {
                             'pigsinpyjamas@yahoo-ca': {
-                                100: {}
+                                100: {
+                                    comparisonVersion: false
+                                }
                             }
                         }
                     },
@@ -269,7 +271,9 @@ const seedShows=async () => {
                         editDataFilter: { type: 'b', filter: {} },
                         displaySettings: {
                             'torin-olat@gmail-com': {
-                                100: {}
+                                100: {
+                                    comparisonVersion: false
+                                }
                             }
                         }
                     },

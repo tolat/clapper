@@ -416,6 +416,10 @@ input.department-input:focus{
     border: 1px solid grey;
 }
 
+.active-lighten:active{
+    opacity: 0.6;
+}
+
 #edit-dropdown{
     width: 13rem;
 }
