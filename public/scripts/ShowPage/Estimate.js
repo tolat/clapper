@@ -199,12 +199,24 @@ toggleManDayRatesModal=(show, setRates) => {
 // Populates the Man Day rates modal with stored man day rates for this estimate version
 populateMandayRates=() => {
     let cont=document.getElementById('manday-rates-container');
+    let eltType='input'
+    let eltEndTag=''
+    let innerText=''
+    if (!_args.apOptions['Edit Manday Rates']) {
+        eltType='div'
+        eltEndTag='</div>'
+    }
     cont.innerHTML=null;
     for (d of _show.departments) {
+        if (!_args.apOptions['Edit Manday Rates']) {
+            innerText=_mandayRates[d]
+        }
         cont.innerHTML+=`<div class="rate-container">
         <div style="min-width: 2rem;">${d}</div>
-        <div>
-        $\xa0<input class="manday-rates-modal-input" id="${d}_mandayRate" value="${_mandayRates[d]}" onkeydown="validateModalInput(event, 'number')">
+        <div style="display: flex; flex-direction:row;">
+        $\xa0<${eltType} class="manday-rates-modal-input" id="${d}_mandayRate" value="${_mandayRates[d]}" onkeydown="validateModalInput(event, 'number')">
+        ${innerText}
+        ${eltEndTag}
         </div>
         </div>`;
     }
@@ -221,6 +233,9 @@ toggleFringesModal=(show, setFringes=false) => {
                 _fringes[f]=parseFloat(document.getElementById(`${f}_fringe`).value);
             }
             updateEstimateMathColumns();
+            balanceAllLaborMandays();
+            updateTotalsRow();
+            updateSaveStatus(false);
         }
     }
     // Show modal
@@ -236,13 +251,29 @@ toggleFringesModal=(show, setFringes=false) => {
 populateFringes=() => {
     let cont=document.getElementById('fringes-container');
     cont.innerHTML=null;
+    let eltEndTag=''
+    let innerText=''
+    let eltType='input'
+    if (!_args.apOptions['Edit Fringes']) {
+        eltType='div'
+        eltEndTag='</div>'
+    }
     for (key of Object.keys(_fringes)) {
+        let deleteButtonDisplay='inherit'
+        let inputStyle=''
+        if (!_args.apOptions['Edit Fringes']) {
+            innerText=_fringes[key]
+            deleteButtonDisplay='none'
+            inputStyle='width: unset;'
+        }
         cont.innerHTML+=`<div id="${key}_fringe-container" style="display: flex; justify-content: space-between; width: 100%;">
         <div style="min-width: 2rem;">${key}</div>
-        <div style="display: flex; justify-content: flex-end;">
-        <input class="modal-input" id="${key}_fringe" value="${_fringes[key]}" onkeydown="validateModalInput(event, 'number')">\xa0%
+        <div style="display: flex; flex-direction:row; justify-content: flex-end;">
+        <${eltType} class="modal-input" style="${inputStyle}" id="${key}_fringe" value="${_fringes[key]}" onkeydown="validateModalInput(event, 'number')">\xa0%
+        ${innerText}
+        ${eltEndTag}
         </div></div>
-        <button style="color: red;" onclick="deleteFringe('${key}')">Delete</button>`;
+        <button style="color: red; display: ${deleteButtonDisplay};" onclick="deleteFringe('${key}')">Delete</button>`;
     }
 }
 
@@ -314,7 +345,7 @@ deleteVersion=() => {
 }
 
 // Update estimate version
-saveData=(isNewVersion=false, isBlankVersion=false) => {
+saveData=(isNewVersion=false, isBlankVersion=false, reload=false) => {
     // Only save if saving is not already underway, and the user has not overidden the RFS warning
     if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
 
@@ -371,7 +402,7 @@ saveData=(isNewVersion=false, isBlankVersion=false) => {
             // Update Totals
             updateTotalsRow()
             // If a new estimate was created or the version name was changed, navigate to new version page
-            if (isNewVersion||_version!=_originalVersion) {
+            if (isNewVersion||_version!=_originalVersion||reload) {
                 window.location=server+`/shows/${_show._id}/Estimate?version=${_version}`;
             } else {
                 // Update saveStatus
@@ -584,6 +615,28 @@ balanceAllLaborMandays=() => {
         for (d of _show.departments) {
             let cell=grid.getColumns().map(c => c.field).indexOf(`${d} Man Days`);
             balanceLaborManDays({ item: item, cell: cell });
+        }
+    }
+}
+
+// Hide and show the comparison version modal
+toggleComparisonVersionModal=(show, save=false) => {
+    if (show) {
+        if (!_args.apOptions['View Estimate Versions']) { return }
+        document.getElementById('grid-modal-container').style.display='flex';
+        document.getElementById('comparison-version-modal').style.display='flex';
+
+        autocomplete(document.getElementById("comparison-version-modal-input"), _sortedVersionKeys)
+    } else {
+        document.getElementById('grid-modal-container').style.display=null;
+        document.getElementById('comparison-version-modal').style.display=null;
+
+        if (save) {
+            let newCompVer=document.getElementById('comparison-version-modal-input').value
+            if (newCompVer&&newCompVer!=_comparisonVersion&&_sortedVersionKeys.includes(newCompVer)) {
+                _comparisonVersion=newCompVer
+                saveData(false, false, true)
+            }
         }
     }
 }

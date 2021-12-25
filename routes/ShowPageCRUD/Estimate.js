@@ -119,8 +119,11 @@ module.exports.update=async function (body, showId, user) {
             sets: []
         }
 
+        accessProfile.displaySettings[apName][v]={
+            comparisonVersion: false
+        }
+
         show.accessMap[apName].estimateVersion=`${v}`
-        accessProfile.displaySettings[apName][v].comparisonVersion=false
         show.markModified('accessMap')
         show.markModified('accessProfiles')
         show.markModified('estimateVersions');

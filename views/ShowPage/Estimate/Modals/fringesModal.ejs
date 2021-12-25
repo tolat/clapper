@@ -1,9 +1,16 @@
 <div id="fringes-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
     Fringes (click fringe to edit):
     <div id="fringes-container" style="max-height: 16rem; overflow-y: scroll; padding: 5px; width: 100%;"></div>
-    <button style="margin: auto; font-weight: bold; font-size: 1.5rem;" onclick="toggleAddFringeModal(true)">+</button>
-    <div class="modal-button-container">
-        <button id="fringes-modal-cancel" onclick="toggleFringesModal(false)" style="color: black;">Cancel</button>
-        <button id="fringes-modal-submit" onclick="toggleFringesModal(false, true)" style="color: green">Set</button>
-    </div>
+    <% if(args.apOptions['Edit Fringes']){ %>
+        <button style="margin: auto; font-weight: bold; font-size: 1.5rem;"
+            onclick="toggleAddFringeModal(true)">+</button>
+        <%}%>
+            <div class="modal-button-container">
+                <button id="fringes-modal-cancel" onclick="toggleFringesModal(false)"
+                    style="color: black;">Cancel</button>
+                <% if(args.apOptions['Edit Fringes']){ %>
+                    <button id="fringes-modal-submit" onclick="toggleFringesModal(false, true)"
+                        style="color: green">Set</button>
+                    <%}%>
+            </div>
 </div>

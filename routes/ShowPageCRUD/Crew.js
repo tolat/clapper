@@ -19,6 +19,12 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let data=initializeData(week.crew.crewList, show, week, accessProfile)
     let currentVersionSetCodes=await show.estimateVersions[show.accessMap[apName].estimateVersion].sets.map(s => s['Set Code'])
 
+    // Create a list of estimateVersion keys sorted by date
+    let sortedVersionKeys=Object.keys(show.estimateVersions)
+        .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
+        .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
+        .map(ev => ev.key)
+
     args.reloadOnWeekChange=true;
     let allUsers=await User.find({});
     args.dropdownNames=await allUsers.map(user => `${user['Name']} [${user['username']}]`)
@@ -35,7 +41,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         apName,
         user,
         currentVersionSetCodes,
-        accessProfile
+        accessProfile,
+        sortedVersionKeys
     })
 }
 

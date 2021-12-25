@@ -1,0 +1,19 @@
+<div id="comparison-version-modal" class="grid-modal" style="min-height: 5rem; min-width: 15rem;">
+    <div style="display: flex; flex-direction: column; margin-bottom: 20px;">
+        <div>
+            Current comparison version (the estimate version <br> that the 'Previous' column gets its values from):<br>
+        </div>
+        <div style="font-size: 1.1 rem; font-weight: bold; text-align: center; margin-top: 10px;">
+            <%=comparisonVersion||'None Set'%>
+                <br>
+        </div>
+    </div>
+    Enter new comparison version:
+    <input id="comparison-version-modal-input" style="width: 100%;" type="text">
+    <div class="modal-button-container">
+        <button id="comparison-version-modal-cancel" onclick="toggleComparisonVersionModal(false)"
+            style="color: black;">Cancel</button>
+        <button id="comparison-version-modal-submit" onclick="toggleComparisonVersionModal(false, true)"
+            style="color: green">Set</button>
+    </div>
+</div>

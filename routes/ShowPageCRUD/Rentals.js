@@ -50,6 +50,12 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         posDeptMap[pos]=week.positions.positionList[pos].Department
     }
 
+    // Create a list of estimateVersion keys sorted by date
+    let sortedVersionKeys=Object.keys(show.estimateVersions)
+        .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
+        .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
+        .map(ev => ev.key)
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show,
@@ -64,7 +70,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         currentWeekSetCodes,
         userPosForWeekMap,
         userNamesForWeekMap,
-        posDeptMap
+        posDeptMap,
+        sortedVersionKeys
     })
 }
 

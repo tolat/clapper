@@ -8,13 +8,20 @@ const crudUtils=require('./utils')
 module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals) {
     let show=await populateShow(id);
 
+    // Create a list of estimateVersion keys sorted by date
+    let sortedVersionKeys=Object.keys(show.estimateVersions)
+        .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
+        .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
+        .map(ev => ev.key)
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show: show,
         section: section,
         args: args,
         sharedModals: sharedModals,
-        pageModals: pageModals
+        pageModals: pageModals,
+        sortedVersionKeys
     })
 }
 

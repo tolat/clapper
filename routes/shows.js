@@ -68,7 +68,11 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
                 dataFilter: { type: 'b', filter: {} },
                 editColumnFilter: { type: 'b', filter: [] },
                 editDataFilter: { type: 'b', filter: {} },
-                displaySettings: { [`${apName}`]: {} }
+                displaySettings: {
+                    [`${apName}`]: {
+                        comparisonVersion: false
+                    }
+                }
             },
             'Purchases': {
                 pageAccess: true,

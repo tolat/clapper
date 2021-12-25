@@ -3,7 +3,9 @@
     <div id="manday-rates-container" style="max-height: 16rem; overflow-y: scroll; padding: 5px; width: 100%;"></div>
     <div class=" modal-button-container">
         <button id="manday-rates-cancel" onclick="toggleManDayRatesModal(false)" style="color: black;">Cancel</button>
-        <button id="manday-rates-modal-submit" onclick="toggleManDayRatesModal(false, true)"
-            style="color: green">Set</button>
+        <%if (args.apOptions['Edit Manday Rates']){ %>
+            <button id="manday-rates-modal-submit" onclick="toggleManDayRatesModal(false, true)"
+                style="color: green">Set</button>
+            <% } %>
     </div>
 </div>
