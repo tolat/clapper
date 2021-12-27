@@ -244,7 +244,11 @@ module.exports.update=async function (body, showId, user) {
 
             // Copy display settings to new version and set comparison version to most recent version
             accessProfile.displaySettings[apName][`${v}`]=JSON.parse(JSON.stringify(accessProfile.displaySettings[apName][`${ov}`]))
-            accessProfile.displaySettings[apName][`${v}`].comparisonVersion=sortedVersionKeys[0]
+            if (isNewVersion) {
+                accessProfile.displaySettings[apName][`${v}`].comparisonVersion=sortedVersionKeys[0]
+            } else {
+                accessProfile.displaySettings[apName][`${v}`].comparisonVersion=accessProfile.displaySettings[apName][`${ov}`].comparisonVersion
+            }
 
             if (isBlankVersion) {
                 accessProfile.displaySettings[apName][`${v}`]={
@@ -258,8 +262,20 @@ module.exports.update=async function (body, showId, user) {
                 }
                 show.estimateVersions[v].extraColumns=[]
             }
-            // Delete old version if this is not a new version (i.e. this is a rename)
-            if (!isNewVersion) { delete show.estimateVersions[ov] }
+            // Delete old version and change comparison version name for all users if this is not a new version (i.e. this is a rename)
+            if (!isNewVersion) {
+                delete show.estimateVersions[ov]
+                console.log(`Renaming version ${ov} to ${v}`)
+                for (prof in show.accessProfiles) {
+                    for (uName in show.accessProfiles[prof].Estimate.displaySettings) {
+                        for (ver in show.accessProfiles[prof].Estimate.displaySettings[uName]) {
+                            if (show.accessProfiles[prof].Estimate.displaySettings[uName][ver].comparisonVersion==ov) {
+                                show.accessProfiles[prof].Estimate.displaySettings[uName][ver].comparisonVersion=v
+                            }
+                        }
+                    }
+                }
+            }
             else {
                 show.estimateVersions[v].dateCreated=new Date(Date.now())
 

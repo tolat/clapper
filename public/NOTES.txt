@@ -25,7 +25,7 @@ Bugs:
 -   ** NEED TO DELETE DAYS WORKED ENTIRELY, NOT JUST SET THEM TO NULL WHEN WEEK IS CLEARED? (I THINK THAT'S WHAT IS DOING IT)
 
 KIT:
--   Convert to SSL
+-   Convert to SSL (DONE)
 
 ARTHUR:
 -   Get it to print nicely (Arthur)
