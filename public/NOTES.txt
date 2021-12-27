@@ -14,11 +14,12 @@ Bugs:
 -   Get working on mobile (DONE)
 -   Remove users from access profile (DONE)
 -   Change access profile level (DONE)
--   Remove _show variable
+-   Remove _show and _week variable (DONE vv ISH vv)
+        *** Think of workaround so we don't need to pass all rentals and position details to crew page (server fetch?) ***
 -   Allow versions to be named with letters and chosen manually for comparison (modal can sort by date asc/desc) (DONE)
 
 -   Copy display settings for version or week when creating new
--   Update changing the week to be its own call to the server, and prompt if use wants to save data on week change
+-   prompt if user wants to save data on week change/version rename/ any operation that causes a reload
     ** Fix for the problem when changing weeks is not possible due to sets that have been deleted in current estimate version
 -   Block duplicate extra and tax columns
 -   ** NEED TO DELETE DAYS WORKED ENTIRELY, NOT JUST SET THEM TO NULL WHEN WEEK IS CLEARED? (I THINK THAT'S WHAT IS DOING IT)

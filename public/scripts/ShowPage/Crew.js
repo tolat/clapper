@@ -81,7 +81,7 @@ saveData=(reload=false) => {
     }
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Crew`, {
+    fetch(server+`/shows/${_args.showid}/Crew`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +89,6 @@ saveData=(reload=false) => {
             extraColumns: _extraColumns,
             currentWeekDays: weekDays,
             newWeek: _newWeek,
-            weeks: _show.weeks,
             taxColumns: _taxColumns,
             deletedWeek: _deletedWeek,
             currentTime: new Date(Date.now()).getTime(),
@@ -137,7 +136,7 @@ calculateWeeklyTotal=(item) => {
     if (!item['Position']||item['Position']=='DELETED') { return 0 }
 
     let total=0;
-    let pos=_week.positions.positionList[item['Position']]
+    let pos=_positions[item['Position']]
     // Return 0 if no position found (errant position code)
     if (!pos) { return 0 }
     let rate=parseFloat(pos['Rate'])
@@ -151,7 +150,7 @@ calculateWeeklyTotal=(item) => {
     // Add tax and rentals to make final total
     let rentals=zeroNanToNull(parseFloat(item['Rentals']))||0
     let tax=0;
-    for (t of _week.crew.taxColumns) {
+    for (t of _taxColumns) {
         tax+=zeroNanToNull(parseFloat(item[t]))||0
     }
 
@@ -162,10 +161,10 @@ calculateWeeklyTotal=(item) => {
 calculateWeeklyRentals=(item) => {
     let rentalAmount=0;
     if (item['username']&&item['Position']) {
-        let rentals=_week.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Supplier Code']==item['Position'])
+        let rentals=_args.rentals.rentalList.filter(r => r['Supplier']&&r['Supplier']==item['username']&&r['Supplier Code']==item['Position'])
         for (rental of rentals) {
             let tax=0;
-            for (t of _week.rentals.taxColumns) {
+            for (t of _args.rentals.taxColumns) {
                 tax+=parseFloat(rental.taxColumnValues[t])||0
             }
             rentalAmount+=parseFloat(rental['Day Rate'])*parseFloat(rental['Days Rented'])*(tax/100+1)
@@ -177,7 +176,7 @@ calculateWeeklyRentals=(item) => {
 // Sets the correct column order for the day/set columns
 setCrewPageColumnOrder=() => {
     let weekDays=_currentWeekDays.map(day => day.toString().slice(0, 3));
-    let postWeekColKeys=['Rentals', 'Total'].concat(_week.crew.taxColumns)
+    let postWeekColKeys=['Rentals', 'Total'].concat(_taxColumns)
     let cols=grid.getColumns();
     let preWeekCols=cols.filter(col => !weekDays.includes(col.field)&&col.name!='Set'&&col.name!='Total'&&!postWeekColKeys.includes(col.name));
     let postWeekCols=cols.filter(col => postWeekColKeys.includes(col.name));
@@ -248,7 +247,7 @@ autoFillUserData=(args) => {
             let posCode=item['Position']
             console.log(posCode)
             //clearShowRecordFields(item)
-            item['Department']=_week.positions.positionList[item['Position']].Department
+            item['Department']=_positions[item['Position']].Department
             item['Position']=posCode
 
         }
@@ -281,7 +280,7 @@ recalculateWeeklyTotal=(args) => {
     let cellField=grid.getColumns()[args.cell].field;
     let weekDays=_currentWeekDays.map(day => day.toString().slice(0, 3));
     // Only update if editing a position or hours cell
-    if (weekDays.includes(cellField)||cellField=='Position'||_week.crew.taxColumns.includes(cellField)) {
+    if (weekDays.includes(cellField)||cellField=='Position'||_taxColumns.includes(cellField)) {
         args.item['Total']=calculateWeeklyTotal(args.item);
         // Apply changes to the dataView
         dataView.updateItem(args.item.id, args.item);
@@ -295,14 +294,6 @@ calculateAllWeeklyTotals=() => {
         // Apply changes to the dataView
         dataView.updateItem(item.id, item);
     }
-}
-
-populateShowRecordData=(record, item) => {
-    let recordPosition=_positions.find(pos => pos._id==record.positionid)||{};
-    item=loadUserHours(record, recordPosition, item);
-    item['Position']=recordPosition['Code'];
-    item['Total']=calculateWeeklyTotal(item, record);
-    item['Department']=recordPosition['Department'];
 }
 
 clearShowRecordFields=(item) => {

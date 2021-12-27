@@ -21,13 +21,14 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         .map(ev => ev.key)
 
     args.reloadOnWeekChange=true;
-    args.showCrew=await crudUtils.getAllCrewUsers(await crudUtils.getAllCrewIDs(show._id.toString()))
     args.latestVersion=sortedVersionKeys[0]
     args.version=estimateVersion
+    args.extraColumns=show.costReport.extraColumns
 
     // Generate grid data
     let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
-    let data=initializeData(show.estimateVersions[estimateVersion].sets, show, week, accessProfile, estimateVersion, args.showCrew)
+    let showCrew=await crudUtils.getAllCrewUsers(await crudUtils.getAllCrewIDs(show._id.toString()))
+    let data=initializeData(show.estimateVersions[estimateVersion].sets, show, week, accessProfile, estimateVersion, showCrew)
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
@@ -114,7 +115,7 @@ module.exports.update=async function (body, showId, user) {
 
     // Delete all records for deleted week if required
     if (body.deletedWeek) {
-        await crudUtils.deleteWeek(body.deletedWeek, show, body.weeks)
+        await crudUtils.deleteWeek(body.deletedWeek, show, show.weeks)
     }
 
     return { message: 'Success' }

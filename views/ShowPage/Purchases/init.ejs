@@ -1,6 +1,5 @@
 <script>
     // Global variables
-    let _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _allSetCodes= <%- JSON.stringify(allSetCodes)%>;
@@ -9,8 +8,9 @@
     setWeekEnding()
     populateAccessProfileModal(false, false, true)
 
-    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
-    let _extraColumns=_show.purchases.extraColumns;
+    let _displaySettings=_accessProfile.displaySettings[_apName][_args.weekid]||{}
+    let _extraColumns=_args.extraColumns;
+    let _taxColumns=_args.taxColumns
     let _validators=[
         {
             fields: ['Set Code'],
@@ -30,10 +30,10 @@
                 this.validationHeader=`Department '${args.item[field]}' Not Found!`
                 this.validationMessage=`New departments can only be added in the 'Estimates' page.`
                 if (args.item[field]) {
-                    let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toString().toLowerCase());
+                    let depIdx=_args.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toString().toLowerCase());
                     let existsDep=false;
                     if (depIdx>=0) {
-                        args.item[field]=_show.departments[depIdx];
+                        args.item[field]=_args.departments[depIdx];
                         dataView.updateItem(args.item.id, args.item);
                         existsDep=true;
                     }
@@ -64,31 +64,27 @@
         },
     ];
     let _totals={ Total: 'sum' };
-    let _taxColumns=_show.purchases.taxColumns
 
     let grid;
     let dataView;
 
     // Load the grid 
     async function onLoad() {
-        var purchases=_show.purchases.purchaseList;
-
         // Set the week ending if the show has a current week ending
-        if (_show.currentweekending) { _weekEnding=_show.currentweekending }
         await setWeekEnding();
 
         // Create options
         var options=await initializeOptions();
 
         // Create grid columns
-        var columns=await initializeColumns(purchases, _show, _args);
+        var columns=await initializeColumns();
 
         // Create grid data
         let data=<%- JSON.stringify(data)%>;
         data=await applyEditDataFilter(data, columns)
 
         // Create data grid
-        await createSlickGrid(data, columns, options, _show, _args);
+        await createSlickGrid(data, columns, options);
 
         grid.recalculate=function (item) {
             item=updatePurchaseTotal(item);
@@ -119,13 +115,13 @@
     }
 
     // Creates grid columns 
-    function initializeColumns(purchases, _show, _args) {
+    function initializeColumns() {
         let columns=[
             { id: "__spacer", width: 0, sortable: false, draggable: false },
             { id: "PO Num", name: "PO Num", field: "PO Num", width: 100, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Date", name: "Date", field: "Date", width: 100, editor: Slick.Editors.Date, sortable: true, cssClass: 'required-for-save' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 75, editor: AutoCompleteEditor, dataSource: _allSetCodes, sortable: true, cssClass: 'required-for-save' },
-            { id: "Department", name: "Department", field: "Department", width: 100, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 100, editor: AutoCompleteEditor, dataSource: _args.departments, sortable: true, cssClass: 'required-for-save' },
             { id: "Episode", name: "Episode", field: "Episode", width: 75, sortable: true, cssClass: 'uneditable' },
             { id: "Amount", name: "Amount", field: "Amount", width: 100, editor: Slick.Editors.Text, sortable: true, groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency' },
         ]

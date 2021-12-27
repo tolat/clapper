@@ -1,14 +1,15 @@
 <script>
     // Global variables
-    let _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
+    let _sortedVersionKeys= <%- JSON.stringify(sortedVersionKeys)%>;
+
 
     setWeekEnding()
     populateAccessProfileModal(false, false, true)
 
-    let _extraColumns=_week.positions.extraColumns;
+    let _extraColumns=_args.extraColumns;
     let _validators=[
         {
             fields: ['Rate'],
@@ -24,10 +25,10 @@
                 this.validationHeader=`Department '${args.item[field]}' Not Found!`
                 this.validationMessage=`New departments can only be added in the 'Estimates' page.\nDepartments are case-sensitive!`
                 if (args.item[field]==undefined) { return false; }
-                let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
+                let depIdx=_args.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
                 let dep=false;
                 if (depIdx>=0) {
-                    args.item[field]=_show.departments[depIdx];
+                    args.item[field]=_args.departments[depIdx];
                     dataView.updateItem(args.item.id, args.item);
                     dep=true;
                 }
@@ -44,29 +45,27 @@
         }
     ];
     let _totals={};
-    let _multipliers=_week.multipliers
+    let _multipliers=_args.multipliers
     let _dropdownNodes=initDropdownNodes()
-    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
+    let _displaySettings=_accessProfile.displaySettings[_apName][_args.weekid]||{}
 
     var grid;
     var dataView;
 
     // Load the grid 
     async function onLoad() {
-        var positions=_week.positions.positionList;
-
         // Create options
         var options=await initializeOptions();
 
         // Create grid columns
-        var columns=await initializeColumns(positions, _show, _args);
+        var columns=await initializeColumns();
 
         // Create grid data
         let data=<%- JSON.stringify(data)%>;
         data=await applyEditDataFilter(data, columns)
 
         // Create data grid
-        await createSlickGrid(data, columns, options, _show, _args);
+        await createSlickGrid(data, columns, options);
 
         grid.recalculate=function (item) {
             // Do Nothing
@@ -89,12 +88,12 @@
     }
 
     // Creates grid columns 
-    function initializeColumns(positions, _show, _args) {
+    function initializeColumns() {
         let columns=[
             { id: "__spacer", width: 0, sortable: false },
             { id: "Code", name: "Code", field: "Code", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save' },
-            { id: "Department", name: "Department", field: "Department", width: 200, editor: AutoCompleteEditor, dataSource: _show.departments, sortable: true, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 200, editor: AutoCompleteEditor, dataSource: _args.departments, sortable: true, cssClass: 'required-for-save' },
             { id: "Rate", name: "Rate", field: "Rate", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save rate' },
         ];
 

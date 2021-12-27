@@ -64,14 +64,13 @@ saveData=(reload=false) => {
     }
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Purchases`, {
+    fetch(server+`/shows/${_args.showid}/Purchases`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             data: dataView.getItems(),
             extraColumns: _extraColumns,
             newWeek: _newWeek,
-            weeks: _show.weeks,
             deletedWeek: _deletedWeek,
             taxColumns: _taxColumns,
             displaySettings: {

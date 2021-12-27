@@ -57,7 +57,7 @@ saveData=(reload=false) => {
     }
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Rates`, {
+    fetch(server+`/shows/${_args.showid}/Rates`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -65,7 +65,6 @@ saveData=(reload=false) => {
             extraColumns: _extraColumns,
             multipliers: _multipliers,
             newWeek: _newWeek,
-            weeks: _show.weeks,
             deletedWeek: _deletedWeek,
             displaySettings: {
                 groupBy: _groupedBy,
@@ -111,7 +110,7 @@ toggleMultipliersModal=(show, update=false) => {
 
         // Update _multipliers with table values
         if (update) {
-            let days=getDaysOfCurrentWeek(new Date(_week.end)).map(day => day.toString().slice(0, 3));
+            let days=getDaysOfCurrentWeek(new Date(_args.weekend)).map(day => day.toString().slice(0, 3));
             for (m of Object.keys(_multipliers)) {
                 for (day of days) {
                     let val=parseFloat(document.getElementById(`${m}-${day}`).value);
@@ -172,7 +171,7 @@ loadMultipliersModal=() => {
     <tbody id="multiplier-rows">
     </tbody>`
 
-    let days=getDaysOfCurrentWeek(new Date(_week.end)).map(day => day.toString().slice(0, 3));
+    let days=getDaysOfCurrentWeek(new Date(_args.weekend)).map(day => day.toString().slice(0, 3));
     let mHeaders=document.getElementById('multiplier-headers');
     let mRows=document.getElementById('multiplier-rows');
     let mRowKeys=Object.keys(_multipliers);

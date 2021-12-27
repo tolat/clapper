@@ -89,7 +89,7 @@ addDepartment=(d) => {
     ]
 
     // Prevent duplicates from being added
-    if (!_show.departments.includes(d)) { _show.departments.push(d) }
+    if (!_args.departments.includes(d)) { _args.departments.push(d) }
 
     addDepartmentCssClass(d);
     addToDepartmentsBar(d, `${d.replaceAll(" ", "")}_cssClass`, `toggleDepartmentClickedModal(true, '${d}')`);
@@ -107,7 +107,7 @@ toggleDepartmentClickedModal=(show, dep, del) => {
         grid.focus()
         let dep=document.getElementById('department-store').innerText;
         let color=document.getElementById('department-color-input').value;
-        if (color!=_show.departmentColorMap[dep]) { addDepartmentCssClass(dep, color) }
+        if (color!=_args.departmentColorMap[dep]) { addDepartmentCssClass(dep, color) }
         if (del) {
             deleteDepartment(document.getElementById('department-store').innerText);
         }
@@ -119,13 +119,13 @@ toggleDepartmentClickedModal=(show, dep, del) => {
         document.getElementById('department-clicked-modal').focus()
         document.getElementById('department-clicked-modal-title').innerText=`${dep} Department`;
         document.getElementById('department-store').innerText=dep;
-        document.getElementById('department-color-input').value=_show.departmentColorMap[dep];
+        document.getElementById('department-color-input').value=_args.departmentColorMap[dep];
     }
 }
 
 // Remove department from the show
 deleteDepartment=(dep) => {
-    _show.departments.splice(_show.departments.indexOf(dep), 1);
+    _args.departments.splice(_args.departments.indexOf(dep), 1);
     document.getElementById(`${dep}_dbarItem`).remove();
 
     let cols=grid.getColumns();
@@ -176,7 +176,7 @@ toggleManDayRatesModal=(show, setRates) => {
         document.getElementById('grid-modal-container').style.display=null;
         document.getElementById('manday-rates-modal').style.display=null;
         if (setRates) {
-            for (d of _show.departments) {
+            for (d of _args.departments) {
                 _mandayRates[d]=parseFloat(document.getElementById(`${d}_mandayRate`).value);
             }
 
@@ -189,7 +189,7 @@ toggleManDayRatesModal=(show, setRates) => {
     // Show modal
     else {
         if (!_args.apOptions['View Manday Rates']) { return }
-        if (_show.departments.length==0) { return }
+        if (_args.departments.length==0) { return }
         populateMandayRates();
         document.getElementById('grid-modal-container').style.display='flex';
         document.getElementById('manday-rates-modal').style.display='flex';
@@ -207,7 +207,7 @@ populateMandayRates=() => {
         eltEndTag='</div>'
     }
     cont.innerHTML=null;
-    for (d of _show.departments) {
+    for (d of _args.departments) {
         if (!_args.apOptions['Edit Manday Rates']) {
             innerText=_mandayRates[d]
         }
@@ -319,7 +319,7 @@ updateVersionName=(isNewVersion=false) => {
 
 // Open estimate
 openEstimate=(version) => {
-    window.location=server+`/shows/${_show._id}/Estimate?version=${version}`
+    window.location=server+`/shows/${_args.showid}/Estimate?version=${version}`
 }
 
 // Delete estimate version
@@ -333,7 +333,7 @@ deleteVersion=() => {
     // Get current version from estimate-version-display. replace '.' with '_' to avoid database bson key problems
     let currentVersion=_version
 
-    fetch(server+`/shows/${_show._id}/Estimate`, {
+    fetch(server+`/shows/${_args.showid}/Estimate`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -341,7 +341,7 @@ deleteVersion=() => {
         })
     })
         .then(response => { return response.json() })
-        .then(responseData => { window.location=server+`/shows/${_show._id}/Estimate?version=${responseData.latestVersion}` })
+        .then(responseData => { window.location=server+`/shows/${_args.showid}/Estimate?version=${responseData.latestVersion}` })
 }
 
 // Update estimate version
@@ -366,7 +366,7 @@ saveData=(isNewVersion=false, isBlankVersion=false, reload=false) => {
     }
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Estimate`, {
+    fetch(server+`/shows/${_args.showid}/Estimate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -375,10 +375,10 @@ saveData=(isNewVersion=false, isBlankVersion=false, reload=false) => {
             mandayRates: _mandayRates,
             fringes: _fringes,
             departmentTotals: _departmentTotals,
-            departments: _show.departments,
+            departments: _args.departments,
             originalVersion: _originalVersion,
             version: _version,
-            departmentColorMap: _show.departmentColorMap,
+            departmentColorMap: _args.departmentColorMap,
             isNewVersion: isNewVersion,
             isBlankVersion: isBlankVersion,
             displaySettings: {
@@ -403,7 +403,7 @@ saveData=(isNewVersion=false, isBlankVersion=false, reload=false) => {
             updateTotalsRow()
             // If a new estimate was created or the version name was changed, navigate to new version page
             if (isNewVersion||_version!=_originalVersion||reload) {
-                window.location=server+`/shows/${_show._id}/Estimate?version=${_version}`;
+                window.location=server+`/shows/${_args.showid}/Estimate?version=${_version}`;
             } else {
                 // Update saveStatus
                 updateSaveStatus(true);
@@ -428,12 +428,12 @@ updateEstimateMathColumns=() => {
     // Get previous version totals. save in 'prevTotals' object
     let prevTotals={};
     if (_comparisonVersion) {
-        for (set of _show.estimateVersions[_version].sets) {
-            let prevSet=_show.estimateVersions[_comparisonVersion].sets.find(s => s['Set Code']==set['Set Code'])
+        for (set of _args.estimateVersion.sets) {
+            let prevSet=_args.comparisonVersion.sets.find(s => s['Set Code']==set['Set Code'])
             if (prevSet) {
-                let prevFringes=_show.estimateVersions[_comparisonVersion].fringes
-                let prevMandayRates=_show.estimateVersions[_comparisonVersion].mandayRates
-                let prevDepartments=_show.departments
+                let prevFringes=_args.estimateVersion.fringes
+                let prevMandayRates=_args.estimateVersion.mandayRates
+                let prevDepartments=_args.departments
                 let prevItem={}
                 for (dep of prevDepartments) {
                     prevItem[`${dep} Man Days`]=prevSet.departmentValues[`${dep} Man Days`]
@@ -450,7 +450,7 @@ updateEstimateMathColumns=() => {
 
     // Calculate math totals for items
     for (item of items) {
-        calculateTotals(item, _fringes, _show.departments, _mandayRates)
+        calculateTotals(item, _fringes, _args.departments, _mandayRates)
         // Set Previous version cost if there is a previous version
         if (_comparisonVersion&&item['Set Code']) {
             item['Previous']=zeroNanToNull(prevTotals[item['Set Code']]);
@@ -497,7 +497,7 @@ function calculateTotals(item, fringes, departments, mandayRates) {
 
 // Returns true if key is a department key e.g. 
 isDepartmentKey=(key) => {
-    for (d of _show.departments) {
+    for (d of _args.departments) {
         if (key==`${d} Man Days`||key==`${d} Materials`||key==`${d} Rentals`||key==`${d} Labor`) {
             return true;
         }
@@ -508,7 +508,7 @@ isDepartmentKey=(key) => {
 // Gets the aggregators for grouping estimates
 getGroupAggregators=() => {
     let aggregators=[];
-    for (dep of _show.departments) {
+    for (dep of _args.departments) {
         aggregators.push(...[
             new Slick.Data.Aggregators.Sum(`${dep} Man Days`),
             new Slick.Data.Aggregators.Sum(`${dep} Materials`),
@@ -565,7 +565,7 @@ isDuplicateCode=(code) => {
 // Returns an array containing the fields of every department column
 getDepartmentColumnFields=() => {
     let fields=[];
-    for (dep of _show.departments) {
+    for (dep of _args.departments) {
         fields.push(`${dep} Man Days`);
         fields.push(`${dep} Materials`);
         fields.push(`${dep} Rentals`);
@@ -577,7 +577,7 @@ getDepartmentColumnFields=() => {
 balanceLaborManDays=(args) => {
     let dep=false;
     let col=grid.getColumns()[args.cell];
-    for (d of _show.departments) {
+    for (d of _args.departments) {
         if (col.field.includes(d)) { dep=d }
     }
 
@@ -585,13 +585,13 @@ balanceLaborManDays=(args) => {
         if (col.name=='Labor') {
             let labor=parseFloat(args.item[`${dep} Labor`]);
             if (labor) {
-                args.item[`${dep} Man Days`]=labor/_show.estimateVersions[_version].mandayRates[dep];
+                args.item[`${dep} Man Days`]=labor/_mandayRates[dep];
             }
         }
         if (col.name=='Man Days') {
             let mandays=parseFloat(args.item[`${dep} Man Days`]);
             if (mandays) {
-                args.item[`${dep} Labor`]=parseFloat(mandays*_show.estimateVersions[_version].mandayRates[dep]).toFixed(2);
+                args.item[`${dep} Labor`]=parseFloat(mandays*_mandayRates[dep]).toFixed(2);
             }
         }
     } else {
@@ -612,7 +612,7 @@ balanceLaborManDays=(args) => {
 balanceAllLaborMandays=() => {
     // Balance Labor Man Days for all items
     for (item of dataView.getItems()) {
-        for (d of _show.departments) {
+        for (d of _args.departments) {
             let cell=grid.getColumns().map(c => c.field).indexOf(`${d} Man Days`);
             balanceLaborManDays({ item: item, cell: cell });
         }

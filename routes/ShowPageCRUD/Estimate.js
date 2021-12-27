@@ -41,9 +41,20 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         args.weekEnding=show.estimateVersions[args.version].weekEnding;
     }
 
-    // Initialize data for the grid, applying the access profile. also update current estimate version
+    args.extraColumns=[];
+    args.fringes={};
+    args.mandayRates={};
+    let comparisonVersion=false
     let data=[]
     if (args.version) {
+        args.extraColumns=show.estimateVersions[args.version].extraColumns
+        args.fringes=show.estimateVersions[args.version].fringes
+        args.mandayRates=show.estimateVersions[args.version].mandayRates
+        args.estimateVersion=show.estimateVersions[args.version]
+        comparisonVersion=accessProfile.displaySettings[apName][args.version].comparisonVersion||false
+        args.comparisonVersion=show.estimateVersions[comparisonVersion]||false
+
+        // Initialize data for the grid, applying the access profile. also update current estimate version
         data=await initializeData(show.estimateVersions[`${args.version}`].sets, show, args, args.version, accessProfile)
         show.accessMap[apName].estimateVersion=args.version
         show.markModified('accessMap')
@@ -58,12 +69,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         }
 
         await show.save()
-    }
-
-    // Set Comaprison Version if not loading page before versions exist
-    let comparisonVersion=false
-    if (args.version) {
-        comparisonVersion=accessProfile.displaySettings[apName][args.version].comparisonVersion||false
     }
 
     res.render('ShowPage/Template', {

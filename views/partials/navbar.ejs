@@ -26,14 +26,15 @@
                         <%= title %>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/CostReport">Cost Report</a></li>
-                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Estimate">Estimate</a></li>
-                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Purchases">Purchases</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=args.showid%>/CostReport">Cost Report</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=args.showid%>/Estimate">Estimate</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=args.showid%>/Purchases">Purchases</a></li>
                         <li><a id="rentals-dropdown" class="dropdown-item"
-                                href="/shows/<%=show.id%>/Rentals">Rentals</a></li>
-                        <li><a id="crew-dropdown" class="dropdown-item" href="/shows/<%=show.id%>/Crew">Crew</a></li>
-                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Rates">Rates</a></li>
-                        <li><a class="dropdown-item" href="/shows/<%=show.id%>/Timesheets">Timesheets</a></li>
+                                href="/shows/<%=args.showid%>/Rentals">Rentals</a></li>
+                        <li><a id="crew-dropdown" class="dropdown-item" href="/shows/<%=args.showid%>/Crew">Crew</a>
+                        </li>
+                        <li><a class="dropdown-item" href="/shows/<%=args.showid%>/Rates">Rates</a></li>
+                        <li><a class="dropdown-item" href="/shows/<%=args.showid%>/Timesheets">Timesheets</a></li>
                     </ul>
                 </div>
             </span>

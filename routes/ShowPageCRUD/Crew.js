@@ -29,10 +29,14 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let allUsers=await User.find({});
     args.dropdownNames=await allUsers.map(user => `${user['Name']} [${user['username']}]`)
     args.allUsernames=await allUsers.map(user => user['username'])
+    args.multipliers=week.multipliers
+    args.extraColumns=week.crew.extraColumns
+    args.taxColumns=week.crew.taxColumns
+    args.positionList=week.positions.positionList
+    args.rentals=week.rentals
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
-        show,
         section,
         args,
         sharedModals,
@@ -42,7 +46,8 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         user,
         currentVersionSetCodes,
         accessProfile,
-        sortedVersionKeys
+        sortedVersionKeys,
+        multipliers: week.multipliers
     })
 }
 

@@ -21,6 +21,9 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
         .map(ev => ev.key)
 
+    args.extraColumns=week.positions.extraColumns
+    args.multipliers=week.multipliers
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show,

@@ -41,7 +41,7 @@ getGroupAggregators=() => {
 
     ])
 
-    for (dep of _show.departments) {
+    for (dep of _args.departments) {
         aggregators.push(...[
             new Slick.Data.Aggregators.Sum(`${dep}_budget`),
             new Slick.Data.Aggregators.Sum(`${dep}_todate`),
@@ -54,149 +54,6 @@ getGroupAggregators=() => {
         ])
     }
     return aggregators;
-}
-
-// Gets the total funds allocated to a set
-calculateBudget=(item) => {
-    let ev=_show.costReport.estimateVersion
-    let set=_show.sets.find(s => s['Set Code']==item['Set Code']);
-
-    return parseFloat(set.estimateTotals[ev].total).toFixed(2);
-}
-
-// Finds first week containing a day
-findFirstContainingWeek=(day, user, weeks) => {
-    let dateMS=new Date(day).getTime()
-    for (week of weeks) {
-        let weekEndMS=new Date(week.end).getTime()
-        if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
-            if (week.crew.crewList.find(c => c.username==user.username)) {
-                return week
-            }
-        }
-    }
-    return false
-}
-
-isInCurrentWeek=(day, user) => {
-    let dateMS=new Date(day).getTime()
-    let weekEndMS=new Date(_week.end).getTime()
-    if (dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)) {
-        if (_week.crew.crewList.find(c => c.username==user.username)) {
-            return true
-        }
-    }
-}
-
-// Calculates the total spent on a set to date (labour, purchases, and rentals)
-calculateCosts=(item) => {
-
-    /* Add cost of crew labor for this set */
-    // Initialize labor variable
-    let departmentLabor={};
-    for (d of _show.departments) { departmentLabor[d]={ week: 0, total: 0, mandays: 0 } }
-
-    // Calculate
-    for (user of _showCrew) {
-        let record=user.showrecords.find(r => r.showid==_show._id);
-        for (recordPosition of record.positions) {
-            let position=_show.positions.positionList.find(p => p['Code']==recordPosition.code)
-            for (day in recordPosition.daysWorked) {
-                let week=findFirstContainingWeek(day, user, _show.weeks)
-                // Only count day worked if it has the same set code as the item and it falls in a valid week 
-                if (recordPosition.daysWorked[day].set==item['Set Code']&&week) {
-                    let multipliers=week.multipliers;
-                    let hours=recordPosition.daysWorked[day].hours||0
-                    let rate=position['Rate']
-                    let dayOfWeek=new Date(day).toString().slice(0, 3);
-                    let tax=0
-                    for (taxCol of week.crew.taxColumns) {
-                        if (record.weeksWorked[week._id].taxColumnValues[recordPosition.code]) {
-                            tax+=parseFloat(record.weeksWorked[week._id].taxColumnValues[recordPosition.code][taxCol])||0
-                        }
-                    }
-
-                    let cost=calculateDailyLaborCost(multipliers, hours, rate, dayOfWeek)*(tax/100+1);
-
-                    // Add cost to correct department total and week cost 
-                    for (k in departmentLabor) {
-                        if (position['Department']==k) {
-                            departmentLabor[k].total+=cost;
-                            departmentLabor[k].mandays++;
-                            if (isInCurrentWeek(day, user)) {
-                                departmentLabor[k].week+=cost;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /* Add rentals for this set */
-    // Initialize rentals variable
-    let departmentRentals={};
-    for (d of _show.departments) { departmentRentals[d]={ week: 0, total: 0 } }
-
-    // Calculate
-    for (week of _show.weeks) {
-        for (rental of week.rentals.rentalList) {
-            if (rental['Set Code']==item['Set Code']) {
-                // Don't count this rental if the supplier is not in the current week's crew list
-                if (rental['Supplier']&&!week.crew.crewList.find(c => c['username']==rental['Supplier'])) { continue }
-
-                let department=rental['Department']
-                let daysRented=rental['Days Rented']||0
-                let rate=rental['Day Rate']
-                let tax=0
-                for (taxCol of week.rentals.taxColumns) {
-                    tax+=rental.taxColumnValues[taxCol]||0
-                }
-
-                let cost=(rate*daysRented)*(tax/100+1);
-
-                for (k in departmentRentals) {
-                    if (department==k) {
-                        departmentRentals[k].total+=cost;
-                        if (week._id==_week._id) {
-                            departmentRentals[k].week+=cost;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /* Add purchases for this set */
-    // Initialize purchases variable
-    let departmentPurchases={};
-    for (d of _show.departments) { departmentPurchases[d]={ week: 0, total: 0 } }
-
-    // Calculate
-    for (p of _show.purchases.purchaseList) {
-        if (p['Set Code']==item['Set Code']) {
-            let cost=p['Amount'];
-            let tax=0;
-            for (tCol of _show.purchases.taxColumns) {
-                let tVal=p.taxColumnValues[tCol]
-                if (tVal) { tax+=tVal }
-            }
-
-            cost*=(tax/100+1);
-
-            // Add cost to correct department
-            for (key in departmentPurchases) {
-                if (p['Department']==key) {
-                    departmentPurchases[key].total+=cost;
-                    if (p.weekId==_week._id) {
-                        departmentPurchases[key].week+=cost;
-                    }
-                }
-            }
-        }
-    }
-
-    return [departmentLabor, departmentPurchases, departmentRentals];
 }
 
 // Save cost report
@@ -224,7 +81,7 @@ saveData=(reload=false, updateVersion=false) => {
     if (reload) { toggleLoadingScreen(true) }
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/CostReport`, {
+    fetch(server+`/shows/${_args.showid}/CostReport`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -233,7 +90,6 @@ saveData=(reload=false, updateVersion=false) => {
             updateVersion: updateVersion,
             totals: updateTotalsRow(),
             newWeek: _newWeek,
-            weeks: _show.weeks,
             deletedWeek: _deletedWeek,
             displaySettings: {
                 groupBy: _groupedBy,
@@ -299,20 +155,5 @@ scrollToDeptCol=(dept) => {
     grid.scrollColumnIntoView(idx);
 }
 
-// Returns latest estimate version
-getLatestVersion=() => {
-    let toBeat=-Infinity;
-    let latest;
-    for (ver of Object.keys(_show.estimateVersions)) {
-        let v=parseFloat(ver.replace("_", "."));
-        if (v>toBeat) {
-            latest=ver;
-            toBeat=v;
-        }
-    }
-    return latest;
-}
-
 testFun=() => {
-    console.log(_show);
 }

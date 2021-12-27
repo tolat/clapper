@@ -55,7 +55,7 @@ generateTimesheets=() => {
     let checkGenerationInterval
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Timesheets`, {
+    fetch(server+`/shows/${_args.showid}/Timesheets`, {
         method: 'PUT',
         body: data,
         credentials: 'include'
@@ -128,8 +128,8 @@ saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteM
 
     // Repopulate open maps modal if deleting map other than current map
     if (deleteMap&&!reload) {
-        const map=_show.timesheets.timesheetMaps.find(m => m.name==newMapName)
-        _show.timesheets.timesheetMaps.splice(_show.timesheets.timesheetMaps.indexOf(map), 1)
+        const map=_args.timesheetMaps.find(m => m.name==newMapName)
+        _args.timesheetMaps.splice(_args.timesheetMaps.indexOf(map), 1)
         populateOpenMapsModal()
     }
 
@@ -139,13 +139,12 @@ saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteM
     statusElement.style.color='rgb(255, 193, 49)';
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Timesheets`, {
+    fetch(server+`/shows/${_args.showid}/Timesheets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             data: dataView.getItems(),
             newWeek: _newWeek,
-            weeks: _show.weeks,
             deletedWeek: _deletedWeek,
             newMapName: newMapName,
             isNewMap: isNewMap,
@@ -270,7 +269,7 @@ initializeVariables=() => {
         }
     }
 
-    for (col of _week.crew.extraColumns) {
+    for (col of _args.extraColumns) {
         variables.push({
             name: `${col}`,
             description: `User added column from Crew page`,
@@ -279,7 +278,7 @@ initializeVariables=() => {
         })
     }
 
-    for (col of _week.crew.taxColumns) {
+    for (col of _args.taxColumns) {
         variables.push({
             name: `${col}`,
             description: `User added TAX column from Crew page`,
@@ -328,7 +327,7 @@ function undoAssignVariable() {
 
 // Initialize timesheet map using timesheet map's currentMap object
 initializeMap=() => {
-    let map=_show.timesheets.timesheetMaps.find(m => m.name==_show.timesheets.currentMap)
+    let map=_args.timesheetMaps.find(m => m.name==_currentMap)
     for (col in map.cellValueMap) {
         for (row in map.cellValueMap[col]) {
             let item=dataView.getItemById(`${row}`)
@@ -406,8 +405,8 @@ populateOpenMapsModal=() => {
     const tsCont=document.getElementById("open-timesheet-map-list-container")
     tsCont.innerHTML=null
 
-    for (map of _show.timesheets.timesheetMaps) {
-        const isCurrentMap=_show.currentMap==map.name
+    for (map of _args.timesheetMaps) {
+        const isCurrentMap=_currentMap==map.name
 
         tsCont.innerHTML+=`
         <div style="display: flex; flex-direction: column; width: 100%; margin-bottom: 10px;">

@@ -1,6 +1,5 @@
 <script>
     // Global variables
-    let _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
@@ -12,16 +11,9 @@
     let _version=_args.version;
     let _originalVersion=_args.version
     let _displaySettings=_accessProfile.displaySettings[_apName][_version]||{}
-    let _extraColumns=[];
-    let _fringes={};
-    let _mandayRates={};
-
-    // If estimate versions exist, _version will be set to current version - load current version data
-    if (_version) {
-        _extraColumns=_show.estimateVersions[_version].extraColumns;
-        _fringes=_show.estimateVersions[_version].fringes;
-        _mandayRates=_show.estimateVersions[_version].mandayRates;
-    }
+    let _extraColumns=_args.extraColumns
+    let _fringes=_args.fringes
+    let _mandayRates=_args.mandayRates
     let _validators=[
         {
             fields: ['Set Code'],
@@ -40,13 +32,11 @@
 
     // Load the grid 
     async function onLoad() {
-        let sets=_show.sets;
-
         // Create options
         let options=await initializeOptions();
 
         // Create grid columns
-        let columns=await initializeColumns(sets, _show, _args);
+        let columns=await initializeColumns();
 
         // Create grid data
         let data=<%- JSON.stringify(data)%>;
@@ -63,7 +53,7 @@
             let cols=grid.getColumns()
             let updateMath=false
             if (editedfields) {
-                for (d of _show.departments) {
+                for (d of _args.departments) {
                     let mathCols=['Man Days', 'Labor', 'Materials', 'Rentals'].map(x => `${d} ${x}`)
                     for (field of editedfields) {
                         if (mathCols.includes(field)) {
@@ -108,7 +98,7 @@
         await updateSaveStatus(true);
 
         // if estimate versions exist, populate this version's manday rates and fringes
-        if (_show.estimateVersions[_args.version]) {
+        if (_sortedVersionKeys.includes(_args.version)) {
             // Populate Manday Rates
             await populateMandayRates()
 
@@ -119,7 +109,7 @@
             await updateEstimateMathColumns()
 
             // If manday rates are not set, open the manday rate modal to set them
-            if (!Object.keys(_show.estimateVersions[_args.version].mandayRates)[0]) {
+            if (!Object.keys(_mandayRates)[0]) {
                 toggleManDayRatesModal(true)
             }
         }
@@ -141,7 +131,7 @@
         // Preliminary saveData (Sets cost report estimate version to this estimate's number)
         if (_sortedVersionKeys[0]) {
             // If manday rates are not set, open the manday rate modal to set them
-            if (!Object.keys(_show.estimateVersions[_args.version].mandayRates)[0]) {
+            if (!Object.keys(_mandayRates)[0]) {
                 toggleManDayRatesModal(true)
             }
         }
@@ -151,7 +141,7 @@
     }
 
     // Creates grid columns 
-    function initializeColumns(sets, _show, _args) {
+    function initializeColumns() {
         let columns=[
             // Core feature columns
             { id: "__spacer", width: 0, sortable: false },
@@ -161,8 +151,8 @@
         ];
 
         // Non-department estimate specific columns
-        if (Object.keys(_show.estimateVersions)[0]) {
-            for (key of _show.estimateVersions[_args.version].extraColumns) {
+        if (_sortedVersionKeys[0]) {
+            for (key of _extraColumns) {
                 columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.LongText, sortable: true });
             }
         }
@@ -176,7 +166,7 @@
         ])
 
         // Department columns 
-        for (d of _show.departments) { columns=columns.concat(addDepartment(d)) }
+        for (d of _args.departments) { columns=columns.concat(addDepartment(d)) }
 
         // Apply access profile column filter to hide restricted columns if _version exists
         columns=hideRestrictedColumns(columns, 'Set Code')

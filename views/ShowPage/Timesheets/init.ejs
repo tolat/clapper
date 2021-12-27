@@ -1,26 +1,23 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>;
     var _args= <%- JSON.stringify(args)%>;
+    let _sortedVersionKeys= <%- JSON.stringify(sortedVersionKeys)%>;
 
     setWeekEnding()
     populateAccessProfileModal(false, false, true)
 
     var _validators=[];
     var _totals={};
-    var _currentMap=_show.timesheets.currentMap||false
-    var _currentMapObject=false
-    if (_currentMap) {
-        _currentMapObject=_show.timesheets.timesheetMaps.find(m => m.name==_currentMap)
-    }
+    var _currentMap=_args.currentMap
+    var _currentMapObject=_args.currentMapObject
     const _currentWeekDays=getDaysOfCurrentWeek()
 
     // Create list of unique hour multipliers
     let _uniqueMuls=[]
-    for (mul in _week.multipliers) {
+    for (mul in _args.multipliers) {
         for (day of _currentWeekDays) {
             let dayAbbrv=day.toString().slice(0, 3)
-            let mulVal=_week.multipliers[mul][dayAbbrv]
+            let mulVal=_args.multipliers[mul][dayAbbrv]
             if (!_uniqueMuls.includes(mulVal)) {
                 _uniqueMuls.push(mulVal)
             }
@@ -35,26 +32,23 @@
 
     // Load the grid 
     async function onLoad() {
-        var sheets=[]
-
         // Add variable picker component to page
         await addVariablePicker()
 
         // Set the week ending if the show has a current week ending
-        if (_show.currentweekending) { _weekEnding=_show.currentweekending }
         await setWeekEnding();
 
         // Create options
         var options=await initializeOptions();
 
         // Create grid data
-        var data=await initializeData(sheets, _show, _args);
+        var data=await initializeData();
 
         // Create grid columns
-        var columns=await initializeColumns(sheets, _show, _args);
+        var columns=await initializeColumns();
 
         // Create data grid
-        await createSlickGrid(data, columns, options, _show, _args);
+        await createSlickGrid(data, columns, options);
 
         // Apply display settings
         if (_currentMapObject&&_currentMapObject.displaySettings) { applyDisplaySettings(_currentMapObject.displaySettings) }
@@ -78,7 +72,7 @@
     }
 
     // Creates grid data 
-    function initializeData(purchases, _show, _args) {
+    function initializeData() {
         let data=[];
 
         for (let i=1; i<=100; i++) {
@@ -89,7 +83,7 @@
     }
 
     // Creates grid columns 
-    function initializeColumns(purchases, _show, _args) {
+    function initializeColumns() {
         let columns=[{ id: "#", name: " ", field: "#", width: 30, minWidth: 10, cssClass: 'spreadsheet-header', headerCssClass: 'spreadsheet-header' }];
         let alphabet='a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.aa.ab.ac.ad.ae.af.ag.ah.ai.aj.ak.al.am.an.ao.ap.aq.ar.as.at.au.av.aw.ax.ay.az.ba.bb.bc.bd.be.bf.bg.bh.bi.bj.bk.bl.bm.bn.bo.bp.bq.br.bs.bt.bu.bv.bw.bx.by.bz'.split('.')
         for (letter of alphabet) {

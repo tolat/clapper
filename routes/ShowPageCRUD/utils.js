@@ -404,12 +404,11 @@ module.exports.calculateDailyLaborCost=function (multipliers, hours, rate, day) 
     return total;
 }
 
-// REturns true if day is is in current week and user is also in the current week's crewlist
+// Returns true if day is in current week 
 module.exports.isInCurrentWeek=function (day, user, _week) {
     let dateMS=new Date(day).getTime()
     let weekEndMS=new Date(_week.end).getTime()
-    return dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)&&
-        _week.crew.crewList.find(c => c.username==user.username)
+    return dateMS<=weekEndMS&&dateMS>=(weekEndMS-7*oneDay)
 
 }
 

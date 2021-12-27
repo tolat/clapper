@@ -1,20 +1,18 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
     let _estimateVersion= <%- JSON.stringify(estimateVersion)%>;
+    let _sortedVersionKeys= <%- JSON.stringify(sortedVersionKeys)%>;
 
     setWeekEnding()
     populateAccessProfileModal(false, false, true)
 
-
-    var _extraColumns=_show.costReport.extraColumns;
+    var _extraColumns=_args.extraColumns;
     var _validators=[];
     var _totals={ Budget: 'sum', 'To Date': 'sum', Remaining: 'sum' };
-    var _showCrew=_args.showCrew
-    let _displaySettings=_accessProfile.displaySettings[_apName][_estimateVersion][_week._id]||{}
+    let _displaySettings=_accessProfile.displaySettings[_apName][_estimateVersion][_args.weekid]||{}
 
     // Set correct version, defaulting to latest version if the cost report's version has been deleted or renamed
     var _version=_args.version
@@ -31,13 +29,11 @@
 
     // Load the grid 
     async function onLoad() {
-        var sets=_show.sets;
-
         // Create options
         var options=await initializeOptions();
 
         // Create grid columns
-        var columns=await initializeColumns(sets);
+        var columns=await initializeColumns();
 
         // Create grid data
         let data=<%- JSON.stringify(data)%>;
@@ -72,7 +68,7 @@
     }
 
     // Creates grid columns 
-    function initializeColumns(positions) {
+    function initializeColumns() {
         let columns=[
             // Core feature columns
             { id: "#", name: "#", field: "#", width: 40, editor: Slick.Editors.Text, sortable: true, minWidth: 0, cssClass: 'cost-report-column' },
@@ -96,7 +92,7 @@
         }
 
         // Colorized Department columns 
-        for (d of _show.departments) {
+        for (d of _args.departments) {
             columns=columns.concat([
                 {
                     id: `${d}_budget`, name: 'Budget', field: `${d}_budget`, width: 80, minWidth: 50,

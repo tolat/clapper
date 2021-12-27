@@ -26,6 +26,9 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
         .map(ev => ev.key)
 
+    args.extraColumns=show.purchases.extraColumns
+    args.taxColumns=show.purchases.taxColumns
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show,
@@ -168,7 +171,7 @@ function initializeData(purchases, _show, _args, week, accessProfile, version) {
             item['Set Code']=set['Set Code'];
             item['Episode']=set['Episode'];
         } else {
-            item['Set Code']='DELETED'
+            item['Set Code']='NOT FOUND'
         }
 
         // Add date value or none if there is no date

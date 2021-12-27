@@ -5,14 +5,26 @@ const User=require('../../models/user')
 const crudUtils=require('./utils')
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
     let show=await populateShow(id);
+    let apName=await crudUtils.getAccessProfileName(user)
+    let week=show.weeks.find(w => w._id==show.accessMap[apName].currentWeek)
 
     // Create a list of estimateVersion keys sorted by date
     let sortedVersionKeys=Object.keys(show.estimateVersions)
         .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
         .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
         .map(ev => ev.key)
+
+
+    args.currentMap=show.timesheets.currentMap||false
+    if (args.currentMap) {
+        args.currentMapObject=show.timesheets.timesheetMaps.find(m => m.name==args.currentMap)
+    }
+    args.timesheetMaps=show.timesheets.timesheetMaps
+    args.multipliers=week.multipliers
+    args.extraColumns=week.crew.extraColumns
+    args.taxColumns=week.crew.taxColumns
 
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,

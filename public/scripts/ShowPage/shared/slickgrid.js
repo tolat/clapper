@@ -5,7 +5,6 @@ let _test=false
 let _groupedBy
 let _editDirectionForwards=true
 let _validEdit=true
-let _week=null
 let _frozenColumns=0
 let _dataSaved=true
 let _cellCssStyles={}
@@ -560,7 +559,7 @@ greyOutLink=(elt) => {
 // Restricts page selector dropdown in nav bar so that pages are filled out in correct order
 setNavRestrictions=() => {
     // If no rates exist, block access to crew and rates
-    if (!_week||!Object.keys(_week.positions.positionList)[0]) {
+    if (!_args.weekid||!_args.weekHasPositions) {
         let crewDropdown=document.getElementById('crew-dropdown')
         let rentalsDropdown=document.getElementById('rentals-dropdown')
         crewDropdown.parentElement.replaceChild(greyOutLink(crewDropdown), crewDropdown)
@@ -1590,7 +1589,7 @@ async function undoAddColumn() {
 
     if (this.istaxcolumn) {
         // *****ONLY CHANGE TAX COLUMNS FOR CURRENT SECTION (RENTALS PURCHASE OR CREW PAGE)*****
-        _taxColumns.splice(_week.crew.taxColumns.indexOf(this.colName), 1)
+        _taxColumns.splice(_args.weekTaxColumns.indexOf(this.colName), 1)
         await calculateAllWeeklyTotals()
     } else {
         _extraColumns.splice(_extraColumns.indexOf(this.colName), 1);
@@ -1614,7 +1613,7 @@ async function executeDeleteColumn() {
     let cName=this.column.name;
 
     if (this.column.istaxcolumn) {
-        _taxColumns.splice(_week.crew.taxColumns.indexOf(cName), 1)
+        _taxColumns.splice(_args.weekTaxColumns.indexOf(cName), 1)
 
         await calculateAllWeeklyTotals()
     } else {
@@ -1874,7 +1873,6 @@ setWeekEnding=() => {
         toggleEnterVersionModal(true, true, false)
         return
     }
-    _week=_args.week
 
     // If in estimate page, show the version in the week ending display
     if (_args.section=='Estimate') {
@@ -1889,9 +1887,9 @@ setWeekEnding=() => {
         }
 
     } else {
-        let weekEnd=new Date(_week.end)
-        let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
-        if (_args.weekList[_args.weekList.length-1]._id==_week._id) {
+        let weekEnd=new Date(_args.weekend)
+        let weekEndingText=`Week ${_args.weekList.indexOf(_args.weekList.find(w => w._id==_args.weekid))+1} (Ending: ${weekEnd.toLocaleDateString('en-US')})`
+        if (_args.weekList[_args.weekList.length-1]._id==_args.weekid) {
             document.getElementById('week-ending-latest-indicator').style.display='flex'
         }
         document.getElementById('week-ending-display').innerText=weekEndingText
@@ -1911,7 +1909,7 @@ toggleDeleteWeekWarningModal=(show, weekNum, weekId, deleteWeek=false) => {
             _deletedWeek=weekId
 
             // Save original week number
-            let currentWeekNum=parseInt(_args.weekList.indexOf(_args.weekList.find(w => w._id==_week._id)))+1
+            let currentWeekNum=parseInt(_args.weekList.indexOf(_args.weekList.find(w => w._id==_args.weekid)))+1
 
             // Delete week from weeklist
             _args.weekList.splice(_args.weekList.indexOf(_args.weekList.find(w => w._id==weekId)), 1)
@@ -1963,7 +1961,7 @@ toggleWeekEndingModal=(show) => {
             let weekDivStyle=null
 
             // Underline if week is the current weeks
-            if (week._id==_week._id) { weekDivStyle='text-decoration: underline;' }
+            if (week._id==_args.weekid) { weekDivStyle='text-decoration: underline;' }
 
             // Add delete button to weeks if there is more than one week
             let deleteButton=''
@@ -1982,7 +1980,7 @@ toggleWeekEndingModal=(show) => {
 }
 
 changeWeek=async (weekId, weekEnd=false, isNewWeek=false, copyCrewFrom='current') => {
-    if (weekId==_week._id&&_deletedWeek!=_week._id) { return }
+    if (weekId==_args.weekid&&_deletedWeek!=_args.weekid) { return }
     if (_args.section!='Estimate') {
         _newWeek={ weekId, end: weekEnd, isNewWeek, copyCrewFrom }
         await toggleAddWeekModal(false)
@@ -2028,7 +2026,7 @@ addTaxColumn=(colName) => {
 
 // Returns array of dates representing the current week
 getDaysOfCurrentWeek=(date=false) => {
-    let day=date||new Date(_week.end);
+    let day=date||new Date(_args.weekend);
 
     let days=[];
     for (let i=0; i<7; i++) {
@@ -2271,13 +2269,13 @@ clearDeletedItems=() => {
 addDepartmentCssClass=(d, newColor=false) => {
     if (newColor) {
         document.getElementById(`${d.replaceAll(" ", "")}_cssClassElement`).remove();
-        _show.departmentColorMap[d]=newColor;
+        _args.departmentColorMap[d]=newColor;
         updateSaveStatus(false);
     }
 
     var departmentStyle=document.createElement('style');
     departmentStyle.id=`${d.replaceAll(" ", "")}_cssClassElement`;
-    let color=_show.departmentColorMap[d];
+    let color=_args.departmentColorMap[d];
 
     // Create new color if adding new department
     if (!color) {
@@ -2285,7 +2283,7 @@ addDepartmentCssClass=(d, newColor=false) => {
         let hexVals=['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         color='#';
         for (let i=0; i<6; i++) { color=color.concat(hexVals[randInt(0, hexVals.length)]) }
-        _show.departmentColorMap[d]=color;
+        _args.departmentColorMap[d]=color;
     }
 
     // Set text color to white if dark colour is chosen, and black otherwise
@@ -2613,7 +2611,7 @@ refocusElement=(elt) => {
 // Reorder departments based on the departments bar
 reorderDepartments=function () {
     let depts=getDeptOrder()
-    _show.departments=depts;
+    _args.departments=depts;
 
     let columns=grid.getColumns();
     let deptCols=[];
@@ -2675,7 +2673,7 @@ function executeReorderDepartments() {
             }
             dBar.appendChild(elt)
         }
-        _show.departments=this.newDeptOrder
+        _args.departments=this.newDeptOrder
 
         grid.setColumns(this.newCols)
         grid.invalidate()
@@ -2700,7 +2698,7 @@ function undoReorderDepartments() {
         }
         dBar.appendChild(elt)
     }
-    _show.departments=this.oldDeptOrder
+    _args.departments=this.oldDeptOrder
 
     grid.setColumns(this.oldCols)
     grid.invalidate()
@@ -2883,7 +2881,7 @@ toggleAccessProfilesModal=(show) => {
 // Applies acces profile to hide restricted columns
 hideRestrictedColumns=(columns, IDkey) => {
     // Apply access profile column filter to hide restricted columns if _version exists
-    if (_args.section=='Estimate'&&!_show.estimateVersions[_version]) { return [] }
+    if (_args.section=='Estimate'&&!_sortedVersionKeys.includes(_version)) { return [] }
 
     // initialize hidden columns display setting if it is empty
     if (!_displaySettings.setHiddenColumns) { _displaySettings.setHiddenColumns=[] }
@@ -3398,7 +3396,7 @@ toggleAddUserToApModal=(show, ap=false, save=false) => {
         document.getElementById('add-user-to-ap-modal-message').innerText=`Start typing username and select name from\nlist to add user to '${ap}':`
 
         // Get Dropdown Names form server and create autocomplete for the modal input
-        fetch(server+`/shows/${_show._id}/${_args.section}/getDropdownNames`, {
+        fetch(server+`/shows/${_args.showid}/${_args.section}/getDropdownNames`, {
             method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include'
         }).then(res => { return res.json() })
             .then(data => autocomplete(document.getElementById("add-user-to-ap-modal-input"), data.dropdownNames))
@@ -3419,7 +3417,7 @@ toggleAddUserToApModal=(show, ap=false, save=false) => {
                 // Create accessMap entry if there is non for this user
                 if (!_args.accessMap[uName]) {
                     _args.accessMap[uName]={
-                        currentWeek: _week._id,
+                        currentWeek: _args.weekid,
                         estimateVersion: _args.accessMap[_args.username.replaceAll('.', '-')].estimateVersion,
                         profile: ap
                     }
@@ -3588,7 +3586,7 @@ toggleAddAccessProfileModal=(show, save) => {
                         displaySettings: {
                             [`${_args.username.replaceAll('.', '-')}`]: {
                                 [`${_args.accessMap[_args.username.replaceAll('.', '-')].estimateVersion}`]: {
-                                    [`${_week._id}`]: {}
+                                    [`${_args.weekid}`]: {}
                                 }
                             }
                         }

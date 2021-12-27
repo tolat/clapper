@@ -43,19 +43,26 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         accessMap={}
     }
 
+    let weekid=show.accessMap[apName].currentWeek
+    let week=show.weeks.find(w => w._id==weekid)
     // Set args
     let args={
         section: section,
         showid: id,
+        weekid,
+        weekend: show.weeks.find(w => w._id==show.accessMap[apName].currentWeek).end,
+        weekHasPositions: Object.keys(week.positions.positionList)[0],
         server: req.app.get('server'),
         weekList: show.weeks.map(w => { return { _id: w._id, end: w.end } }),
-        week: show.weeks.find(w => w._id==show.accessMap[apName].currentWeek),
         accessProfileName: show.accessMap[apName].profile,
         accessProfiles,
         accessMap,
         username: req.user.username,
         accessLevel: accessProfile.accessLevel,
-        apOptions: accessProfile.options
+        apOptions: accessProfile.options,
+        departmentColorMap: show.departmentColorMap,
+        departments: show.departments,
+        apName
     };
 
 

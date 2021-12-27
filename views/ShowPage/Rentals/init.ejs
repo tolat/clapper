@@ -1,6 +1,5 @@
 <script>
     // Global variables
-    var _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
@@ -8,11 +7,13 @@
     let _userPosForWeekMap= <%- JSON.stringify(userPosForWeekMap)%>;
     let _userNamesForWeekMap= <%- JSON.stringify(userNamesForWeekMap)%>;
     let _posDeptMap= <%- JSON.stringify(posDeptMap)%>;
+    let _sortedVersionKeys= <%- JSON.stringify(sortedVersionKeys)%>;
 
     setWeekEnding()
     populateAccessProfileModal(false, false, true)
 
-    var _extraColumns=_week.rentals.extraColumns;
+    var _extraColumns=_args.extraColumns;
+    var _taxColumns=_args.taxColumns
     var _validators=[
         {
             fields: ['Rental Name'],
@@ -78,10 +79,10 @@
                 this.validationHeader=`Department '${args.item[field]}' Not Found!`
                 this.validationMessage=`New departments can only be added in the 'Estimates' page.\nDepartments are case-sensitive!`
                 if (!args.item[field]||args.item[field]=="") { return false }
-                let depIdx=_show.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
+                let depIdx=_args.departments.map(d => d.toLowerCase()).indexOf(args.item[field].toLowerCase());
                 let dep=false;
                 if (depIdx>=0) {
-                    args.item[field]=_show.departments[depIdx];
+                    args.item[field]=_args.departments[depIdx];
                     dataView.updateItem(args.item.id, args.item);
                     dep=true;
                 }
@@ -92,8 +93,7 @@
     var _totals={ 'Week Total': 'sum' };
     var _allShowCrew=_args.allShowCrew
     var _allUsers=_args.allUsers
-    var _taxColumns=_week.rentals.taxColumns
-    let _displaySettings=_accessProfile.displaySettings[_apName][_week._id]||{}
+    let _displaySettings=_accessProfile.displaySettings[_apName][_args.weekid]||{}
     var _allWeekCrewNames=Object.keys(_userNamesForWeekMap).map(uname => `${_userNamesForWeekMap[uname]} [${uname}]`)
 
     var grid;
@@ -101,13 +101,11 @@
 
     // Load the grid 
     async function onLoad() {
-        var rentals=_week.rentals.rentalList;
-
         // Create options
         var options=await initializeOptions();
 
         // Create grid columns
-        var columns=await initializeColumns(rentals);
+        var columns=await initializeColumns();
 
         // Create grid data
         let data=<%- JSON.stringify(data)%>;
@@ -160,7 +158,7 @@
             { id: "Rental Name", name: "Rental Name", field: "Rental Name", width: 200, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Day Rate", name: "Day Rate", field: "Day Rate", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save currency' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _currentWeekSetCodes, sortable: true, cssClass: 'required-for-save' },
-            { id: "Department", name: "Department", field: "Department", width: 90, sortable: true, editor: AutoCompleteEditor, dataSource: _show.departments, cssClass: 'required-for-save' },
+            { id: "Department", name: "Department", field: "Department", width: 90, sortable: true, editor: AutoCompleteEditor, dataSource: _args.departments, cssClass: 'required-for-save' },
             { id: "Days Rented", name: "Days Rented", field: "Days Rented", width: 90, editor: Slick.Editors.Text, sortable: true },
             { id: "Supplier", name: "Supplier", field: "Supplier", width: 150, sortable: true, editor: AutoCompleteEditor, dataSource: _allWeekCrewNames },
             { id: "Supplier Code", name: "Supplier Code", field: "Supplier Code", width: 80, editor: AutoCompleteEditor, dataSource: Object.keys(_posDeptMap), sortable: true },
@@ -172,7 +170,7 @@
         }
 
         // Add tax columns
-        for (taxCol of _week.rentals.taxColumns) {
+        for (taxCol of _taxColumns) {
             columns.push({
                 id: taxCol, name: taxCol, field: taxCol, width: 80,
                 sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column'

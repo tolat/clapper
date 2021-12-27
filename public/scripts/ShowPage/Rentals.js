@@ -132,7 +132,7 @@ getWeekTotal=(item) => {
     let rate=parseFloat(item['Day Rate'])||0;
     let days=parseFloat(item['Days Rented'])||0;
     let tax=0
-    for (taxCol of _week.rentals.taxColumns) {
+    for (taxCol of _taxColumns) {
         let taxAmount=parseFloat(item[taxCol])||0
         tax+=taxAmount
     }
@@ -191,14 +191,13 @@ saveData=(reload=false) => {
     }
 
     // Post estimate data and version to server
-    fetch(server+`/shows/${_show._id}/Rentals`, {
+    fetch(server+`/shows/${_args.showid}/Rentals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             data: dataView.getItems(),
             extraColumns: _extraColumns,
             newWeek: _newWeek,
-            weeks: _show.weeks,
             deletedWeek: _deletedWeek,
             taxColumns: _taxColumns,
             displaySettings: {
@@ -238,5 +237,4 @@ saveData=(reload=false) => {
 }
 
 testFun=() => {
-    console.log(_show.rentals.rentalList);
 }
