@@ -92,9 +92,37 @@ module.exports.delete=async function (body, showId) {
     let v=body.version;
     let show=await Show.findById(showId)
 
+    // Create a list of estimateVersion keys sorted by date (without version to be deleted)
+    let sortedVersionKeys=Object.keys(show.estimateVersions)
+        .map(k => { show.estimateVersions[k].key=k; return show.estimateVersions[k] })
+        .sort((a, b) => a.dateCreated>b.dateCreated? -1:1)
+        .map(ev => ev.key).filter(vName => vName!=v)
+
+    // Delete estimate version
     delete show.estimateVersions[v];
-    show.markModified(`estimateVersions`);
-    await show.save();
+
+    // Change all user access maps to point to most recent version instead
+    for (uName in show.accessMap) {
+        if (show.accessMap[uName].estimateVersion==v) {
+            show.accessMap[uName].estimateVersion=sortedVersionKeys[0]
+        }
+
+        // Change all access profile Estimate page display settings to not use the deleted version as comparison version
+        for (ap in show.accessProfiles) {
+            for (ver of sortedVersionKeys) {
+                if (show.accessProfiles[ap].Estimate.displaySettings[uName]&&
+                    show.accessProfiles[ap].Estimate.displaySettings[uName][ver]&&
+                    show.accessProfiles[ap].Estimate.displaySettings[uName][ver].comparisonVersion==v) {
+                    show.accessProfiles[ap].Estimate.displaySettings[uName][ver].comparisonVersion=false
+                }
+            }
+        }
+    }
+
+    show.markModified(`accessProfiles`)
+    show.markModified(`accessMap`)
+    show.markModified(`estimateVersions`)
+    await show.save()
 
     return { latestVersion: getLatestVersion(show) }
 }
