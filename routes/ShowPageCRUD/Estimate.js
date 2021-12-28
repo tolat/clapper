@@ -293,7 +293,6 @@ module.exports.update=async function (body, showId, user) {
             // Delete old version and change comparison version name for all users if this is not a new version (i.e. this is a rename)
             if (!isNewVersion) {
                 delete show.estimateVersions[ov]
-                console.log(`Renaming version ${ov} to ${v}`)
                 for (prof in show.accessProfiles) {
                     for (uName in show.accessProfiles[prof].Estimate.displaySettings) {
                         for (ver in show.accessProfiles[prof].Estimate.displaySettings[uName]) {
@@ -305,7 +304,7 @@ module.exports.update=async function (body, showId, user) {
                 }
             }
             else {
-                show.estimateVersions[v].dateCreated=new Date(Date.now())
+                show.estimateVersions[v].dateCreated=new Date(Date.now()).getTime()
 
                 // Add displaysettings for cost report page 
                 show.accessProfiles[show.accessMap[apName].profile]['Cost Report'].displaySettings[apName][v]={

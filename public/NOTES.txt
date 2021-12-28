@@ -14,9 +14,10 @@ Bugs:
 -   Get working on mobile (DONE)
 -   Remove users from access profile (DONE)
 -   Change access profile level (DONE)
--   Remove _show and _week variable (DONE vv ISH vv)
-        *** Think of workaround so we don't need to pass all rentals and position details to crew page (server fetch?) ***
+-   Remove _show and _week variable (DONE)
 -   Allow versions to be named with letters and chosen manually for comparison (modal can sort by date asc/desc) (DONE)
+
+** when renaming a version it changes the sorted version keys order 
 
 -   Copy display settings for version or week when creating new
 -   prompt if user wants to save data on week change/version rename/ any operation that causes a reload
