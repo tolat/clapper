@@ -927,6 +927,7 @@ tbody tr{
 
 .cost-report-column{
     color: black !important;
+    font-style: italic !important;
 }
 
 .rate::after{
