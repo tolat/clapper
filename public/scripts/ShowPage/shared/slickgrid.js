@@ -2616,12 +2616,12 @@ reorderDepartments=function () {
     let columns=grid.getColumns();
     let deptCols=[];
     for (d of depts) {
-        deptCols.push(...(columns.filter(c => c.field.includes(d))));
+        deptCols.push(...(columns.filter(c => c.field&&c.field.includes(d))));
     }
 
     let nonDeptCols=columns.filter(c => {
         for (d of depts) {
-            if (c.field.includes(d)||c.field=='___ExtraColumn___') { return false }
+            if (c.field&&(c.field.includes(d)||c.field=='___ExtraColumn___')) { return false }
         }
         return true
     })

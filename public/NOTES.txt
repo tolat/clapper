@@ -17,7 +17,7 @@ Bugs:
 -   Remove _show and _week variable (DONE)
 -   Allow versions to be named with letters and chosen manually for comparison (modal can sort by date asc/desc) (DONE)
 
-** when renaming a version it changes the sorted version keys order 
+** when renaming a version it changes the sorted version keys order (FIXED)
 
 -   Copy display settings for version or week when creating new
 -   prompt if user wants to save data on week change/version rename/ any operation that causes a reload
