@@ -257,7 +257,7 @@ module.exports.update=async function (body, showId, user) {
 
     // Delete all records for deleted week if required
     if (body.deletedWeek) {
-        await crudUtils.deleteWeek(body.deletedWeek, show, body.weeks)
+        await crudUtils.deleteWeek(body.deletedWeek, show, body.weeks, apName)
     }
 
     return { message: message };

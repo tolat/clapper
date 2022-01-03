@@ -16,7 +16,7 @@ module.exports.getDaysOfWeekEnding=(date) => {
 }
 
 // Deletes all records of a week in all show's User showrecords
-module.exports.deleteWeek=async function (weekId, show, newWeeks) {
+module.exports.deleteWeek=async function (weekId, show, newWeeks, apName) {
     // DO Nothing if editing week is not allowed by the access profile
     if (!show.accessProfiles[show.accessMap[apName].profile].options['Edit Weeks']) {
         return
