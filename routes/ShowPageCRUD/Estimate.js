@@ -54,6 +54,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         comparisonVersion=accessProfile.displaySettings[apName][args.version].comparisonVersion||false
         args.comparisonVersion=show.estimateVersions[comparisonVersion]||false
 
+        // Filter out restricted sets from comparison version if it exists
+        if (args.comparisonVersion) {
+            // *** FILTER HERE ***
+        }
+
         // Initialize data for the grid, applying the access profile. also update current estimate version
         data=await initializeData(show.estimateVersions[`${args.version}`].sets, show, args, args.version, accessProfile)
         show.accessMap[apName].estimateVersion=args.version

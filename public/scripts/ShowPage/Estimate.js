@@ -431,8 +431,8 @@ updateEstimateMathColumns=() => {
         for (set of _args.estimateVersion.sets) {
             let prevSet=_args.comparisonVersion.sets.find(s => s['Set Code']==set['Set Code'])
             if (prevSet) {
-                let prevFringes=_args.estimateVersion.fringes
-                let prevMandayRates=_args.estimateVersion.mandayRates
+                let prevFringes=_args.comparisonVersion.fringes
+                let prevMandayRates=_args.comparisonVersion.mandayRates
                 let prevDepartments=_args.departments
                 let prevItem={}
                 for (dep of prevDepartments) {
