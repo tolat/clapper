@@ -31,7 +31,7 @@ toggleEnterVersionModal=(show, firstEstimate=false, isNewVersion=false) => {
         // Otherwise Set regular modal text
         else {
             document.querySelector('#enter-version-modal label').innerText='Note: \n Changing the version number will save and refresh the page, clearing your undo/redo history. \n \n Enter new version number: \n \n ';
-            document.querySelector('#enter-version-modal input').placeholder=`${replaceAll(_version, "_", ".")}`;
+            document.querySelector('#enter-version-modal input').placeholder=`${_version.replaceAll("_", ".")}`;
             document.querySelector('#enter-version-modal input').focus();
             document.querySelector('#enter-version-modal button').style.display=null;
         }
@@ -68,22 +68,22 @@ addDepartment=(d) => {
     columns=[
         {
             id: mdKey, name: 'Man Days', field: mdKey, width: 80, minWidth: 50,
-            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${replaceAll(d, " ", "")}_cssClass`,
+            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`,
             groupTotalsFormatter: sumTotalsFormatter, cssClass: 'mandays'
         },
         {
             id: lrKey, name: 'Labor', field: lrKey, width: 80, minWidth: 50,
-            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${replaceAll(d, " ", "")}_cssClass`,
+            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`,
             groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency'
         },
         {
             id: mtKey, name: 'Materials', field: mtKey, width: 80, minWidth: 50,
-            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${replaceAll(d, " ", "")}_cssClass`,
+            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`,
             groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency'
         },
         {
             id: rlKey, name: 'Rentals', field: rlKey, width: 80, minWidth: 50,
-            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${replaceAll(d, " ", "")}_cssClass`,
+            editor: Slick.Editors.Text, sortable: true, headerCssClass: `${d.replaceAll(" ", "")}_cssClass`,
             groupTotalsFormatter: sumTotalsDollarsFormatter, cssClass: 'currency'
         },
     ]
@@ -92,18 +92,10 @@ addDepartment=(d) => {
     if (!_args.departments.includes(d)) { _args.departments.push(d) }
 
     addDepartmentCssClass(d);
-    addToDepartmentsBar(d, `${replaceAll(d, " ", "")}_cssClass`, `toggleDepartmentClickedModal(true, '${d}')`);
+    addToDepartmentsBar(d, `${d.replaceAll(" ", "")}_cssClass`, `toggleDepartmentClickedModal(true, '${d}')`);
     updateSaveStatus(false);
 
     return columns
-}
-
-// Custom replace all function for compatibility
-replaceAll=(str, x, y) => {
-    while (str.includes(x)) {
-        str=str.replace(x, y)
-    }
-    return str
 }
 
 // Hides or shows the 'Department Clicked' modal
