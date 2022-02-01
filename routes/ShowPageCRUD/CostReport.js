@@ -17,6 +17,9 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     // Temporary fix for renamed/deleted versions lingering in accessMap
     if (!show.estimateVersions[estimateVersion]) {
         estimateVersion=Object.keys(show.estimateVersions)[0]
+        show.accessMap[apName].estimateVersion=estimateVersion
+        show.markModified('accessMap')
+        await show.save()
     }
 
     // Create a list of estimateVersion keys sorted by date
