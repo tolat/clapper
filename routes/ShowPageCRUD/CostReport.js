@@ -12,8 +12,12 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     // Get accessProfile
     let apName=await crudUtils.getAccessProfileName(user)
     let accessProfile=show.accessProfiles[show.accessMap[apName].profile]['Cost Report']
-    let estimateVersion=show.accessMap[apName].estimateVersion||Object.keys(show.estimateVersions)[0]
-    console.log(estimateVersion)
+    let estimateVersion=show.accessMap[apName].estimateVersion
+
+    // Temporary fix for renamed/deleted versions lingering in accessMap
+    if (!show.estimateVersions[estimateVersion]) {
+        estimateVersion=Object.keys(show.estimateVersions)[0]
+    }
 
     // Create a list of estimateVersion keys sorted by date
     let sortedVersionKeys=Object.keys(show.estimateVersions)
