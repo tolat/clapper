@@ -9,14 +9,16 @@ Git
 TASKS
 
 *** SHOW var still being passed in estimate page for dev reasons ***
+-   Email verification
 -   Change show totals to reflect budget totals for each individual user
 -   Make all access profiles created by lower levels visible to upper levels
 -   Make departments bar always wrap for tablet using/viewing
--   Email verification
--   Inertia on finger scrolling
 -   copy paste on mobile (long touch starts selection)
--   Make auto number by column create a number column
+-   Make auto number by column create a number column if none exists
 -   do not use replace all for browser compatibility
+-   Inertia on finger scrolling
+-   Prevent creating duplicate columns
+
 
 
 TORIN:
