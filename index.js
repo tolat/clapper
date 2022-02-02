@@ -126,6 +126,7 @@ app.use(timesheetRoutes)
 app.all('/', function (request, response, next) {
     if (process.env.NODE_ENV!='develop_local'&&!request.secure) {
         return response.redirect("https://"+request.headers.host+request.url);
+        console.log('\n\nredirecting to https..\n\n')
     } else {
         next();
     }
