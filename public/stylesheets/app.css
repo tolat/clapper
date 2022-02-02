@@ -54,6 +54,7 @@ button.navbar-toggler{
     font-size: inherit;
     width: auto;
 }
+
 .navbar-simple-brand:hover{
     color: white;
 }
@@ -349,21 +350,19 @@ input.department-input:focus{
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
-    justify-content: center;
+    height: 800px;
     align-items: center;
     font-size: 0.8rem;
-    margin-top: 3.5rem;
+    margin-top: 6rem;
 }
 
 #create-account-container input{
-    height: 1.5rem;
     font-size: 0.8rem;
 }
 
 #create-account-container form{
     padding: 2%;
-    width: 500px;
+    max-width: 600px;
 }
 
 #input-name-container{
