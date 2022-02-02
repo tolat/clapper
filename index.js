@@ -113,7 +113,7 @@ const timesheetRoutes=require('./routes/timesheets')
 
 // Redirect all incoming requests to https if not in local dev
 app.all('/', function (request, response, next) {
-    console.log(`\n\nis request secure? ${request.secure}\n\n`)
+    console.log(`forwarded: ${request.header('x-forwarded-proto')}`)
     next();
 })
 
