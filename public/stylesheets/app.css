@@ -54,6 +54,9 @@ button.navbar-toggler{
     font-size: inherit;
     width: auto;
 }
+.navbar-simple-brand:hover{
+    color: white;
+}
 
 #main-container{
     display: flex;
