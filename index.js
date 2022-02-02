@@ -126,8 +126,9 @@ app.use(timesheetRoutes)
 app.all('/', function (request, response, next) {
     if (process.env.NODE_ENV!='develop_local'&&!request.secure) {
         return response.redirect("https://"+request.headers.host+request.url);
+    } else {
+        next();
     }
-    next();
 })
 
 // global variables for timesheet generation
