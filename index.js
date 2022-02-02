@@ -111,17 +111,6 @@ const profileRoutes=require('./routes/profile');
 const showPageRoutes=require('./routes/ShowPage');
 const timesheetRoutes=require('./routes/timesheets')
 
-// Begin Routes
-app.get('/', (req, res) => { res.redirect('/login') })
-
-// Site routes
-app.use('/login', loginRoutes);
-app.use('/createAccount', createAccountRoutes);
-app.use('/shows', showsRoutes);
-app.use('/profile', profileRoutes);
-app.use('/shows/:id/:section', showPageRoutes);
-app.use(timesheetRoutes)
-
 // Redirect all incoming requests to https if not in local dev
 app.all('*', function (request, response, next) {
     console.log(`\n\nis request secure? ${request.secure}\n\n`)
@@ -132,6 +121,17 @@ app.all('*', function (request, response, next) {
         next();
     }
 })
+
+// Begin Routes
+app.get('/', (req, res) => { res.redirect('/login') })
+
+// Site routes
+app.use('/login', loginRoutes);
+app.use('/createAccount', createAccountRoutes);
+app.use('/shows', showsRoutes);
+app.use('/profile', profileRoutes);
+app.use('/shows/:id/:section', showPageRoutes);
+app.use(timesheetRoutes)
 
 // global variables for timesheet generation
 global.generatedTimesheets=[]
