@@ -13,6 +13,11 @@ body::-webkit-scrollbar {
 .landing-background{
     background-image: url("../images/backgrounds/filmset_3.jpg");
     background-size: cover;
+    color: white;
+}
+
+.landing-background .form-text{
+    color: white;
 }
 
 input[type="checkbox"] { 
