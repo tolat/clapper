@@ -10,6 +10,11 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+.landing-background{
+    background-image: url("../images/backgrounds/filmset_3.jpg");
+    background-size: cover;
+}
+
 input[type="checkbox"] { 
     filter: grayscale(0.1);
 }

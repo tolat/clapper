@@ -18,6 +18,7 @@ TASKS
 -   do not use replace all for browser compatibility
 -   Inertia on finger scrolling
 -   Prevent creating duplicate columns
+-   Prevent creating duplicate departments
 
 
 

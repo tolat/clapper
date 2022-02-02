@@ -5,11 +5,11 @@
     <%- include("partials/head")%>
 </head>
 
-<body>
+<body class="landing-background" style="color: white;">
     <%- include("partials/navbar-simple")%>
         <div id="login-container">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
-                <h1 style="margin: 0;">Login</h1>
+                <h1 style="margin: 0; color: white;">Login</h1>
             </div>
             <form id="login-form" action="/login" method="POST">
                 <%- include("partials/flash") %>
@@ -24,7 +24,7 @@
                     </div>
                     <button type="submit" class="btn btn-success">Login</button>
                     <button type="button" class="btn button-secondary" onclick="location.href = '/createAccount';"
-                        style="margin-top: 15px;">Create
+                        style="margin-top: 15px; color: white;">Create
                         Account</button>
             </form>
         </div>
