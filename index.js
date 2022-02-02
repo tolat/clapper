@@ -112,8 +112,8 @@ const showPageRoutes=require('./routes/ShowPage');
 const timesheetRoutes=require('./routes/timesheets')
 
 // Redirect all incoming requests to https if not in local dev
-app.all('/', function (request, response, next) {
-    console.log(`forwarded: ${request.header('x-forwarded-proto')}`)
+app.all('*', function (request, response, next) {
+    console.log(`\n\nforwarded: ${request.header('x-forwarded-proto')}\n\n`)
     next();
 })
 
