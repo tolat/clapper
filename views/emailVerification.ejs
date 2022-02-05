@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("partials/head")%>
+</head>
+
+<body class="landing-background" style="color: white;">
+    <%- include("partials/navbar-simple")%>
+        <div
+            style="display: flex; width: 100%; height: 100%; justify-content: center; align-items: center; flex-direction: column;">
+            <h3 style="font-style: italic;">
+                <%=args.text%>
+            </h3>
+            <%-args.button%>
+        </div>
+
+</body>
+
+</html>

@@ -209,6 +209,7 @@ module.exports.getAllCrewIDs=async function (showid) {
         }
     }
 
+    allCrewMembers=allCrewMembers.filter(m => !!m)
     return allCrewMembers
 }
 
@@ -220,6 +221,7 @@ module.exports.getAllCrewUsers=async function (IDlist) {
         userList.push(user)
     }
 
+    userList=userList.filter(u => !!u)
     return userList
 }
 

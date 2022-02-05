@@ -20,6 +20,7 @@ body::-webkit-scrollbar {
     color: white;
 }
 
+
 input[type="checkbox"] { 
     filter: grayscale(0.1);
 }

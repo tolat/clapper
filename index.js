@@ -66,8 +66,8 @@ const contentSecurityPolicy={
 app.use(helmet.contentSecurityPolicy(contentSecurityPolicy))
 
 // Morgan logger
-// const morgan=require('morgan');
-// app.use(morgan('dev'));
+//const morgan=require('morgan');
+//app.use(morgan('dev'));
 
 // Session
 const secret=process.env.SECRET
@@ -103,14 +103,6 @@ app.use((req, res, next) => {
 // Handle CORS
 app.use((req, res, next) => { handleCORS(req, res, next) });
 
-// Routers
-const loginRoutes=require('./routes/login');
-const createAccountRoutes=require('./routes/createAccount');
-const showsRoutes=require('./routes/shows');
-const profileRoutes=require('./routes/profile');
-const showPageRoutes=require('./routes/ShowPage');
-const timesheetRoutes=require('./routes/timesheets')
-
 // Redirect all incoming requests to https if not in local dev
 app.all('*', function (request, response, next) {
     if (process.env.NODE_ENV!='develop_local'&&request.header('x-forwarded-proto')!='https') {
@@ -122,12 +114,22 @@ app.all('*', function (request, response, next) {
 // Begin Routes
 app.get('/', (req, res) => { res.redirect('/login') })
 
+// Routers
+const loginRoutes=require('./routes/login');
+const createAccountRoutes=require('./routes/createAccount');
+const showsRoutes=require('./routes/shows');
+const profileRoutes=require('./routes/profile');
+const showPageRoutes=require('./routes/ShowPage');
+const timesheetRoutes=require('./routes/timesheets')
+const emailVerificationRoutes=require('./routes/emailVerification')
+
 // Site routes
 app.use('/login', loginRoutes);
 app.use('/createAccount', createAccountRoutes);
 app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
+app.use('/emailVerification/', emailVerificationRoutes)
 app.use(timesheetRoutes)
 
 // global variables for timesheet generation

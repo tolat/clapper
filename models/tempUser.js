@@ -3,23 +3,23 @@ const mongoose=require('mongoose');
 const Schema=mongoose.Schema;
 const passportLocalMongoose=require('passport-local-mongoose')
 
-const UserSchema=new Schema({
+const TempUserSchema=new Schema({
     'username': String,
     'Name': String,
     'Email': String,
     'Phone': String,
-    claimed: Boolean,
     showrecords: [Object],
+    created: Date,
+    verificationKey: String,
+    password: String
 }, { minimize: false })
 
-UserSchema.plugin(passportLocalMongoose)
-
-UserSchema.virtual('fullname').get(function () {
+TempUserSchema.virtual('fullname').get(function () {
     return `${this.firstname} ${this.lastname}`
 });
 
-UserSchema.virtual('displayKeys').get(function () {
+TempUserSchema.virtual('displayKeys').get(function () {
     return ['Email', 'Phone', 'Name'];
 });
 
-module.exports=mongoose.model('User', UserSchema);
+module.exports=mongoose.model('TempUser', TempUserSchema);

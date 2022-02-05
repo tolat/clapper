@@ -38,6 +38,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let showCrew=await crudUtils.getAllCrewUsers(await crudUtils.getAllCrewIDs(show._id.toString()))
     let data=initializeData(show.estimateVersions[estimateVersion].sets, show, week, accessProfile, estimateVersion, showCrew)
 
+
     res.render('ShowPage/Template', {
         title: `${show['Name']} - ${section}`,
         show,

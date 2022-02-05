@@ -5,6 +5,7 @@ if (process.env.NODE_ENV!=='production') {
 const mongoose=require('mongoose');
 const Show=require('../models/show');
 const User=require('../models/user');
+const TempUser=require('../models/tempUser');
 const { positions }=require('./positions');
 const { showNames, genStartDate, departmentNames, genDateBetween }=require('./shows');
 const { getDescription }=require('./sets');
@@ -569,6 +570,9 @@ const seedDB=async () => {
 
     await seedSets();
     console.log('done sets..');
+
+    await TempUser.deleteMany({});
+    console.log('done deleting temporary users..');
 
     await User.deleteMany({});
     await seedUsers();

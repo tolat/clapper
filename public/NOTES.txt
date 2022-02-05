@@ -10,6 +10,9 @@ TASKS
 
 *** SHOW var still being passed in estimate page for dev reasons ***
 -   Email verification
+        -   Need to prevent creating accounts for existing accounts. have to differentiate between existing account that are claimed and unclaimed. 
+            Possibly using .authenticate and reading the error message (no salt vs. auth failed)
+        -   Need to add ttl to tempusers
 -   Change show totals to reflect budget totals for each individual user
 -   Make all access profiles created by lower levels visible to upper levels
 -   Make departments bar always wrap for tablet using/viewing
