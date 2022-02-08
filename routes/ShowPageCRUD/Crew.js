@@ -91,6 +91,8 @@ module.exports.update=async function (body, showId, user) {
             if (!user) {
                 user=new User();
                 user.username=item['username']
+                user.created=new Date()
+                user.status='unclaimed'
                 user.showrecords=[{
                     showid: show._id,
                     showname: show['Name'],

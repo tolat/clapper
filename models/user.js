@@ -8,7 +8,8 @@ const UserSchema=new Schema({
     'Name': String,
     'Email': String,
     'Phone': String,
-    claimed: Boolean,
+    status: String,
+    created: Date,
     showrecords: [Object],
 }, { minimize: false })
 

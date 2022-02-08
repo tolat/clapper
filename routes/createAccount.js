@@ -3,7 +3,6 @@ const tryCatch=require('../utils/tryCatch');
 const ExpressError=require('../utils/ExpressError');
 const router=express.Router({ mergeParams: true });
 const User=require('../models/user');
-const TempUser=require('../models/tempUser');
 const { joiValidate, userValidationSchema }=require('../utils/validationSchemas')
 const { parsePhoneNumber }=require('libphonenumber-js');
 const numUtils=require('../utils/numberUtils')
@@ -21,12 +20,41 @@ router.get('/', (req, res) => {
 // Create account 
 router.post('/', joiValidate(userValidationSchema), tryCatch(async (req, res) => {
     try {
-        let tempUser=new TempUser(req.body.user);
-        tempUser.Name=`${req.body.user.firstname} ${req.body.user.lastname}`
-        tempUser.username=tempUser.Email
-        tempUser.created=new Date(Date.now())
-        tempUser.verificationKey=numUtils.stringToIntHash(tempUser.username)
-        await tempUser.save()
+        // Create new user, mark them as awaiting verification
+        let user=new User(req.body.user);
+        user.Name=`${req.body.user.firstname} ${req.body.user.lastname}`
+        user.username=user.Email
+        user.created=new Date()
+        user.status='awaiting-verification-delete'
+        user.showrecords={}
+
+        // Check for existing user
+        let existingUser=await User.findOne({ username: user.username })
+        if (existingUser) {
+            // Check if existing user is awaiting verification
+            if (existingUser.status.includes('awaiting-verification')) {
+                req.flash('error', 'A user with that email is already awaiting verification')
+                res.render('emailVerification', {
+                    title: 'Email Verification',
+                    args: {
+                        server: req.app.get('server'),
+                        text: 'Check your email for the account confirmation link!',
+                        button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="">Resend email</div>`
+                    }
+                })
+                return
+            }
+
+            // Check if existing user is unclaimed. Copy data into new user if it is
+            if (existingUser.status=='unclaimed') {
+                user._id=existingUser._id.toString()
+                user.showrecords=JSON.parse(JSON.stringify(existingUser.showrecords))
+                user.status='awaiting-verification-keep'
+                await User.findByIdAndDelete(user._id)
+            }
+        }
+
+        await User.register(user, req.body.user.password)
 
         // Send verification email
         let transporter=nodemailer.createTransport({
@@ -34,23 +62,28 @@ router.post('/', joiValidate(userValidationSchema), tryCatch(async (req, res) =>
             port: 465,
             secure: true, // true for 465, false for other ports
             auth: {
-                user: 'clapper.noreply@gmail.com',
+                user: `${process.env.VERIFICATION_EMAIL}`,
                 pass: `${process.env.VERIFICATION_EMAIL_PASSWORD}`
             },
         });
 
-        let info=await transporter.sendMail({
-            from: '"clapper.ca-noreply" <clapper.noreply@gmail.com>',
-            to: "torin.olat@gmail.com",
-            subject: "Confirm clapper.ca email",
-            html: `<a href='${process.env.SERVER}/emailVerification/${tempUser.verificationKey}'>Click to confirm email</a>`,
-        });
+        // Try sending verification email to client
+        try {
+            let info=await transporter.sendMail({
+                from: `"clapper.ca-noreply" <${process.env.VERIFICATION_EMAIL}>`,
+                to: `torin.olat@gmail.com`,
+                subject: "Confirm clapper.ca email",
+                html: `<a href='${process.env.SERVER}/emailVerification/${user._id.toString()}'>Click to confirm email</a>`,
+            });
+        } catch (e) {
+            req.flash('error', e.message)
+        }
 
         // Redirect to email verification page
         res.redirect('/emailVerification')
     }
     catch (e) {
-        req.flash('error', e.message)
+        req.flash(`error`, e.message)
         res.redirect('/createAccount')
     }
 }))

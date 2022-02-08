@@ -21,6 +21,7 @@ const dbUrl=process.env.DB_URL
 const MongoStore=require("connect-mongo")
 const GridStream=require('gridfs-stream')
 const favicon=require('serve-favicon')
+const schemaUtils=require('./utils/schemaUtils')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -35,6 +36,9 @@ global.db.once('open', () => {
     // Initialize gridstrem on global variable so we can read and write files from mongodb gridfs
     global.gfs=GridStream(db.db, mongoose.mongo)
 });
+
+// Periodically delete expired unverified every 30 seconds
+setInterval(schemaUtils.clearUnverifiedUsers, 30000)
 
 // Starting express
 const app=express();

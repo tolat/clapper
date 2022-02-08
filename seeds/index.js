@@ -5,7 +5,6 @@ if (process.env.NODE_ENV!=='production') {
 const mongoose=require('mongoose');
 const Show=require('../models/show');
 const User=require('../models/user');
-const TempUser=require('../models/tempUser');
 const { positions }=require('./positions');
 const { showNames, genStartDate, departmentNames, genDateBetween }=require('./shows');
 const { getDescription }=require('./sets');
@@ -417,6 +416,8 @@ const seedUsers=async () => {
         }
         user['Email']=email
         user['username']=email
+        user.created=new Date()
+        user.status='unclaimed'
         await user.save();
     }
 
@@ -571,9 +572,6 @@ const seedDB=async () => {
     await seedSets();
     console.log('done sets..');
 
-    await TempUser.deleteMany({});
-    console.log('done deleting temporary users..');
-
     await User.deleteMany({});
     await seedUsers();
     console.log('done users..');
@@ -591,7 +589,9 @@ const seedDB=async () => {
         Name: "Torin O'Regan-Latarius",
         username: "torin.olat@gmail.com",
         Email: "torin.olat@gmail.com",
-        Phone: "6047235351"
+        Phone: "6047235351",
+        created: new Date(),
+        status: 'claimed'
     })
     await User.register(mUser, 'Password1')
 
@@ -600,7 +600,9 @@ const seedDB=async () => {
         Name: "Kit Clark",
         username: "pigsinpyjamas@yahoo.ca",
         Email: "pigsinpyjamas@yahoo.ca",
-        Phone: "18004206969"
+        Phone: "18004206969",
+        created: new Date(),
+        status: 'claimed'
     })
     await User.register(ptUser, 'Password1')
 
