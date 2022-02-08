@@ -71,11 +71,12 @@ router.post('/', joiValidate(userValidationSchema), tryCatch(async (req, res) =>
         try {
             let info=await transporter.sendMail({
                 from: `"clapper.ca-noreply" <${process.env.VERIFICATION_EMAIL}>`,
-                to: `torin.olat@gmail.com`,
+                to: user.username,
                 subject: "Confirm clapper.ca email",
                 html: `<a href='${process.env.SERVER}/emailVerification/${user._id.toString()}'>Click to confirm email</a>`,
             });
         } catch (e) {
+            console.log(e)
             req.flash('error', e.message)
         }
 

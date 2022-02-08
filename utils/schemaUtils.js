@@ -13,7 +13,7 @@ module.exports.clearUnverifiedUsers=async () => {
         // Only change users that are expired
         if ((now-user.created)>process.env.CLEAR_UNVERIFIED_USER_INTERVAL) {
             if (user.status=='awaiting-verification-delete') {
-                console.log(`\n\nDelete user ${user.username} who was awaiting validation`)
+                console.log(`\n\nDelete user ${user.username} who was awaiting verification`)
                 await User.findByIdAndDelete(user._id)
             } else {
                 user.status='unclaimed'
