@@ -7,18 +7,29 @@ module.exports.populateShow=async (id) => {
 }
 
 module.exports.clearUnverifiedUsers=async () => {
-    let users=await User.find({ $or: [{ status: 'awaiting-verification-delete' }, { status: 'awaiting-verification-keep' }] })
+    let users=await User.find({ status: { $regex: 'awaiting-verification' } })
     let now=new Date().getTime()
     for (user of users) {
-        // Only change users that are expired
+        // Only change users that have outlived their awiaiting verification time
         if ((now-user.created)>process.env.CLEAR_UNVERIFIED_USER_INTERVAL) {
             if (user.status=='awaiting-verification-delete') {
-                console.log(`\n\nDelete user ${user.username} who was awaiting verification`)
                 await User.findByIdAndDelete(user._id)
             } else {
                 user.status='unclaimed'
                 await user.save()
             }
+        }
+    }
+}
+
+module.exports.clearAwaitingPasswordRecovery=async () => {
+    let users=await User.find({ status: { $regex: 'awaiting-password-recovery' } })
+    let now=new Date().getTime()
+    for (user of users) {
+        // Only change users that have outlived their password recovery time
+        if ((now-user.created)>process.env.CLEAR_AWAITING_RECOVERY_INTERVAL) {
+            user.status='claimed'
+            await user.save()
         }
     }
 }

@@ -37,8 +37,9 @@ global.db.once('open', () => {
     global.gfs=GridStream(db.db, mongoose.mongo)
 });
 
-// Periodically delete expired unverified every 30 seconds
+// Delete expired unverified users and reset users awaiting password recovery every 30 seconds
 setInterval(schemaUtils.clearUnverifiedUsers, 30000)
+setInterval(schemaUtils.clearAwaitingPasswordRecovery, 30000)
 
 // Starting express
 const app=express();
@@ -126,6 +127,7 @@ const profileRoutes=require('./routes/profile');
 const showPageRoutes=require('./routes/ShowPage');
 const timesheetRoutes=require('./routes/timesheets')
 const emailVerificationRoutes=require('./routes/emailVerification')
+const passwordRecoveryRoutes=require('./routes/passwordRecovery')
 
 // Site routes
 app.use('/login', loginRoutes);
@@ -134,6 +136,7 @@ app.use('/shows', showsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/shows/:id/:section', showPageRoutes);
 app.use('/emailVerification/', emailVerificationRoutes)
+app.use('/passwordRecovery/', passwordRecoveryRoutes)
 app.use(timesheetRoutes)
 
 // global variables for timesheet generation

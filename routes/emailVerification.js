@@ -12,7 +12,8 @@ router.get('/', (req, res) => {
     const args={
         server: req.app.get('server'),
         text: 'Check your email for the account confirmation link!',
-        button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="">Resend link</div>`
+        button: ''
+        //button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="">Resend link</div>`
     };
 
     res.render('emailVerification', {

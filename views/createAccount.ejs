@@ -33,7 +33,7 @@
                     <div class="mb-3">
                         <label for="InputPhone" class="form-label">Phone</label>
                         <input type="text" class="form-control" id="InputPhone" name="user[Phone]" required>
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback" style="font-weight: bold;">
                             Please enter a valid phone number.
                         </div>
                         <div id="emailHelp" class="form-text">We'll never share your phone number with anyone else.
@@ -42,14 +42,13 @@
                     <div class="mb-3">
                         <label for="InputPassword" class="form-label">Password</label>
                         <input type="password" class="form-control" id="InputPassword" name="user[password]" required>
-                        <div class="invalid-feedback">
-                            Please enter a valid password.
-                        </div>
+                        <div class="invalid-feedback" style="font-weight: bold;" id="password-validity-feedback"></div>
                     </div>
                     <div class="mb-3">
                         <label for="VerifyPassword" class="form-label">Re-Enter Password</label>
                         <input type="password" class="form-control" id="VerifyPassword" required>
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback" style="font-weight: bold;"
+                            id="confirm-password-validity-feedback">
                             Passwords do not match.
                         </div>
                     </div>
@@ -76,6 +75,42 @@
             pwElt.value!=vpwElt.value?
                 this.setCustomValidity("Passwords don't match!"):
                 this.setCustomValidity("")
+        })
+
+        pwElt.addEventListener('change', function (e) {
+            let setDefault=true
+            // Make sure password is at least 7 characters long
+            if (pwElt.value.length<7) {
+                let feedback="Password must be minimum 7 characters"
+                this.setCustomValidity(feedback)
+                document.getElementById('password-validity-feedback').innerHTML=feedback
+
+                setDefault=false
+            }
+
+            // Make sure password has one letter and one number
+            let hasLetter=false
+            let hasNumber=false
+            for (let c of pwElt.value.split('')) {
+                if ('qwertyuiopasdfghjklzxcvbnm'.split('').includes(c)) {
+                    hasLetter=true
+                }
+                if ('1234567890'.split('').includes(c)) {
+                    hasNumber=true
+                }
+            }
+
+            if (!hasNumber||!hasLetter) {
+                let feedback="Password must contain at least one letter and one number"
+                this.setCustomValidity(feedback)
+                document.getElementById('password-validity-feedback').innerHTML=feedback
+                setDefault=false
+            }
+
+            if (setDefault) {
+                document.getElementById('password-validity-feedback').innerHTML=""
+                this.setCustomValidity("")
+            }
         })
 
         // Loop over them and prevent submission
