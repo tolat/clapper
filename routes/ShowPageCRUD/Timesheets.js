@@ -38,10 +38,11 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
 }
 
 // Update Timesheets
-module.exports.update=async function (body, showId) {
+module.exports.update=async function (body, showId, user) {
     let messages=[]
     let show=await populateShow(showId)
     let currentMap=await show.timesheets.timesheetMaps.find(m => m.name==show.timesheets.currentMap)
+    let apName=await crudUtils.getAccessProfileName(user)
 
     if (show.timesheets.currentMap) {
         // Parse value map from grid and save new map values
@@ -103,7 +104,7 @@ module.exports.update=async function (body, showId) {
 
     // Create new week if required
     if (body.newWeek) {
-        await crudUtils.createWeek(body, show, genUniqueId())
+        await crudUtils.createWeek(body, show, genUniqueId(), apName)
     }
 
     // Delete all records for deleted week if required
