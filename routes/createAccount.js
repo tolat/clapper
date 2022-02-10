@@ -33,7 +33,7 @@ router.post('/', joiValidate(userValidationSchema), tryCatch(async (req, res) =>
         if (existingUser) {
             // Check if existing user is awaiting verification
             if (existingUser.status.includes('awaiting-verification')) {
-                req.flash('error', 'A user with that email is already awaiting verification')
+                req.flash('warning', 'A user with that email is already awaiting verification')
                 res.render('emailVerification', {
                     title: 'Email Verification',
                     args: {

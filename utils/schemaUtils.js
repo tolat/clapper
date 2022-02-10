@@ -26,10 +26,7 @@ module.exports.clearAwaitingPasswordRecovery=async () => {
     let users=await User.find({ status: { $regex: 'awaiting-password-recovery' } })
     let now=new Date().getTime()
     for (user of users) {
-        // Only change users that have outlived their password recovery time
-        if ((now-user.created)>process.env.CLEAR_AWAITING_RECOVERY_INTERVAL) {
-            user.status='claimed'
-            await user.save()
-        }
+        user.status='claimed'
+        await user.save()
     }
 }

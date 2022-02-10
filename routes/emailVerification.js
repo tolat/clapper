@@ -32,7 +32,7 @@ router.get('/:userid', async (req, res) => {
     let user=await User.findById(req.params.userid)
     // Handle expired verification link
     if (!user||user.status=='unclaimed') {
-        req.flash('error', 'Verification link expired. Please create account again')
+        req.flash('warning', 'Verification link expired. Please create account again')
         res.render('createAccount', {
             title: 'Create Account',
             args: {

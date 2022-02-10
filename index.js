@@ -39,7 +39,7 @@ global.db.once('open', () => {
 
 // Delete expired unverified users and reset users awaiting password recovery every 30 seconds
 setInterval(schemaUtils.clearUnverifiedUsers, 30000)
-setInterval(schemaUtils.clearAwaitingPasswordRecovery, 30000)
+setInterval(schemaUtils.clearAwaitingPasswordRecovery, process.env.CLEAR_AWAITING_PASSWORD_INTERVAL)
 
 // Starting express
 const app=express();
