@@ -87,6 +87,10 @@ button.navbar-toggler{
     height: 100%;
 }
 
+.underline-on-hover:hover{
+    text-decoration: underline;
+}
+
 .nav-tabs button.nav-link.active{
     color: black;
     background-color: rgb(220, 220, 220);;
@@ -151,6 +155,8 @@ cursor: pointer;
     display: flex;
     flex-direction: column;
     margin: 5px;
+    max-height: 100%;
+    overflow-y: scroll;
 }
 
 .cursor-pointer:hover{
@@ -160,7 +166,6 @@ cursor: pointer;
 .show-list-item-container{
     width: 100%;
     display: flex;
-    flex-direction: column;
     border: 1px solid lightgray;
     border-radius: 2px;
     margin-top: 10px;

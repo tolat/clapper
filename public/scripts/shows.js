@@ -76,6 +76,7 @@ deleteShow=(showid) => {
                 window.location=responseData.redirect
             } else {
                 document.getElementById(`${showid}-table-item`).remove()
+                document.getElementById('show-count-indicator').innerText=parseInt(document.getElementById('show-count-indicator').innerText)-1
             }
         })
 

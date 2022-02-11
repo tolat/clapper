@@ -116,31 +116,22 @@ app.all('*', function (request, response, next) {
     next();
 })
 
-// Begin Routes
-app.get('/', (req, res) => { res.redirect('/login') })
-
-// Routers
-const loginRoutes=require('./routes/login');
-const createAccountRoutes=require('./routes/createAccount');
-const showsRoutes=require('./routes/shows');
-const profileRoutes=require('./routes/profile');
-const showPageRoutes=require('./routes/ShowPage');
-const timesheetRoutes=require('./routes/timesheets')
-const emailVerificationRoutes=require('./routes/emailVerification')
-const passwordRecoveryRoutes=require('./routes/passwordRecovery')
-
 // Site routes
-app.use('/login', loginRoutes);
-app.use('/createAccount', createAccountRoutes);
-app.use('/shows', showsRoutes);
-app.use('/profile', profileRoutes);
-app.use('/shows/:id/:section', showPageRoutes);
-app.use('/emailVerification/', emailVerificationRoutes)
-app.use('/passwordRecovery/', passwordRecoveryRoutes)
-app.use(timesheetRoutes)
+app.use('/login', require('./routes/login'));
+app.use('/createAccount', require('./routes/createAccount'));
+app.use('/shows', require('./routes/shows'));
+app.use('/profile', require('./routes/profile'));
+app.use('/shows/:id/:section', require('./routes/ShowPage'));
+app.use('/emailVerification/', require('./routes/emailVerification'))
+app.use('/passwordRecovery/', require('./routes/passwordRecovery'))
+app.use('/downloadShow', require('./routes/downloadShow'))
+app.use(require('./routes/timesheets'))
 
 // global variables for timesheet generation
 global.generatedTimesheets=[]
+
+// Redirect base url to Login route
+app.get('/', (req, res) => { res.redirect('/login') })
 
 // Logout route
 app.get('/logout', isLoggedIn, (req, res) => {

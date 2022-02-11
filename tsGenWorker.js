@@ -32,20 +32,34 @@ tsGenQueue.on('global:completed', (job, result) => {
 
 // Process tsGenQueue jobs
 tsGenQueue.process(async (job, done) => {
-    // Wait for template to be piped form the database
-    await pipeTemplateFromDb(job).catch(e => done(e))
+    // Handle timesheet generation jobs
+    if (job.data.type=='timesheet-generation') {
+        // Wait for template to be piped form the database
+        await pipeTemplateFromDb(job).catch(e => done(e))
 
-    // Generate timesheets
-    await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename, job.data.apName, job.data.accessProfile).catch(e => done(e))
+        // Generate timesheets
+        await generateTimesheets(job.data.show, job.data.valueMap, job.data.week, job.data.filename, job.data.apName, job.data.accessProfile).catch(e => done(e))
 
-    //Delete old file from GridFS
-    await removeTemplateFromDB(job.data.filename).catch(e => done(e))
+        //Delete old file from GridFS
+        await removeTemplateFromDB(job.data.filename).catch(e => done(e))
 
-    // Write completed timesheets back to database
-    await pipeCompletedTimesheetsToDb(job).catch(e => done(e))
+        // Write completed timesheets back to database
+        await pipeCompletedTimesheetsToDb(job).catch(e => done(e))
 
-    // Finish job 
-    done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+        // Finish job 
+        done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
+    }
+    // Handle show download jobs
+    else if (job.data.type=='show-download') {
+        console.log('downloading show..')
+        // Generate show .xlsx file
+        generateShowXlsx(job.data.show)
+
+        // Pipe show .xlsx file to the db
+
+        // Finish job
+        done(null, null)
+    }
 })
 
 // Delete uploaded tmeplate form db 
@@ -294,5 +308,29 @@ async function generateTimesheets(show, valueMap, week, filename, apName, access
 
     // Write final workbook to local file
     await workbook.xlsx.writeFile(filepath)
+}
+
+async function generateShowXlsx(show) {
+
+    let activeWorkbook=new ExcelJS.Workbook()
+    let estimatesWorkbook=new ExcelJS.Workbook()
+    let weeksWorkbook=new ExcelJS.Workbook()
+
+    // Generate Estimate worksheets
+
+    // Generate Purchases worksheet
+
+    // Generate CostReport worksheets
+
+    for (week of show.weeks) {
+        // Generate Rates worksheets
+
+        // Generate Crew worksheets
+
+        // Generate Rentals worksheets
+    }
+
+
+
 }
 

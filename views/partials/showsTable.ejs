@@ -1,35 +1,60 @@
 <div id="shows-list-container">
     <% for (show of shows) {%>
         <div class="show-list-item-container" id="<%=show._id%>-table-item">
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <div style="display: flex; flex-direction: column; flex-grow: 1;">
                 <div id="<%=show.id%>_name" style="font-size: 1.3rem; width: 100%;"
                     onclick="window.location = ('/shows/<%=show._id%>/0')">
                     <%=show['Name']%>
                 </div>
+                <div id="show-item-body-container" style="display: flex;">
+                    <div id="widget-container" style="display: flex;">
+                        <div style="display:flex; flex-direction: row;">
+                            <div class="show-data-item">
+                                <div>Budget:</div>
+                                <div>
+                                    <%=show.costReport.budget%>
+                                </div>
+                            </div>
+                            <div class="show-data-item">
+                                <div>To Date:</div>
+                                <div>
+                                    <%=show.costReport.toDate%>
+                                </div>
+                            </div>
+                            <div class="show-data-item">
+                                <div>Remaining:</div>
+                                <div>
+                                    <%=show.costReport.remaining%>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex-grow: 1;" onclick="window.location = ('/shows/<%=show._id%>/0')"></div>
+                </div>
+            </div>
+            <div id="row-end-button-container"
+                style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div class="shows-table-delete-button"
                     onclick="toggleDeleteShowWarningModal(true, false,'<%=show._id%>')">
-                    Delete</div>
-            </div>
-            <div style="display:flex; flex-direction: row;">
-                <div class="show-data-item">
-                    <div>Budget:</div>
-                    <div>
-                        <%=show.costReport.budget%>
-                    </div>
+                    Delete
                 </div>
-                <div class="show-data-item">
-                    <div>To Date:</div>
-                    <div>
-                        <%=show.costReport.toDate%>
-                    </div>
-                </div>
-                <div class="show-data-item">
-                    <div>Remaining:</div>
-                    <div>
-                        <%=show.costReport.remaining%>
-                    </div>
+                <div class="shows-table-download-button underline-on-hover"
+                    onclick="downloadShow('<%=show._id.toString()%>')">
+                    Download
                 </div>
             </div>
         </div>
         <%}%>
 </div>
+
+<script>
+    async function downloadShow(showid) {
+        // Show loading wheel and 'downloading show...' in navbar
+
+        fetch(_args.server+`/downloadShow/${showid}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+    }
+</script>

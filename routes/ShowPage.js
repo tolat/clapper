@@ -225,6 +225,7 @@ router.put('/', isLoggedIn, hasShowAccess, upload.single('file'), tryCatch(async
     // Queue generation job for worker
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     await tsGenQueue.add({
+        type: 'timesheet-generation',
         show,
         accessProfile,
         apName,
