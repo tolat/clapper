@@ -1043,6 +1043,13 @@ tbody tr{
     border-radius: 2px;
 }
 
+.invalid-feedback{
+    color: white;
+    background-color: #dd5252;
+    padding: 2px 2px 2px 6px;
+    border-radius: 2px;
+}
+
 .departments-bar-item:hover{
     cursor: pointer;
 }
