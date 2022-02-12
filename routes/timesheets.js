@@ -16,16 +16,20 @@ tsGenQueue.on('global:completed', async (job, result) => {
         return
     }
 
-    const resultObj=JSON.parse(JSON.parse(result))
+    // Handle completed timesheet generation job
+    if (job.type=='timesheet-generation') {
 
-    // Pipe in completed timesheets form DB
-    await pipeCompletedTimesheetsFromDB(resultObj)
+        const resultObj=JSON.parse(JSON.parse(result))
 
-    // Make this file as completed
-    global.generatedTimesheets.push(resultObj.filename)
+        // Pipe in completed timesheets form DB
+        await pipeCompletedTimesheetsFromDB(resultObj)
 
-    // Clear generated timesheets from db (they were only uploaded for generation)
-    await removeGeneratedTimesheetsFromDB(resultObj.filename)
+        // Make this file as completed
+        global.generatedTimesheets.push(resultObj.filename)
+
+        // Clear generated timesheets from db (they were only uploaded for generation)
+        await removeGeneratedTimesheetsFromDB(resultObj.filename)
+    }
 })
 
 //Helper to clear generated timesheets from db 
