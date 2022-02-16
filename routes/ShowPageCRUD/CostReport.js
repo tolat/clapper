@@ -6,7 +6,7 @@ const crudUtils=require('./utils')
 const numUtils=require('../../utils/numberUtils')
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user, dataOnly) {
     let show=await populateShow(id);
 
     // Get accessProfile
@@ -39,20 +39,24 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     let data=initializeData(show.estimateVersions[estimateVersion].sets, show, week, accessProfile, estimateVersion, showCrew)
 
 
-    res.render('ShowPage/Template', {
-        title: `${show['Name']} - ${section}`,
-        show,
-        section,
-        args,
-        sharedModals,
-        pageModals,
-        data,
-        apName,
-        accessProfile,
-        user,
-        sortedVersionKeys,
-        estimateVersion
-    })
+    if (dataOnly) {
+        res.send({ data })
+    } else {
+        res.render('ShowPage/Template', {
+            title: `${show['Name']} - ${section}`,
+            show,
+            section,
+            args,
+            sharedModals,
+            pageModals,
+            data,
+            apName,
+            accessProfile,
+            user,
+            sortedVersionKeys,
+            estimateVersion
+        })
+    }
 }
 
 // Update Cost Report

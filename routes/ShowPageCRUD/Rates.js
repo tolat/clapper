@@ -4,7 +4,7 @@ const Show=require('../../models/show')
 const crudUtils=require('./utils')
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user, dataOnly) {
     let show=await populateShow(id);
 
     // Get accessProfile
@@ -24,19 +24,24 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     args.extraColumns=week.positions.extraColumns
     args.multipliers=week.multipliers
 
-    res.render('ShowPage/Template', {
-        title: `${show['Name']} - ${section}`,
-        show,
-        section,
-        args,
-        sharedModals,
-        pageModals,
-        accessProfile,
-        data,
-        user,
-        apName,
-        sortedVersionKeys
-    })
+    // Just send back data if this is a data only request
+    if (dataOnly) {
+        res.send({ data })
+    } else {
+        res.render('ShowPage/Template', {
+            title: `${show['Name']} - ${section}`,
+            show,
+            section,
+            args,
+            sharedModals,
+            pageModals,
+            accessProfile,
+            data,
+            user,
+            apName,
+            sortedVersionKeys
+        })
+    }
 }
 
 // Update rates 

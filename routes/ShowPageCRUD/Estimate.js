@@ -4,7 +4,7 @@ const { sortByNumber, zeroNanToNull }=require('../../utils/numberUtils')
 const crudUtils=require('./utils')
 
 // Render Estimate page
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user, dataOnly) {
     let show=await populateShow(id);
 
     // Initialize data for grid based on user access profile
@@ -76,20 +76,25 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         await show.save()
     }
 
-    res.render('ShowPage/Template', {
-        title: `${show['Name']} - ${section}`,
-        show,
-        section,
-        args,
-        sharedModals,
-        pageModals,
-        data,
-        accessProfile,
-        user,
-        apName,
-        sortedVersionKeys,
-        comparisonVersion
-    })
+    // Just send back data if this is a data only request
+    if (dataOnly) {
+        res.send({ data })
+    } else {
+        res.render('ShowPage/Template', {
+            title: `${show['Name']} - ${section}`,
+            show,
+            section,
+            args,
+            sharedModals,
+            pageModals,
+            data,
+            accessProfile,
+            user,
+            apName,
+            sortedVersionKeys,
+            comparisonVersion
+        })
+    }
 }
 
 // Delete Estimate Version

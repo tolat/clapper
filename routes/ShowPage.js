@@ -85,8 +85,11 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
         // Do Nothing
     }
 
-    return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user)
+    // Check if this is a request for data only
+    let dataOnly=false
+    if (req.query.dataOnly) { dataOnly=true }
 
+    return ShowPageCRUD[sanitizeHtml(section)].get(id, section, query, args, res, sharedModals, pageModals, req.user, dataOnly)
 }))
 
 // Send list of dropdown names to browser

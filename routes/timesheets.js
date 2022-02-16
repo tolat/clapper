@@ -17,33 +17,32 @@ tsGenQueue.on('global:completed', async (job, result) => {
     }
 
     // Handle completed timesheet generation job
-    if (job.type=='timesheet-generation') {
-
-        const resultObj=JSON.parse(JSON.parse(result))
+    if (job.type=='timesheet-generation'||'show-download') {
+        const resultObj=await JSON.parse(JSON.parse(result))
 
         // Pipe in completed timesheets form DB
-        await pipeCompletedTimesheetsFromDB(resultObj)
+        await pipeCompletedSpreadsheetsFromDB(resultObj.filename)
 
         // Make this file as completed
-        global.generatedTimesheets.push(resultObj.filename)
+        global.generatedSpreadsheets.push(resultObj.filename)
 
         // Clear generated timesheets from db (they were only uploaded for generation)
-        await removeGeneratedTimesheetsFromDB(resultObj.filename)
+        await removeGeneratedSpreadsheetsFromDB(resultObj.filename)
     }
 })
 
 //Helper to clear generated timesheets from db 
-function removeGeneratedTimesheetsFromDB(filename) {
+function removeGeneratedSpreadsheetsFromDB(filename) {
     return new Promise(function (resolve, reject) {
         global.gfs.remove({ filename }, () => resolve())
     })
 }
 
 // Helper to return a promise that resolves when timesheets are piped in from db
-function pipeCompletedTimesheetsFromDB(resultObj) {
+function pipeCompletedSpreadsheetsFromDB(filename) {
     return new Promise(function (resolve, reject) {
-        const readDB=global.gfs.createReadStream({ filename: resultObj.filename })
-        const filepath=`${path.join(__dirname, '../uploads')}/${resultObj.filename}.xlsx`
+        const readDB=global.gfs.createReadStream({ filename })
+        const filepath=`${path.join(__dirname, '../uploads')}/${filename}.xlsx`
         const writeLocal=fs.createWriteStream(filepath)
         writeLocal.on('finish', () => resolve())
         writeLocal.on('error', () => reject())
@@ -54,7 +53,7 @@ function pipeCompletedTimesheetsFromDB(resultObj) {
 // Check if timesheets have been generated for :filenamme template
 router.get('/checkgenerated/:filename', isLoggedIn, tryCatch(async (req, res, next) => {
     // Tell client if timesheets for :filename have been generated
-    if (global.generatedTimesheets.includes(req.params.filename)) {
+    if (global.generatedSpreadsheets.includes(req.params.filename)) {
         res.send({ filename: req.params.filename })
     } else {
         res.send({ filename: false })

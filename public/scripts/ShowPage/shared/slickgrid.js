@@ -3354,7 +3354,6 @@ applyEditDataFilter=(data, columns) => {
             }
         }
         if (editDataFilter.type=='w'&&!Object.keys(editDataFilter.filter)[0]) {
-            console.log('EMPTY WHITELIST!')
             item=setItemUneditable(item, columns)
         }
     }

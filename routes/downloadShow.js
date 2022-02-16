@@ -18,10 +18,11 @@ router.post('/:showid', async (req, res) => {
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     await tsGenQueue.add({
         type: 'show-download',
-        show
+        show,
+        activeData: req.body.activeData
     })
 
-    res.send({ success: 'success' })
+    res.send({ success: 'success!' })
 
 })
 

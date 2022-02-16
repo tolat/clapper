@@ -49,12 +49,51 @@
 
 <script>
     async function downloadShow(showid) {
-        // Show loading wheel and 'downloading show...' in navbar
 
+        // Get all showData fromt the server
+        let activeData={
+            CostReport: {},
+            Estimate: {},
+            Purchases: {},
+            Rates: {},
+            Rentals: {},
+            Crew: {}
+        }
+        for (page in activeData) {
+            const response=await fetch(_args.server+`/shows/${showid}/${page}?dataOnly=1`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            })
+
+            const responseObject=await response.json()
+            activeData[page]=responseObject.data
+        }
+
+        console.log(activeData)
+
+        // fetch request to downloadShow
         fetch(_args.server+`/downloadShow/${showid}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
+            credentials: 'include',
+            body: JSON.stringify({ activeData })
         })
+            .then(response => { return response.json() })
+            .then(responseJson => { console.log(responseJson) })
+    }
+
+    // Hide and show download show modal - need user password to make fetch calls from worker process
+    function toggleDownloadShowModal(show, showid) {
+        if (show) {
+            document.getElementById('grid-modal-container').style.display='flex'
+            document.getElementById('download-show-modal').style.display='flex'
+
+            // Set Download button to call download shsow on correct showid
+            document.getElementById('download-show-download-button').setAttribute('onclick', `downloadShow("${showid}")`)
+        } else {
+            document.getElementById('grid-modal-container').style.display=null
+            document.getElementById('download-show-modal').style.display='none'
+        }
     }
 </script>

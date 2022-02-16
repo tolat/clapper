@@ -128,7 +128,7 @@ app.use('/downloadShow', require('./routes/downloadShow'))
 app.use(require('./routes/timesheets'))
 
 // global variables for timesheet generation
-global.generatedTimesheets=[]
+global.generatedSpreadsheets=[]
 
 // Redirect base url to Login route
 app.get('/', (req, res) => { res.redirect('/login') })

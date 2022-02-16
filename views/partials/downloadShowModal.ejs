@@ -1,0 +1,12 @@
+<div id="download-show-modal"
+    style="display: none; background-color: white; padding: 30px; border-radius: 2px; margin-top: -18rem;">
+    <form id="download-show-form" method="POST">
+        <label for="password" class="form-label">Enter password to download show:</label>
+        <input type="password" id="download-show-password" class="form-control" aria-describedby="name" name="password">
+        <span id="createShowButtonContainer">
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                onclick="toggleDownloadShowModal(false,false)">Cancel</button>
+            <button type="button" id="download-show-download-button" class="btn btn-sm btn-success">Download</button>
+        </span>
+    </form>
+</div>

@@ -44,7 +44,7 @@ tsGenQueue.process(async (job, done) => {
         await removeTemplateFromDB(job.data.filename).catch(e => done(e))
 
         // Write completed timesheets back to database
-        await pipeCompletedTimesheetsToDb(job).catch(e => done(e))
+        await pipeCompletedSpreadsheetsToDb(job, job.data.filename).catch(e => done(e))
 
         // Finish job 
         done(null, JSON.stringify({ filename: job.data.filename, fileid: job.data.fileid }))
@@ -53,12 +53,13 @@ tsGenQueue.process(async (job, done) => {
     else if (job.data.type=='show-download') {
         console.log('downloading show..')
         // Generate show .xlsx file
-        generateShowXlsx(job.data.show)
+        let activeWorkbookName=await generateShowXlsx(job.data).catch(e => done(e))
 
         // Pipe show .xlsx file to the db
+        await pipeCompletedSpreadsheetsToDb(job, activeWorkbookName).catch(e => done(e))
 
         // Finish job
-        done(null, null)
+        done(null, JSON.stringify({ filename: activeWorkbookName }))
     }
 })
 
@@ -70,14 +71,14 @@ function removeTemplateFromDB(filename) {
 }
 
 // Pipe completed timesheets xlsx file from local /uploads directory to the database
-function pipeCompletedTimesheetsToDb(job) {
+function pipeCompletedSpreadsheetsToDb(job, filename) {
     return new Promise(function (resolve, reject) {
-        const filepath=`${path.join(__dirname, '/uploads')}/${job.data.filename}.xlsx`
+        const filepath=`${path.join(__dirname, '/uploads')}/${filename}.xlsx`
 
         // Stream completed timesheets to mongo 
         const readLocal=fs.createReadStream(filepath)
         const writeDB=global.gfs.createWriteStream({
-            filename: job.data.filename,
+            filename: filename,
             content_type: job.data.contentType
         })
         writeDB.on('finish', () => resolve())
@@ -218,7 +219,6 @@ async function generateTimesheets(show, valueMap, week, filename, apName, access
                 setEpisodeMap[`${weekDay}-Episode`]=set.Episode
             }
 
-            console.log(2)
             // Assign variable values to cells in spreadsheet
             for (col in valueMap) {
                 for (row in valueMap[col]) {
@@ -310,27 +310,43 @@ async function generateTimesheets(show, valueMap, week, filename, apName, access
     await workbook.xlsx.writeFile(filepath)
 }
 
-async function generateShowXlsx(show) {
+async function generateShowXlsx(data) {
 
+    // Duplicate blank .xlsx sheet to uploads
+    const activeWorkbookName=`${data.show.Name}-${new Date().toISOString().slice(0, 10)}`
+    const activeWorkbookFilepath=`${path.join(__dirname, '/uploads')}/${activeWorkbookName}.xlsx`
+    await fs.copyFileSync(`${path.join(__dirname, '/public')}/resources/blank.xlsx`, activeWorkbookFilepath)
+
+    // Create active Workbook 
     let activeWorkbook=new ExcelJS.Workbook()
-    let estimatesWorkbook=new ExcelJS.Workbook()
-    let weeksWorkbook=new ExcelJS.Workbook()
+    await activeWorkbook.xlsx.readFile(activeWorkbookFilepath)
 
-    // Generate Estimate worksheets
+    // Add Current Cost Report worksheet
+    for (page in data.activeData) {
+        let worksheet=activeWorkbook.addWorksheet(`${page}`)
+        let columns=[]
+        let hiddenCols=['id', 'editedfields', 'userid']
+        for (col in data.activeData[page][0]) {
+            if (!hiddenCols.includes(col)) {
+                columns.push({
+                    header: col,
+                    key: col,
+                    width: 15
+                })
+            }
+        }
+        worksheet.columns=columns
+        worksheet.views=[{ showRowColHeaders: true }]
 
-    // Generate Purchases worksheet
-
-    // Generate CostReport worksheets
-
-    for (week of show.weeks) {
-        // Generate Rates worksheets
-
-        // Generate Crew worksheets
-
-        // Generate Rentals worksheets
+        // Add data rows
+        for (row of data.activeData[page]) {
+            worksheet.addRow(row)
+        }
     }
 
+    // Write active workbook to new workbook in uploads folder
+    await activeWorkbook.xlsx.writeFile(activeWorkbookFilepath)
 
-
+    return activeWorkbookName
 }
 

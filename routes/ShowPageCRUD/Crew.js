@@ -7,7 +7,7 @@ const numUtils=require('../../utils/numberUtils')
 const oneDay=24*60*60*1000;
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user, dataOnly) {
     let show=await Show.findById(id).populate('weeks.crew.crewList')
 
     // Get accessProfile
@@ -35,20 +35,26 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     args.positionList=week.positions.positionList
     args.rentals=week.rentals
 
-    res.render('ShowPage/Template', {
-        title: `${show['Name']} - ${section}`,
-        section,
-        args,
-        sharedModals,
-        pageModals,
-        data,
-        apName,
-        user,
-        currentVersionSetCodes,
-        accessProfile,
-        sortedVersionKeys,
-        multipliers: week.multipliers
-    })
+    // Just send back data if this is a data only request
+    if (dataOnly) {
+        res.send({ data })
+    }
+    else {
+        res.render('ShowPage/Template', {
+            title: `${show['Name']} - ${section}`,
+            section,
+            args,
+            sharedModals,
+            pageModals,
+            data,
+            apName,
+            user,
+            currentVersionSetCodes,
+            accessProfile,
+            sortedVersionKeys,
+            multipliers: week.multipliers
+        })
+    }
 }
 
 // Update crew

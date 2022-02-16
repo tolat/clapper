@@ -4,7 +4,7 @@ const crudUtils=require('./utils')
 const numberUtils=require('../../utils/numberUtils')
 
 // Render ShowPage section
-module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user) {
+module.exports.get=async function (id, section, query, args, res, sharedModals, pageModals, user, dataOnly) {
     show=await Show.findById(id)
 
     // Get accessProfile
@@ -29,20 +29,25 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     args.extraColumns=show.purchases.extraColumns
     args.taxColumns=show.purchases.taxColumns
 
-    res.render('ShowPage/Template', {
-        title: `${show['Name']} - ${section}`,
-        show,
-        section,
-        args,
-        sharedModals,
-        pageModals,
-        data,
-        accessProfile,
-        user,
-        allSetCodes,
-        apName,
-        sortedVersionKeys
-    })
+    // Just send back data if this is a data only request
+    if (dataOnly) {
+        res.send({ data })
+    } else {
+        res.render('ShowPage/Template', {
+            title: `${show['Name']} - ${section}`,
+            show,
+            section,
+            args,
+            sharedModals,
+            pageModals,
+            data,
+            accessProfile,
+            user,
+            allSetCodes,
+            apName,
+            sortedVersionKeys
+        })
+    }
 }
 
 // Update purchases
