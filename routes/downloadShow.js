@@ -14,6 +14,8 @@ const router=express.Router({ mergeParams: true });
 router.post('/:showid', async (req, res) => {
     const show=await schemaUtils.populateShow(req.params.showid)
 
+    // *** FILTER OUT PAGES THAT USER HAS NO ACCESS TO FROM BODY.ACTIVEDATA
+
     // Queue .xlsx generation for timesheetworker
     const tsGenQueue=new Queue('tsGenQueue', process.env.REDIS_URL)
     await tsGenQueue.add({

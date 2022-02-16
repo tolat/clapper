@@ -70,8 +70,6 @@
             activeData[page]=responseObject.data
         }
 
-        console.log(activeData)
-
         // fetch request to downloadShow
         fetch(_args.server+`/downloadShow/${showid}`, {
             method: 'POST',
@@ -81,6 +79,8 @@
         })
             .then(response => { return response.json() })
             .then(responseJson => { console.log(responseJson) })
+
+        // ADD periodic fetch to download show from server
     }
 
     // Hide and show download show modal - need user password to make fetch calls from worker process
