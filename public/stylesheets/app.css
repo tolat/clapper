@@ -194,7 +194,7 @@ cursor: pointer;
     background-color: rgb(255, 193, 49);
     text-align: center;
     border-radius: 2px;
-    border: 1px solid rgb(97, 97, 97);
+    /* border: 1px solid rgb(97, 97, 97); */
     height: 2.2rem;
     width: 2.2rem;
     font-weight: bold;
@@ -342,6 +342,12 @@ input.department-input:focus{
 }
 .button-secondary:hover{
     text-decoration: underline;
+}
+
+.button-simple{
+    background: none;
+    border: none;
+    color: black;
 }
 
 #login-container{
