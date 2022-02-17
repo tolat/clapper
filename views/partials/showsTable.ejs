@@ -51,6 +51,9 @@
     // Send show download job to server and poll every second to see if job has been completed, then download
     async function downloadShow(showid) {
 
+        // Show loading screen
+        toggleLoadingScreen(true, 'Downloading...')
+
         // Get all showData fromt the server
         let activeData={
             CostReport: {},
@@ -88,7 +91,7 @@
                         .then(responseData => {
                             // If timesheets generated then download the .xlsx file from server
                             if (responseData.filename) {
-                                //toggleLoadingScreen(false)
+                                toggleLoadingScreen(false)
                                 download(responseData.filename)
                                 console.log('Done')
                                 window.clearInterval(checkGenerationInterval)
@@ -107,6 +110,25 @@
             downloadElt.parentElement.removeChild(downloadElt)
         }
     }
+
+    // Hide and show the loading screen with spinner and message 'msg'
+    toggleLoadingScreen=(show, msg='Loading...') => {
+        if (show) {
+            document.getElementById('grid-modal-container').style.display='flex';
+            document.getElementById('grid-modal-container').innerHTML+=`
+                <div id="loading-spinner" style="margin-top: 25%; display: flex; flex-direction: column; align-items: center">
+                    <div class="spinner-border text-light" role="status"></div>
+                    <br>
+                    <div style="color: white">${msg}</div>
+                </div>
+                `;
+        } else {
+            document.getElementById('grid-modal-container').style.display=null;
+            let elt=document.getElementById('loading-spinner');
+            if (elt) { elt.remove() }
+        }
+    }
+
 
     // Hide and show download show modal - need user password to make fetch calls from worker process
     function toggleDownloadShowModal(show, showid) {
