@@ -191,17 +191,19 @@ cursor: pointer;
     font-size: 1rem;
     background-color: white;
     position: absolute;
-    right: 2%; /* Same as main container margin */
     background-color: rgb(255, 193, 49);
-    padding: 6px;
     text-align: center;
     border-radius: 2px;
-    border: 1px solid black;
+    border: 1px solid rgb(97, 97, 97);
+    height: 2.2rem;
+    width: 2.2rem;
+    font-weight: bold;
+    font-size: 1.3rem;
 }
 
 #create-show-button:hover{
     cursor: pointer;
-    text-decoration: underline;
+    background-color: rgb(234,172,29);
 }
 
 #join-show-button{

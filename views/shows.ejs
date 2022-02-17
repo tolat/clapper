@@ -16,14 +16,15 @@
         <%- include("partials/navbar") %>
             <div id="main-container">
                 <%- include("partials/flash") %>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px;">
                         <div
                             style="font-size: 1.7rem; display: flex; flex-direction: row; justify-content: flex-start;">
                             My Shows&nbsp;(<div id="show-count-indicator">
                                 <%=`${shows.length}`%>
                             </div>)
                         </div>
-                        <a id="create-show-button" onclick="toggleCreateShow('flex')">Create Show</a>
+                        <div style="width: 2.2rem; height: 2.2rem;"><a id="create-show-button"
+                                onclick="toggleCreateShow('flex')">+</a></div>
                     </div>
                     <%- include('partials/showsTable') %>
             </div>
