@@ -48,6 +48,7 @@
 </div>
 
 <script>
+    // Send show download job to server and poll every second to see if job has been completed, then download
     async function downloadShow(showid) {
 
         // Get all showData fromt the server
@@ -78,9 +79,33 @@
             body: JSON.stringify({ activeData })
         })
             .then(response => { return response.json() })
-            .then(responseJson => { console.log(responseJson) })
+            .then(responseData => {
+                // Check evey  1000 ms to see if generation is done
+                checkGenerationInterval=setInterval(() => {
+                    console.log('checking for show download...')
+                    fetch(_args.server+`/checkgenerated/${responseData.filename}`, { method: 'GET', credentials: 'include' })
+                        .then(response => { return response.json() })
+                        .then(responseData => {
+                            // If timesheets generated then download the .xlsx file from server
+                            if (responseData.filename) {
+                                //toggleLoadingScreen(false)
+                                download(responseData.filename)
+                                console.log('Done')
+                                window.clearInterval(checkGenerationInterval)
+                            }
+                        })
+                }, 1000);
+            })
 
-        // ADD periodic fetch to download show from server
+        // Downlaod timesheets from server
+        function download(filename) {
+            let downloadElt=document.createElement('div')
+            downloadElt.style.diplay='none'
+            downloadElt.innerHTML=`<a id="download-link" href="/uploads/${filename}.xlsx" download></a>`
+            document.body.appendChild(downloadElt)
+            document.getElementById('download-link').click()
+            downloadElt.parentElement.removeChild(downloadElt)
+        }
     }
 
     // Hide and show download show modal - need user password to make fetch calls from worker process

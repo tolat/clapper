@@ -51,15 +51,14 @@ tsGenQueue.process(async (job, done) => {
     }
     // Handle show download jobs
     else if (job.data.type=='show-download') {
-        console.log('downloading show..')
         // Generate show .xlsx file
-        let activeWorkbookName=await generateShowXlsx(job.data).catch(e => done(e))
+        await generateShowXlsx(job.data).catch(e => done(e))
 
         // Pipe show .xlsx file to the db
-        await pipeCompletedSpreadsheetsToDb(job, activeWorkbookName).catch(e => done(e))
+        await pipeCompletedSpreadsheetsToDb(job, job.data.activeWorkbookName).catch(e => done(e))
 
         // Finish job
-        done(null, JSON.stringify({ filename: activeWorkbookName }))
+        done(null, JSON.stringify({ filename: job.data.activeWorkbookName }))
     }
 })
 
@@ -313,13 +312,15 @@ async function generateTimesheets(show, valueMap, week, filename, apName, access
 async function generateShowXlsx(data) {
 
     // Duplicate blank .xlsx sheet to uploads
-    const activeWorkbookName=`${data.show.Name}-${new Date().toISOString().slice(0, 10)}`
-    const activeWorkbookFilepath=`${path.join(__dirname, '/uploads')}/${activeWorkbookName}.xlsx`
+    const activeWorkbookFilepath=`${path.join(__dirname, '/uploads')}/${data.activeWorkbookName}.xlsx`
     await fs.copyFileSync(`${path.join(__dirname, '/public')}/resources/blank.xlsx`, activeWorkbookFilepath)
 
     // Create active Workbook 
     let activeWorkbook=new ExcelJS.Workbook()
     await activeWorkbook.xlsx.readFile(activeWorkbookFilepath)
+
+    // Remove Sheet1 from blank template
+    activeWorkbook.removeWorksheet(activeWorkbook.getWorksheet('Sheet1').id)
 
     // Add Current Cost Report worksheet
     for (page in data.activeData) {
@@ -346,7 +347,5 @@ async function generateShowXlsx(data) {
 
     // Write active workbook to new workbook in uploads folder
     await activeWorkbook.xlsx.writeFile(activeWorkbookFilepath)
-
-    return activeWorkbookName
 }
 

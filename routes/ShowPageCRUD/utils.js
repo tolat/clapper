@@ -435,3 +435,10 @@ module.exports.parseValueMap=function (items) {
 
 module.exports.showPages=['Cost Report', 'Crew', 'Estimate', 'Purchases', 'Rentals', 'Rates', 'Timesheets']
 
+module.exports.replaceAll=(r, rw) => {
+    for (let i=0; i<this.length; i++) {
+        if (this[i]==r)
+            this[i]=rw
+    }
+}
+
