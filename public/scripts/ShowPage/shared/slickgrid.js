@@ -653,6 +653,9 @@ triggerPaste=async () => {
         newClipText+=char
     }
 
+    // Insert \n chars after \r chars for old excel versions
+    newClipText=newClipText.replaceAll("\r", "\r\n")
+
     // Replace double quotes, and remove any remaining single quotes
     newClipText=newClipText.replaceAll('""', '_*Q*_')
     newClipText=newClipText.replaceAll('"', '')
