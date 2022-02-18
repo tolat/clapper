@@ -641,8 +641,15 @@ triggerPaste=async () => {
 
     console.log(clipText.split(''))
 
+    // Insert \n chars after \r chars for old excel versions
+    clipText=clipText.replaceAll('\r', '\r\n')
+    clipText=clipText.replaceAll('\n\n', '\n')
+
     // Replace \r carachters - only use \n for row separation
     clipText=clipText.replaceAll('\r', '')
+
+    console.log(clipText.split(''))
+
 
     // Replace intra-cell return chars with placeholder so splitting into rows is easier
     let newClipText=''
@@ -652,9 +659,6 @@ triggerPaste=async () => {
         else if (char=='\n'&&inQuote) { char='_*R*_' }
         newClipText+=char
     }
-
-    // Insert \n chars after \r chars for old excel versions
-    newClipText=newClipText.replaceAll("\r", "\r\n")
 
     // Replace double quotes, and remove any remaining single quotes
     newClipText=newClipText.replaceAll('""', '_*Q*_')
