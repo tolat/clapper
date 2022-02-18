@@ -10,7 +10,7 @@ TASKS
 
 *** SHOW var still being passed in estimate page for dev reasons ***
 -   Email verification (DONE)
--   Export entire show as workbook
+-   Export entire show as workbook (DONE FOR ACTIVE SHEETS)
 -   Change show totals to reflect budget totals for each individual user
 -   Make all access profiles created by lower levels visible to upper levels
 -   Make departments bar always wrap for tablet using/viewing
@@ -20,6 +20,11 @@ TASKS
 -   Inertia on finger scrolling
 -   Prevent creating duplicate columns
 -   Prevent creating duplicate departments
+-   Change estimate File dropdown to not have open or delete (move delete to open version modal)
+
+Dad GUI updates
+-   Get rid of blank column at start
+-   Get rid of NoFringes Column MAYBE
 
 
 

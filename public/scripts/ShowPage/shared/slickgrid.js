@@ -639,6 +639,8 @@ triggerPaste=async () => {
 
     await navigator.clipboard.readText().then(text => { clipText=text })
 
+    console.log(clipText.split(''))
+
     // Replace \r carachters - only use \n for row separation
     clipText=clipText.replaceAll('\r', '')
 
