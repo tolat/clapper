@@ -639,8 +639,6 @@ triggerPaste=async () => {
 
     await navigator.clipboard.readText().then(text => { clipText=text })
 
-    console.log(clipText.split(''))
-
     // Insert \n chars after \r chars for old excel versions
     clipText=clipText.replaceAll('\r', '\r\n')
     clipText=clipText.replaceAll('\n\n', '\n')
@@ -832,7 +830,7 @@ triggerCopy=() => {
             if (!columns[j].isHidden) { value=item[columns[j].field] }
             value? copyString+='\"'+value.toString().replaceAll('"', '""')+'\"\t':copyString+='\t'
         }
-        copyString+='\r\n'
+        copyString+='\r'
     }
 
     navigator.clipboard.writeText(copyString)
