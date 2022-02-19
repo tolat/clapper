@@ -44,8 +44,16 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     }
 
     let weekid=show.accessMap[apName].currentWeek
-    let week=show.weeks.find(w => w._id==weekid)||show.weeks[0]
-    console.log(week._id)
+    let week=show.weeks.find(w => w._id==weekid)
+
+    // Handle week that doesn't exist
+    if (!week) {
+        week=show.weeks[0]
+        show.accessMap[apName].currentWeek=week._id.toString()
+        sshow.markModified('accessMap')
+        await show.save()
+    }
+
     // Set args
     let args={
         section: section,
