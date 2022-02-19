@@ -2000,9 +2000,7 @@ toggleAddWeekModal=(show, update) => {
     // Hide Modal
     if (!show) {
         if (update) {
-            let weekEnd=new Date((document.getElementById('add-week-input').value+'T00:00').replace(/-/g, '\/').replace(/T.+/, ''))
-            console.log((document.getElementById('add-week-input').value+'T00:00').replace(/-/g, '\/').replace(/T.+/, ''))
-            console.log(weekEnd)
+            let weekEnd=new Date((document.getElementById('add-week-input').value+'T00:00:00').replace(/-/g, '\/').replace(/T.+/, ''))
             if (weekEnd=='Invalid Date') {
                 document.getElementById('add-week-modal-input-warning').style.display='flex'
                 return
@@ -2012,7 +2010,7 @@ toggleAddWeekModal=(show, update) => {
             if (document.getElementById('add-week-radio-preceding').checked) { copyCrewFrom='preceding' }
             if (document.getElementById('add-week-radio-blank').checked) { copyCrewFrom='blank' }
 
-            //changeWeek(false, weekEnd, true, copyCrewFrom)
+            changeWeek(false, weekEnd, true, copyCrewFrom)
         }
         document.getElementById('add-week-modal-input-warning').style.display='none'
         document.getElementById('add-week-modal').style.display=null
