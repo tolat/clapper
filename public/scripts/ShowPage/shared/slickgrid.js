@@ -788,8 +788,12 @@ function executePaste() {
             for (j=0; j<=this.endCell-this.startCell; j++) {
                 let column=this.columns[j+this.startCell]
                 if (column&&(!column.cssClass||!column.cssClass.includes('uneditable'))) {
-                    if (this.rows[i][j]) {
+                    // Handle blank cells
+                    if (!this.rows[i][j]||this.rows[i][j]=='') {
+                        item[column.field]=undefined
+                    } else {
                         let cellData=this.rows[i][j].replaceAll('_*Q*_', '"').replaceAll('_*R*_', '\n')
+
                         if (column.cssClass&&column.cssClass.includes('currency')) {
                             item[column.field]=parseNumberFromCurrency(cellData)
                         } else {
