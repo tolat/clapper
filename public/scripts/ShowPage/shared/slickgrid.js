@@ -2000,9 +2000,8 @@ toggleAddWeekModal=(show, update) => {
     // Hide Modal
     if (!show) {
         if (update) {
-            let weekEnd=new Date(document.getElementById('add-week-input').value+'T00:00')
-            console.log(document.getElementById('add-week-input').value)
-            console.log(document.getElementById('add-week-input').value+'T00:00')
+            let weekEnd=new Date((document.getElementById('add-week-input').value+'T00:00').replace(/-/g, '\/').replace(/T.+/, ''))
+            console.log((document.getElementById('add-week-input').value+'T00:00').replace(/-/g, '\/').replace(/T.+/, ''))
             console.log(weekEnd)
             if (weekEnd=='Invalid Date') {
                 document.getElementById('add-week-modal-input-warning').style.display='flex'
