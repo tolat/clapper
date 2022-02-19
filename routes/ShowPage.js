@@ -44,7 +44,7 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     }
 
     let weekid=show.accessMap[apName].currentWeek
-    let week=show.weeks.find(w => w._id==weekid)
+    let week=show.weeks.find(w => w._id==weekid)||show.weeks[0]._id
     // Set args
     let args={
         section: section,
