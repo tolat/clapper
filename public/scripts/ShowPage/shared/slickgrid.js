@@ -775,44 +775,42 @@ function executePaste() {
 
     // Replace grid data with paste data
     for (let i=0; i<=this.endRow-this.startRow; i++) {
-        if (this.rows[i][0]!=undefined) {
-            let idx=i+this.startRow
-            let item=dataView.getItemByIdx(idx)
+        let idx=i+this.startRow
+        let item=dataView.getItemByIdx(idx)
 
-            // Do not paste into this item if it is in an uneditable row
-            if (_cellCssStyles['uneditableRow']&&Object.keys(_cellCssStyles['uneditableRow']).includes(item.id)) { continue }
+        // Do not paste into this item if it is in an uneditable row
+        if (_cellCssStyles['uneditableRow']&&Object.keys(_cellCssStyles['uneditableRow']).includes(item.id)) { continue }
 
-            if (_groupedBy) {
-                item=items.find(i => dataView.getRowById(i.id)==idx)
-            }
-            for (j=0; j<=this.endCell-this.startCell; j++) {
-                let column=this.columns[j+this.startCell]
-                if (column&&(!column.cssClass||!column.cssClass.includes('uneditable'))) {
-                    // Handle blank cells
-                    if (!this.rows[i][j]||this.rows[i][j]=='') {
-                        item[column.field]=undefined
+        if (_groupedBy) {
+            item=items.find(i => dataView.getRowById(i.id)==idx)
+        }
+        for (j=0; j<=this.endCell-this.startCell; j++) {
+            let column=this.columns[j+this.startCell]
+            if (column&&(!column.cssClass||!column.cssClass.includes('uneditable'))) {
+                // Handle blank cells
+                if (!this.rows[i][j]||this.rows[i][j]=='') {
+                    item[column.field]=undefined
+                } else {
+                    let cellData=this.rows[i][j].replaceAll('_*Q*_', '"').replaceAll('_*R*_', '\n')
+
+                    if (column.cssClass&&column.cssClass.includes('currency')) {
+                        item[column.field]=parseNumberFromCurrency(cellData)
                     } else {
-                        let cellData=this.rows[i][j].replaceAll('_*Q*_', '"').replaceAll('_*R*_', '\n')
-
-                        if (column.cssClass&&column.cssClass.includes('currency')) {
-                            item[column.field]=parseNumberFromCurrency(cellData)
-                        } else {
-                            item[column.field]=cellData
-                        }
-
-                        if (!item.editedfields)
-                            item.editedfields=[]
-                        if (!item.editedfields.includes(column.field))
-                            item.editedfields.push(column.field)
-                        if (!editedfields.includes(column.field))
-                            editedfields.push(column.field)
+                        item[column.field]=cellData
                     }
+
+                    if (!item.editedfields)
+                        item.editedfields=[]
+                    if (!item.editedfields.includes(column.field))
+                        item.editedfields.push(column.field)
+                    if (!editedfields.includes(column.field))
+                        editedfields.push(column.field)
                 }
             }
-
-            dataView.updateItem(item.id, item)
-            grid.recalculate(item, editedfields)
         }
+
+        dataView.updateItem(item.id, item)
+        grid.recalculate(item, editedfields)
     }
 
     runAllValidators()
