@@ -50,7 +50,7 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
     if (!week) {
         week=show.weeks[0]
         show.accessMap[apName].currentWeek=week._id.toString()
-        sshow.markModified('accessMap')
+        show.markModified('accessMap')
         await show.save()
     }
 
