@@ -38,6 +38,9 @@ getGroupAggregators=() => {
 
 // Update Purhchases
 saveData=(reload=false) => {
+    // Commit active edits
+    grid.getEditController().commitCurrentEdit()
+
     // Only save if saving is not already underway, and the user has not overidden the RFS warning
     if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
 

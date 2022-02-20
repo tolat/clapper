@@ -165,30 +165,8 @@ calculateAllWeeklyTotals=() => {
 
 // Update rentals
 saveData=(reload=false) => {
-    // Only save if saving is not already underway, and the user has not overidden the RFS warning
-    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
-
-    // Indicate grid is saving
-    let statusElement=document.getElementById('save-status');
-    statusElement.innerText='saving...';
-    statusElement.style.color='rgb(255, 193, 49)';
-
-    // Run all validators
-    runAllValidators()
-
-    // Cancel save if invalid cells remain
-    if (invalidCellsRemain()) {
-        toggleLoadingScreen(false)
-        updateSaveStatus(_dataSaved)
-        _savingUnderway=false
-        return
-    }
-
-    // Grey screen and show loader if reloading
-    if (reload) {
-        document.getElementById('grid-modal-container').style.display='flex';
-        document.getElementById('grid-modal-container').innerHTML=`<div class="spinner-border text-light" role="status" style="margin-top: 25%;"></div>`;
-    }
+    // Run pre save procedure
+    preSaveProcedure(reload)
 
     // Post estimate data and version to server
     fetch(server+`/shows/${_args.showid}/Rentals`, {

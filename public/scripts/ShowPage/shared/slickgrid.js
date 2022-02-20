@@ -287,12 +287,16 @@ createSlickGrid=(data, columns, options) => {
         if (!document.getElementById('grid-container').contains(document.activeElement)) { return }
     });
 
-    // Warn before navigating away from page
-    window.onbeforeunload=function () {
+    window.addEventListener("beforeunload", function (e) {
+        // Commit active edits
+        grid.getEditController().commitCurrentEdit()
+
+        // Prevent window unload
         if (!_dataSaved||!_accessProfilesSaved) {
-            return true;
+            e.preventDefault()
+            e.returnValue=''
         }
-    };
+    });
 
     // Add new row callback
     grid.onAddNewRow.subscribe(function (e, args) {
@@ -3796,6 +3800,33 @@ toggleApLevelModal=(show, ap=false, save=false) => {
 // Satisficing function since comparison version is in display settings and display settings keys are handled as functions
 comparisonVersion=() => {
     // Do Nothing
+}
+
+preSaveProcedure=(reload) => {
+    // Commit active edits
+    grid.getEditController().commitCurrentEdit()
+
+    // Only save if saving is not already underway, and the user has not overidden the RFS warning
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
+
+    // Indicate grid is saving
+    let statusElement=document.getElementById('save-status');
+    statusElement.innerText='saving...';
+    statusElement.style.color='rgb(255, 193, 49)';
+
+    // Run all validators
+    runAllValidators()
+
+    // Cancel save if invalid cells remain
+    if (invalidCellsRemain()) {
+        toggleLoadingScreen(false)
+        updateSaveStatus(_dataSaved)
+        _savingUnderway=false
+        return
+    }
+
+    // Grey screen if reloading 
+    if (reload) { toggleLoadingScreen(true) }
 }
 
 

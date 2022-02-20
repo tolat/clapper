@@ -50,30 +50,11 @@ getGroupAggregators=() => {
 
 // Update estimate
 saveData=(reload=false) => {
-    // Only save if saving is not already underway, and the user has not overidden the RFS warning
-    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
-
-    // Indicate grid is saving
-    let statusElement=document.getElementById('save-status');
-    statusElement.innerText='saving...';
-    statusElement.style.color='rgb(255, 193, 49)';
-
-    // Run all validators
-    runAllValidators()
-
-    // Cancel save if invalid cells remain
-    if (invalidCellsRemain()) {
-        toggleLoadingScreen(false)
-        updateSaveStatus(_dataSaved)
-        _savingUnderway=false
-        return
-    }
+    // Run pre save procedure
+    preSaveProcedure(reload)
 
     // Clear highlighted cells
     grid.removeCellCssStyles("hangingSetsOrHours");
-
-    // Grey screen if reloading since the save can take some time
-    if (reload) { toggleLoadingScreen(true, 'Reloading...') }
 
     let weekDays=[]
     for (day of _currentWeekDays) {

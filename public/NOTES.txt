@@ -24,8 +24,7 @@ TASKS
 
 Dad GUI updates
 -   Get rid of blank column at start (DONE)
--   Get rid of NoFringes Column MAYBE
--   Change name column on rates page to Position column
+-   Change name column on rates page to Position column (DONE)
 -   Prompt to save on navigating away
 -   Full Departments bar on all pages except cost report
 -   Long bar up top where text entry can happen (like excel)
