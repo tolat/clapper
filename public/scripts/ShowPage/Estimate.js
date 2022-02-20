@@ -212,7 +212,7 @@ populateMandayRates=() => {
             innerText=_mandayRates[d]
         }
         cont.innerHTML+=`<div class="rate-container">
-        <div style="min-width: 2rem;">${d}</div>
+        <div style="min-width: 2rem; padding-right: 5px;">${d}</div>
         <div style="display: flex; flex-direction:row;">
         $\xa0<${eltType} class="manday-rates-modal-input" id="${d}_mandayRate" value="${_mandayRates[d]}" onkeydown="validateModalInput(event, 'number')">
         ${innerText}
