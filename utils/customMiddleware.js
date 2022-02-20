@@ -11,6 +11,14 @@ module.exports.isLoggedIn=(req, res, next) => {
     next()
 }
 
+module.exports.isAdmin=(req, res, next) => {
+    if (!process.env.ADMINS.includes(req.user.username)) {
+        req.flash('error', 'You must be an administrator to access this route.')
+        return res.redirect('/login')
+    }
+    next()
+}
+
 module.exports.isShowOwner=async (req, res, next) => {
     const showid=req.params.id
     const apName=crudUtils.getAccessProfileName(req.user)

@@ -13,8 +13,9 @@ const server=process.env.SERVER
 const passport=require('passport')
 const LocalStrategy=require('passport-local')
 const User=require('./models/user')
+const Show=require('./models/show')
 const flash=require('connect-flash')
-const { isLoggedIn, handleCORS }=require('./utils/customMiddleware')
+const { isLoggedIn, handleCORS, isAdmin }=require('./utils/customMiddleware')
 const mongoSanitize=require('express-mongo-sanitize')
 const helmet=require('helmet')
 const dbUrl=process.env.DB_URL
@@ -139,6 +140,27 @@ app.get('/logout', isLoggedIn, (req, res) => {
     req.flash('success', 'Logout successful.')
     if (req.session.returnTo) { delete req.session.returnTo }
     res.redirect('/login')
+})
+
+// Database fixing route
+app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
+    let allShows=await Show.find({})
+
+    for (show of allShows) {
+        for (week of show.weeks) {
+            for (posCode in week.positions.positionList) {
+                let position=week.positions.positionList[posCode]
+                if (!position['Position Title']) {
+                    position['Position Title']=position['Name']
+                    delete position['Name']
+                }
+            }
+        }
+        show.markModified('weeks')
+        await show.save()
+    }
+
+    res.redirect('/shows')
 })
 
 // 404 Route / no other route matched

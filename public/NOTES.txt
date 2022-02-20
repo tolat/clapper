@@ -23,17 +23,16 @@ TASKS
 -   Change estimate File dropdown to not have open or delete (move delete to open version modal)
 
 Dad GUI updates
--   Get rid of blank column at start
+-   Get rid of blank column at start (DONE)
 -   Get rid of NoFringes Column MAYBE
--   Number column doesn't toggle sort
 -   Change name column on rates page to Position column
 -   Prompt to save on navigating away
 -   Full Departments bar on all pages except cost report
 -   Long bar up top where text entry can happen (like excel)
 -   Don't save Cost report and Estimate sheet on load
 -   Allow duplicately named rentals
--   change rental name to rental type
--   Make sure week ending date 
+-   change rental name to rental type 
+-   Make sure week ending date (DONE)
 
 
 

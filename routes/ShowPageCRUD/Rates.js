@@ -72,13 +72,13 @@ module.exports.update=async function (body, showId, user) {
 
     // Save items
     let updatedList={}
-    const RFSkeys=['Name', 'Department', 'Code', 'Rate']
+    const RFSkeys=['Position Title', 'Department', 'Code', 'Rate']
     for (item of body.data) {
         if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
             let pos=week.positions.positionList[item['Code']]||{}
 
             // Set core position values
-            for (key of ['Name', 'Department', 'Rate', 'Code']) {
+            for (key of RFSkeys) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     pos[key]=item[key]
                 }
@@ -134,7 +134,7 @@ function initializeData(positions, _show, _args, _week, accessProfile) {
         if (!positions[posCodes[i]]) { continue }
         let item={
             id: 'id_'+i,
-            'Name': positions[posCodes[i]]['Name'],
+            'Position Title': positions[posCodes[i]]['Position Title'],
             'Code': posCodes[i],
             'Department': positions[posCodes[i]]['Department'],
             'Rate': positions[posCodes[i]]['Rate'],
