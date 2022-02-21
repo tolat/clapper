@@ -76,14 +76,21 @@ module.exports.update=async function (body, showId, user) {
     // Update Purchases
     let updatedList=[]
     for (item of body.data) {
-        const RFSkeys=['Set Code', 'Department', 'PO Num', 'Date']
+        const RFSkeys=['Set Code', 'Department', 'Date']
         if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
             // Find existing purchase 
-            let p=await show.purchases.purchaseList.find(purch => purch['PO Num']==item['PO Num'])
+            let p=await show.purchases.purchaseList.find(purch => purch._id==item._id)
 
-            // Create new purchase if non exists
+            // Create new purchase if none exists
             if (!p) {
+                // Ensure unique purchase id
+                let uniqueId=numberUtils.genUniqueId()
+                while (show.purchases.purchaseList.find(purch => purch._id==uniqueId)) {
+                    uniqueId=numberUtils.genUniqueId()
+                }
+
                 p={
+                    _id: uniqueId,
                     extraColumnValues: {},
                     taxColumnValues: {},
                 }
@@ -150,6 +157,7 @@ function initializeData(purchases, _show, _args, week, accessProfile, version) {
     for (let i=0; i<purchases.length; i++) {
         let item={
             id: 'id_'+i,
+            _id: purchases[i]._id,
             'Department': purchases[i]['Department'],
             'PO Num': purchases[i]['PO Num'],
             'Invoice Num': purchases[i]['Invoice Num'],

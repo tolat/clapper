@@ -23,6 +23,7 @@ const MongoStore=require("connect-mongo")
 const GridStream=require('gridfs-stream')
 const favicon=require('serve-favicon')
 const schemaUtils=require('./utils/schemaUtils')
+const numberUtils=require('./utils/numberUtils')
 
 // Connect to the database and handle connection errors
 mongoose.connect(dbUrl, {
@@ -147,16 +148,17 @@ app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
     let allShows=await Show.find({})
 
     for (show of allShows) {
-        for (week of show.weeks) {
-            for (posCode in week.positions.positionList) {
-                let position=week.positions.positionList[posCode]
-                if (!position['Position Title']) {
-                    position['Position Title']=position['Name']
-                    delete position['Name']
+        for (purchase of show.purchases.purchaseList) {
+            if (!purchase._id) {
+                // Ensure unique purchase id
+                let uniqueId=numberUtils.genUniqueId()
+                while (show.purchases.purchaseList.find(purch => purch._id==uniqueId)) {
+                    uniqueId=numberUtils.genUniqueId()
                 }
+                purchase._id=uniqueId
             }
         }
-        show.markModified('weeks')
+        show.markModified('purchases')
         await show.save()
     }
 

@@ -129,9 +129,8 @@
             onEnd: reorderDepartments
         });
 
-        // Preliminary saveData (Sets cost report estimate version to this estimate's number)
+        // If manday rates are not set, open the manday rate modal to set them
         if (_sortedVersionKeys[0]) {
-            // If manday rates are not set, open the manday rate modal to set them
             if (!Object.keys(_mandayRates)[0]) {
                 toggleManDayRatesModal(true)
             }

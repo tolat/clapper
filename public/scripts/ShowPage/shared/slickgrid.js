@@ -195,16 +195,19 @@ createSlickGrid=(data, columns, options) => {
 
     // Update context cell and context Item on active cell change
     grid.onActiveCellChanged.subscribe(function (e, args) {
-        // Set context cell
         let activeCell=grid.getActiveCell()
+
+        // Initialize new active cell with double click timer
+        if (activeCell&&_contextCell&&_contextCell.row!=activeCell.row&&_contextCell.cell!=activeCell.cell) {
+            _cellDblClick=activeCell
+        }
+
+        // Set context cell
         if (activeCell) {
             _contextCell={ row: activeCell.row, cell: activeCell.cell }
         } else {
             _contextCell={ row: 0, cell: 0 }
         }
-
-        // Handle double click to edit
-        _cellDblClick=activeCell
 
         grid.focus()
     });
@@ -283,7 +286,7 @@ createSlickGrid=(data, columns, options) => {
         } else {
             _cellDblClick=activeCell
         }
-        setTimeout(() => { _cellDblClick=false }, 300);
+        setTimeout(() => { _cellDblClick=false; console.log('cancelling dbl click') }, 400);
     })
 
     // Grid Key Listener
