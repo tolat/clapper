@@ -32,6 +32,7 @@ Dad GUI updates
 -   Allow duplicately named rentals
 -   change rental name to rental type 
 -   Make sure week ending date (DONE)
+-   Make autonumber feature without end number (just autonuumber up to end of grid)
 
 
 

@@ -1073,7 +1073,7 @@ tbody tr{
 }
 
 .invalid-cell{
-    background-color: red !important;
+    background-color: rgb(255, 81, 81) !important;
     color: white !important;
 }
 
