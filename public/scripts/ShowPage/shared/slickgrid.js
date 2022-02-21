@@ -22,6 +22,7 @@ let _savingUnderway=false
 let _accessProfilesSaved=true
 let _initialAccessProfiles
 let _scrollVector={ x: 0, y: 0 }
+let _cellDblClick=false
 
 // Edit History Buffer
 let undoRedoBuffer={
@@ -201,6 +202,10 @@ createSlickGrid=(data, columns, options) => {
         } else {
             _contextCell={ row: 0, cell: 0 }
         }
+
+        // Handle double click to edit
+        _cellDblClick=activeCell
+
         grid.focus()
     });
 
@@ -271,8 +276,14 @@ createSlickGrid=(data, columns, options) => {
             await grid.render()
         }
 
-        // Stop double click to enter cell editor (edit with key press)
-
+        // Handle double click to edit
+        if (activeCell&&_cellDblClick&&_cellDblClick.row==activeCell.row&&_cellDblClick.cell==activeCell.cell) {
+            grid.editActiveCell()
+            _cellDblClick=false
+        } else {
+            _cellDblClick=activeCell
+        }
+        setTimeout(() => { _cellDblClick=false }, 300);
     })
 
     // Grid Key Listener
