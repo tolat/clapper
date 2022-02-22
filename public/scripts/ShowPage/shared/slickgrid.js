@@ -1565,6 +1565,12 @@ getColumnOrder=() => {
 addColumn=() => {
     let command={ type: 'editColumn' }
 
+    // Don't allow adding duplicate columns
+    if (grid.getColumns().find(c => c.name==document.getElementById('add-column-input').value)) {
+        // GIVE FEEDBACK
+        return
+    }
+
     command.execute=executeAddColumn
     command.direction=document.getElementById('add-column-direction').innerText
     command.undo=undoAddColumn

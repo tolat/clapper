@@ -13,7 +13,7 @@ TASKS
 -   Export entire show as workbook (DONE FOR ACTIVE SHEETS)
 -   Change show totals to reflect budget totals for each individual user
 -   Make all access profiles created by lower levels visible to upper levels
--   Make departments bar always wrap for tablet using/viewing
+-   Make departments bar always wrap for tablet using/viewing (DONE)
 -   copy paste on mobile using little handle to drag
 -   Make auto number by column create a number column if none exists
 -   do not use replace all for browser compatibility
@@ -25,15 +25,15 @@ TASKS
 Dad GUI updates
 -   Get rid of blank column at start (DONE)
 -   Change name column on rates page to Position column (DONE)
--   Prompt to save on navigating away
--   Full Departments bar on all pages except cost report
--   Long bar up top where text entry can happen (like excel)
--   Don't save Cost report and Estimate sheet on load
+-   Prompt to save on navigating away (NO)
+-   Full Departments bar on all pages except cost report (NO)
+-   Long bar up top where text entry can happen (like excel) (NO)
+-   Don't save Estimate sheet on load (DONE)
 -   Allow duplicately named rentals (DONE)
 -   change rental name to rental type (DONE)
 -   Change Purchase PONUM to being not a required field (use id as hidden field on item to save) (DONE)
 -   Make sure week ending date (DONE)
--   Make autonumber feature without end number (just autonuumber up to end of grid)
+-   Make autonumber feature without end number (just autonuumber up to end of grid) (DONE)
 
 
 

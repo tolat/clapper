@@ -1218,6 +1218,20 @@ tbody tr{
     margin: 10px 0 10px 0;
 }
 
+@media (max-width: 1050px){
+    .grid-toolbar{
+        flex-wrap: wrap;
+    }
+
+    .grid-toolbar-searchbar{
+        width: 100%;
+    }
+
+    .grid-toolbar-searchbar input{
+        flex-grow: 1;
+    }
+}
+
 @media (max-width: 700px) {
     .sidebar {
      display: none;
