@@ -198,7 +198,7 @@ createSlickGrid=(data, columns, options) => {
         let activeCell=grid.getActiveCell()
 
         // Initialize new active cell with double click timer
-        if (activeCell&&_contextCell&&_contextCell.row!=activeCell.row&&_contextCell.cell!=activeCell.cell) {
+        if (activeCell&&_contextCell&&_contextCell.row!=activeCell.row&&_contextCell.cell!=activeCell.cell&&!e.shiftKey) {
             _cellDblClick=activeCell
         }
 
@@ -242,7 +242,13 @@ createSlickGrid=(data, columns, options) => {
     // If shift click on a cell, select cells starting at active cell to clicked cell
     grid.onClick.subscribe(async function (e, args) {
         let activeCell=await grid.getActiveCell()
+        let cancelDblClick=false
+
+        // Handle shift clicking
         if (e.shiftKey&&activeCell) {
+            // Disable cell double click
+            cancelDblClick=true
+
             let toRow=args.row;
             let toCell=args.cell;
             let fromRow=activeCell.row;
@@ -265,12 +271,10 @@ createSlickGrid=(data, columns, options) => {
             let selectionModel=await grid.getSelectionModel()
             let ranges=await selectionModel.getSelectedRanges()
 
-            if (toCell&&toRow) {
-                ranges[0].fromCell=fromCell
-                ranges[0].fromRow=fromRow
-                ranges[0].toCell=toCell
-                ranges[0].toRow=toRow
-            }
+            ranges[0].fromCell=fromCell
+            ranges[0].fromRow=fromRow
+            ranges[0].toCell=toCell
+            ranges[0].toRow=toRow
 
             await grid.setActiveCell(originalFromRow, originalFromCell)
             await selectionModel.setSelectedRanges(ranges)
@@ -280,13 +284,13 @@ createSlickGrid=(data, columns, options) => {
         }
 
         // Handle double click to edit
-        if (activeCell&&_cellDblClick&&_cellDblClick.row==activeCell.row&&_cellDblClick.cell==activeCell.cell) {
+        if (activeCell&&_cellDblClick&&_cellDblClick.row==activeCell.row&&_cellDblClick.cell==activeCell.cell&&!cancelDblClick) {
             grid.editActiveCell()
             _cellDblClick=false
         } else {
             _cellDblClick=activeCell
         }
-        setTimeout(() => { _cellDblClick=false; console.log('cancelling dbl click') }, 400);
+        setTimeout(() => { _cellDblClick=false }, 300);
     })
 
     // Grid Key Listener
