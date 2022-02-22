@@ -22,6 +22,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
 
     // Generate a map of all show crew usernames to their position codes for this week
     const allShowUsers=await crudUtils.getAllCrewUsers(await crudUtils.getAllCrewIDs(show._id))
+    console.log(allShowUsers.length)
     let userPosForWeekMap={}
     let userNamesForWeekMap={}
     for (user of allShowUsers) {

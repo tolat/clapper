@@ -18,7 +18,7 @@ TASKS
 -   Make auto number by column create a number column if none exists
 -   do not use replace all for browser compatibility
 -   Inertia on finger scrolling
--   Prevent creating duplicate columns
+-   Prevent creating duplicate columns (DONE + GIVE USER FEEDBACK)
 -   Prevent creating duplicate departments
 -   Change estimate File dropdown to not have open or delete (move delete to open version modal)
 
