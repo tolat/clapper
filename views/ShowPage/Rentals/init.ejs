@@ -146,7 +146,7 @@
     // Creates grid columns 
     function initializeColumns(positions) {
         let columns=[
-            { id: "Rental Name", name: "Rental Name", field: "Rental Name", width: 200, editor: Slick.Editors.Text, sortable: true },
+            { id: "Rental Type", name: "Rental Type", field: "Rental Type", width: 200, editor: Slick.Editors.Text, sortable: true },
             { id: "Day Rate", name: "Day Rate", field: "Day Rate", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save currency' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _currentWeekSetCodes, sortable: true, cssClass: 'required-for-save' },
             { id: "Department", name: "Department", field: "Department", width: 90, sortable: true, editor: AutoCompleteEditor, dataSource: _args.departments, cssClass: 'required-for-save' },

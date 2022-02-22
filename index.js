@@ -150,28 +150,9 @@ app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
     for (show of allShows) {
         for (week of show.weeks) {
             for (rental of week.rentals.rentalList) {
-                if (!rental._id) {
-                    // Ensure unique id
-                    let uniqueId=numberUtils.genUniqueId()
-
-                    while (await !ensureUniqueId()) {
-                        uniqueId=numberUtils.genUniqueId()
-                    }
-
-                    function ensureUniqueId() {
-                        for (show_ of allShows) {
-                            for (week_ of show_.weeks) {
-                                for (rental_ of week_.rentals.rentalList) {
-                                    if (rental_._id==uniqueId) {
-                                        return false
-                                    }
-                                }
-                            }
-                        }
-                        return true
-                    }
-
-                    rental._id=uniqueId
+                if (rental['Rental Name']) {
+                    rental['Rental Type']=rental['Rental Name']
+                    delete rental['Rental Name']
                 }
             }
         }
