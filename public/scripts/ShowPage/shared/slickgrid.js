@@ -2586,6 +2586,13 @@ autoFillRange=(start, end, increment) => {
     let command={ type: 'autoFillRange' }
     let activeCell=grid.getActiveCell();
     if (!activeCell) { return }
+
+    // Auto fill to end of grid if no end is specified
+    if (!end) {
+        let inc=increment||1
+        end=(grid.getData().getItems().length-activeCell.row)*inc
+    }
+
     command.execute=executeAutoFillRange;
     command.undo=undoAutoFillRange;
     command.start=start;
