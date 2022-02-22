@@ -126,9 +126,9 @@ module.exports.update=async function (body, showId, user) {
     }
 
     // Add old values for restricted items to the updated List
-    let restrictedItems=await crudUtils.getRestrictedItems(show.purchases.purchaseList, accessProfile, 'PO Num')
+    let restrictedItems=await crudUtils.getRestrictedItems(show.purchases.purchaseList, accessProfile, '_id')
     for (item of restrictedItems) {
-        updatedList.push(show.purchases.purchaseList.find(p => p['PO Num']==item))
+        updatedList.push(show.purchases.purchaseList.find(p => p['_id']==item))
     }
 
     show.purchases.purchaseList=updatedList
@@ -200,9 +200,9 @@ function initializeData(purchases, _show, _args, week, accessProfile, version) {
     }
 
 
-    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'PO Num')
-    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'PO Num')
-        .filter(item => !restrictedItems.includes(item['PO Num']))
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, '_id')
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, '_id')
+        .filter(item => !restrictedItems.includes(item['_id']))
 
     return data;
 }

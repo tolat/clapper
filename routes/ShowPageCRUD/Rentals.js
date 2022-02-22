@@ -108,10 +108,10 @@ module.exports.update=async function (body, showId, user) {
 
     // Update rental list
     let updatedList=[]
-    const RFSkeys=['Day Rate', 'Set Code', 'Department', 'Rental Name']
+    const RFSkeys=['Day Rate', 'Set Code', 'Department']
     for (item of body.data) {
         if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
-            let rental=await week.rentals.rentalList.find(r => r['Rental Name']==item['Rental Name'])
+            let rental=await week.rentals.rentalList.find(r => r._id==item._id)
 
             // If no rental exists, create new rental
             if (!rental) {
@@ -150,9 +150,9 @@ module.exports.update=async function (body, showId, user) {
     }
 
     // Add old values for restricted items to the updated List
-    let restrictedItems=await crudUtils.getRestrictedItems(week.rentals.rentalList, accessProfile, 'Rental Name')
+    let restrictedItems=await crudUtils.getRestrictedItems(week.rentals.rentalList, accessProfile, '_id')
     for (item of restrictedItems) {
-        updatedList.push(week.rentals.rentalList.find(rental => rental['Rental Name']==item))
+        updatedList.push(week.rentals.rentalList.find(rental => rental['_id']==item))
     }
 
     week.rentals.rentalList=updatedList
@@ -180,6 +180,7 @@ function initializeData(rentals, _week, accessProfile) {
     for (let i=0; i<rentals.length; i++) {
         let item={
             id: 'id_'+i,
+            _id: rentals[i]._id,
             'Day Rate': rentals[i]['Day Rate'],
             'Days Rented': rentals[i]['Days Rented'],
             'Rental Name': rentals[i]['Rental Name'],
@@ -203,9 +204,9 @@ function initializeData(rentals, _week, accessProfile) {
         data.push(item);
     }
 
-    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, 'Rental Name')
-    data=crudUtils.filterRestrictedColumnData(data, accessProfile, 'Rental Name')
-        .filter(item => !restrictedItems.includes(item['Rental Name']))
+    let restrictedItems=crudUtils.getRestrictedItems(data, accessProfile, '_id')
+    data=crudUtils.filterRestrictedColumnData(data, accessProfile, '_id')
+        .filter(item => !restrictedItems.includes(item['_id']))
 
     return data;
 }
