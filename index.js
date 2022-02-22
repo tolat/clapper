@@ -148,17 +148,34 @@ app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
     let allShows=await Show.find({})
 
     for (show of allShows) {
-        for (purchase of show.purchases.purchaseList) {
-            if (!purchase._id) {
-                // Ensure unique purchase id
-                let uniqueId=numberUtils.genUniqueId()
-                while (show.purchases.purchaseList.find(purch => purch._id==uniqueId)) {
-                    uniqueId=numberUtils.genUniqueId()
+        for (week of show.weeks) {
+            for (rental of week.rentals.rentalList) {
+                if (!rental._id) {
+                    // Ensure unique id
+                    let uniqueId=numberUtils.genUniqueId()
+
+                    while (await !ensureUniqueId()) {
+                        uniqueId=numberUtils.genUniqueId()
+                    }
+
+                    function ensureUniqueId() {
+                        for (show_ of allShows) {
+                            for (week_ of show_.weeks) {
+                                for (rental_ of week_.rentals.rentalList) {
+                                    if (rental_._id==uniqueId) {
+                                        return false
+                                    }
+                                }
+                            }
+                        }
+                        return true
+                    }
+
+                    rental._id=uniqueId
                 }
-                purchase._id=uniqueId
             }
         }
-        show.markModified('purchases')
+        show.markModified('weeks')
         await show.save()
     }
 

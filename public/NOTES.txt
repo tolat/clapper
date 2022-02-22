@@ -31,7 +31,7 @@ Dad GUI updates
 -   Don't save Cost report and Estimate sheet on load
 -   Allow duplicately named rentals
 -   change rental name to rental type 
--   Change Purchase PONUM to being not a required field (use id as hidden field on item to save)
+-   Change Purchase PONUM to being not a required field (use id as hidden field on item to save) (DONE)
 -   Make sure week ending date (DONE)
 -   Make autonumber feature without end number (just autonuumber up to end of grid)
 

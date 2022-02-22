@@ -457,7 +457,6 @@ createSlickGrid=(data, columns, options) => {
 }
 
 function handleSwipe(e) {
-    console.log('touchstart!')
     if (e.changedTouches.length>1) { return }
     const touchStart=e.changedTouches[0]
     let scrollVectoAcc={ x: 0, y: 0 }
@@ -668,8 +667,7 @@ triggerPaste=async () => {
     // Replace \r carachters - only use \n for row separation
     clipText=clipText.replaceAll('\r', '')
 
-    console.log(clipText.split(''))
-
+    //console.log(clipText.split(''))
 
     // Replace intra-cell return chars with placeholder so splitting into rows is easier
     let newClipText=''
@@ -3128,7 +3126,6 @@ toggleDataFilterModal=(show, ap=false, apPage=false, filterCol=false, newFilter=
             document.getElementById('data-filter-modal-input').value=currentValues
             document.getElementById('data-filter-column-input').style.display='none'
             document.getElementById('data-filter-column-input-label').style.display='none'
-            console.log(document.getElementById('data-filter-column-input').style.display)
         }
 
     } else {
