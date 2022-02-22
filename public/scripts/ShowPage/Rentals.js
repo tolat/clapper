@@ -109,6 +109,9 @@ autoFillSupplierData=(args) => {
                         item['Supplier Code']=userPositions[0]
                         item['Department']=_posDeptMap[userPositions[0]]
                     }
+                } else {
+                    item['Supplier Code']=userPositions[0]
+                    item['Department']=_posDeptMap[userPositions[0]]
                 }
             }
         }

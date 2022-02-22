@@ -35,6 +35,8 @@ Dad GUI updates
 -   Make sure week ending date (DONE)
 -   Make autonumber feature without end number (just autonuumber up to end of grid) (DONE)
 
+-   Change username to Email on Crew page
+-   Change Supplier to Supplier Email on Rentals page 
 
 
 TORIN:
