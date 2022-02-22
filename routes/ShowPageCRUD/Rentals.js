@@ -22,7 +22,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
 
     // Generate a map of all show crew usernames to their position codes for this week
     const allShowUsers=await crudUtils.getAllCrewUsers(await crudUtils.getAllCrewIDs(show._id))
-    console.log(allShowUsers.length)
     let userPosForWeekMap={}
     let userNamesForWeekMap={}
     for (user of allShowUsers) {
@@ -37,7 +36,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
             }
             if (daysWorkedInWeek) {
                 // Generate userNameMap
-                if (!userNamesForWeekMap[user.username]) { userNamesForWeekMap[user.username]=user.Name }
+                if (!userNamesForWeekMap[user.username]) { userNamesForWeekMap[user.username]=user.Name||'* name empty *' }
                 // Generate userPosMap
                 if (!userPosForWeekMap[user.username]) { userPosForWeekMap[user.username]=[] }
                 if (!userPosForWeekMap[user.username].includes[pos.code]) { userPosForWeekMap[user.username].push(pos.code) }
