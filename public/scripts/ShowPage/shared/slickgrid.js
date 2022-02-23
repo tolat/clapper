@@ -682,14 +682,9 @@ triggerPaste=async () => {
     newClipText=newClipText.replaceAll('\r', '')
     let rows=newClipText.split('\n')
 
-    // Split up rows into cell values (trim last cell since it will always be a blank (after last \t))
+    // Split up rows into cell values WRONG --> ??(trim last cell since it will always be a blank (after last \t))?? <-- WRONG
     for (i=0; i<rows.length; i++) {
         rows[i]=rows[i].split('\t')
-
-        // If last row item is blank, trim it
-        if (rows[i][rows[i].length-1]=='') {
-            rows[i].pop()
-        }
     }
 
     editCommand.rows=rows
@@ -706,8 +701,6 @@ triggerPaste=async () => {
 
     editCommand.columns=grid.getColumns()
     editCommand.selectedRange=grid.getSelectionModel().getSelectedRanges()[0]
-
-    console.log(rows[0].length, editCommand.startCell)
 
     editCommand.row=editCommand.startRow
     editCommand.cell=editCommand.startCell
@@ -800,8 +793,6 @@ function executePaste() {
         this.endCell=this.startCell+Xrange
     }
 
-    console.log(this)
-
     // Replace grid data with paste data
     for (let i=0; i<=this.endRow-this.startRow; i++) {
         let idx=i+this.startRow
@@ -814,7 +805,6 @@ function executePaste() {
             item=items.find(i => dataView.getRowById(i.id)==idx)
         }
         for (let j=0; j<=this.endCell-this.startCell; j++) {
-            console.log(j)
             let column=this.columns[j+this.startCell]
             if (column&&(!column.cssClass||!column.cssClass.includes('uneditable'))) {
                 // Handle blank cells
