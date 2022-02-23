@@ -667,8 +667,6 @@ triggerPaste=async () => {
     // Replace \r carachters - only use \n for row separation
     clipText=clipText.replaceAll('\r', '')
 
-    //console.log(clipText.split(''))
-
     // Replace intra-cell return chars with placeholder so splitting into rows is easier
     let newClipText=''
     let inQuote=false
@@ -697,10 +695,19 @@ triggerPaste=async () => {
     editCommand.rows=rows
     editCommand.startRow=_contextCell.row
     editCommand.startCell=_contextCell.cell
-    editCommand.endRow=rows.length-1+editCommand.startRow
-    editCommand.endCell=rows[0].length-1+editCommand.startCell
+
+    let offset_1=1
+    if (rows.length==0) { offset_1=0 }
+    editCommand.endRow=rows.length-offset_1+editCommand.startRow
+
+    let offset_2=1
+    if (rows[0].length==0) { offset_2=0 }
+    editCommand.endCell=rows[0].length-offset_2+editCommand.startCell
+
     editCommand.columns=grid.getColumns()
     editCommand.selectedRange=grid.getSelectionModel().getSelectedRanges()[0]
+
+    console.log(rows[0].length, editCommand.startCell)
 
     editCommand.row=editCommand.startRow
     editCommand.cell=editCommand.startCell
@@ -793,6 +800,8 @@ function executePaste() {
         this.endCell=this.startCell+Xrange
     }
 
+    console.log(this)
+
     // Replace grid data with paste data
     for (let i=0; i<=this.endRow-this.startRow; i++) {
         let idx=i+this.startRow
@@ -804,7 +813,8 @@ function executePaste() {
         if (_groupedBy) {
             item=items.find(i => dataView.getRowById(i.id)==idx)
         }
-        for (j=0; j<=this.endCell-this.startCell; j++) {
+        for (let j=0; j<=this.endCell-this.startCell; j++) {
+            console.log(j)
             let column=this.columns[j+this.startCell]
             if (column&&(!column.cssClass||!column.cssClass.includes('uneditable'))) {
                 // Handle blank cells
