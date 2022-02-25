@@ -1072,6 +1072,10 @@ tbody tr{
     opacity: 0.5;
 }
 
+.inactive{
+    opacity: 0.5;
+}
+
 .invalid-cell{
     background-color: rgb(255, 81, 81) !important;
     color: white !important;

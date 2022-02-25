@@ -37,6 +37,8 @@ Dad GUI updates
 
 -   Change username to Phone Number on Crew page
 -   Change Supplier to Supplier Phone on Rentals page 
+-   Need totals synopsis per department on crew page
+-   Active Set slector column 
 
 
 TORIN:

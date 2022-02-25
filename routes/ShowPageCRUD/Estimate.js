@@ -41,7 +41,7 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
         args.weekEnding=show.estimateVersions[args.version].weekEnding;
     }
 
-    args.extraColumns=[];
+    args.extraColumns={};
     args.fringes={};
     args.mandayRates={};
     let comparisonVersion=false
@@ -154,7 +154,7 @@ module.exports.update=async function (body, showId, user) {
     // First blank estimate case 
     if (!ov) {
         show.estimateVersions[v]={
-            extraColumns: [],
+            extraColumns: {},
             displaySettings: {},
             mandayRates: {},
             fringes: {},
@@ -249,7 +249,7 @@ module.exports.update=async function (body, showId, user) {
             // Update extra column keys, deleting values for columns that don't exist anymore
             let previousValues=set.extraColumnValues
             set.extraColumnValues={}
-            for (key of body.extraColumns) {
+            for (key in body.extraColumns) {
                 // Set extra column value for this key if it isn't restricted. if it is, then set it to the previous values
                 !crudUtils.isRestrictedColumn(key, accessProfile)? set.extraColumnValues[key]=item[key]:
                     set.extraColumnValues[key]=previousValues[key]
@@ -298,7 +298,7 @@ module.exports.update=async function (body, showId, user) {
                     }
                     set.extraColumnValues={}
                 }
-                show.estimateVersions[v].extraColumns=[]
+                show.estimateVersions[v].extraColumns={}
             }
             // Delete old version and change comparison version name for all users if this is not a new version (i.e. this is a rename)
             if (!isNewVersion) {

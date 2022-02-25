@@ -148,15 +148,14 @@ app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
     let allShows=await Show.find({})
 
     for (show of allShows) {
-        for (week of show.weeks) {
-            for (rental of week.rentals.rentalList) {
-                if (rental['Rental Name']) {
-                    rental['Rental Type']=rental['Rental Name']
-                    delete rental['Rental Name']
-                }
+        for (ev in show.estimateVersions) {
+            let newExtraCols={}
+            for (col of show.estimateVersions[ev].extraColumns) {
+                newExtraCols[col]='text'
             }
+            show.estimateVersions[ev].extraColumns=newExtraCols
         }
-        show.markModified('weeks')
+        show.markModified('estimateVersions')
         await show.save()
     }
 

@@ -146,13 +146,18 @@
             // Core feature columns
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true },
-            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true }
+            { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true },
+            //{ id: "Active", name: "Active", field: "Active", width: 150, editor: Slick.Editors.Text, sortable: true }
         ];
 
         // Non-department estimate specific columns
         if (_sortedVersionKeys[0]) {
-            for (key of _extraColumns) {
-                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.LongText, sortable: true });
+            for (key in _extraColumns) {
+                // Select column editor based on extracolumns map
+                let editor=Slick.Editors.Text
+                if (_extraColumns[key]=='longtext') { editor=Slick.Editors.LongText }
+
+                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor, sortable: true });
             }
         }
 

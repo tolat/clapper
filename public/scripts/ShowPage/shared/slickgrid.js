@@ -682,6 +682,8 @@ triggerPaste=async () => {
     newClipText=newClipText.replaceAll('\r', '')
     let rows=newClipText.split('\n')
 
+    console.log(rows)
+
     // Split up rows into cell values WRONG --> ??(trim last cell since it will always be a blank (after last \t))?? <-- WRONG
     for (i=0; i<rows.length; i++) {
         rows[i]=rows[i].split('\t')
@@ -850,9 +852,20 @@ triggerCopy=() => {
         for (let j=copyRange.fromCell; j<=copyRange.toCell; j++) {
             let value=false
             if (!columns[j].isHidden) { value=item[columns[j].field] }
-            value? copyString+='\"'+value.toString().replaceAll('"', '""')+'\"\t':copyString+='\t'
+            if (value) {
+                copyString+='\"'+value.toString().replaceAll('"', '""')+'\"'
+            }
+
+            // Add \t for next cell if not at end of row
+            if (j!=copyRange.toCell) {
+                copyString+='\t'
+            }
         }
-        copyString+='\r'
+
+        // Add \r for new row if not at last row
+        if (i!=copyRange.toRow) {
+            copyString+='\r'
+        }
     }
 
     navigator.clipboard.writeText(copyString)
@@ -1605,8 +1618,9 @@ async function executeAddColumn() {
 
         await calculateAllWeeklyTotals()
     } else {
-        if (this.islongtext) { newColumn.editor=Slick.Editors.LongText }
-        _extraColumns.push(this.colName);
+        let editor='text'
+        if (this.islongtext) { newColumn.editor=Slick.Editors.LongText; editor='longtext' }
+        _extraColumns[this.colName]=editor;
     }
 
 
@@ -1627,7 +1641,7 @@ async function undoAddColumn() {
         _taxColumns.splice(_args.weekTaxColumns.indexOf(this.colName), 1)
         await calculateAllWeeklyTotals()
     } else {
-        _extraColumns.splice(_extraColumns.indexOf(this.colName), 1);
+        delete _extraColumns[this.colName]
     }
 }
 
@@ -1652,8 +1666,8 @@ async function executeDeleteColumn() {
 
         await calculateAllWeeklyTotals()
     } else {
-        if (_extraColumns.includes(cName)) {
-            await _extraColumns.splice(_extraColumns.indexOf(`${cName}`), 1);
+        if (_extraColumns[cName]) {
+            delete _extraColumns[cName]
         }
     }
 
@@ -1670,7 +1684,9 @@ async function undoDeleteColumn() {
         _taxColumns.push(this.column.name)
         await calculateAllWeeklyTotals()
     } else {
-        await _extraColumns.push(this.column.name);
+        let editor='text'
+        if (this.column.editor==Slick.Editors.LongText) { editor='longtext' }
+        _extraColumns[this.column.name]=editor
     }
 }
 
