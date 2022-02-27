@@ -131,7 +131,7 @@ module.exports.update=async function (body, showId, user) {
             // Save extra column values, deferring to previous value if this column in restricted
             let previousValues=rental.extraColumnValues
             rental.extraColumnValues={}
-            for (key of body.extraColumns) {
+            for (key in body.extraColumns) {
                 !crudUtils.isRestrictedColumn(key, accessProfile)? rental.extraColumnValues[key]=item[key]:
                     rental.extraColumnValues[key]=previousValues[key]
             }
@@ -195,7 +195,7 @@ function initializeData(rentals, _week, accessProfile) {
             item[taxCol]=numUtils.zeroNanToNull(parseFloat(rentals[i].taxColumnValues[taxCol]))
         }
 
-        for (extraCol of _week.rentals.extraColumns) {
+        for (extraCol in _week.rentals.extraColumns) {
             item[extraCol]=rentals[i].extraColumnValues[extraCol]
         }
 

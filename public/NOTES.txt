@@ -39,7 +39,7 @@ Dad GUI updates
 -   Change username to Phone Number on Crew page
 -   Change Supplier to Supplier Phone on Rentals page 
 -   Need totals synopsis per department on crew page
--   Active Set slector column 
+-   Active Set slector column (DONE)
 -   Grid scroll on column drag
 -   Cell contents visible on hover for 1 second
 -   Fix bug in rentals page where there are red cells on save

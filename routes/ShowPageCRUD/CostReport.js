@@ -106,7 +106,7 @@ module.exports.update=async function (body, showId, user) {
     for (item of body.data) {
         if (item['Set Code']) {
             // Save extra column values if they are not restricted
-            for (col of body.extraColumns) {
+            for (col in body.extraColumns) {
                 if (!crudUtils.isRestrictedColumn(col, accessProfile)) {
                     if (!show.costReport.setExtraColumnMap[item['Set Code']])
                         show.costReport.setExtraColumnMap[item['Set Code']]={}
@@ -217,7 +217,7 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
         }
 
         // Add extra column values
-        for (col of show.costReport.extraColumns) {
+        for (col in show.costReport.extraColumns) {
             let map=show.costReport.setExtraColumnMap[item['Set Code']];
             if (map) { item[col]=map[col] }
         }

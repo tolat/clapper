@@ -107,7 +107,7 @@ module.exports.update=async function (body, showId, user) {
             // Save extra column values
             let previousValues=p.extraColumnValues
             p.extraColumnValues={};
-            for (key of body.extraColumns) {
+            for (key in body.extraColumns) {
                 !crudUtils.isRestrictedColumn(key, accessProfile)? p.extraColumnValues[key]=item[key]:
                     p.extraColumnValues[key]=previousValues[key]
             }
@@ -192,7 +192,7 @@ function initializeData(purchases, _show, _args, week, accessProfile, version) {
             item['Date']=(new Date(purchases[i]['Date'])).toLocaleDateString('en-US');
 
         // Add extra column values
-        for (col of _show.purchases.extraColumns) {
+        for (col in _show.purchases.extraColumns) {
             item[col]=purchases[i].extraColumnValues[col];
         }
 

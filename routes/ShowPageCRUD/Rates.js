@@ -87,7 +87,7 @@ module.exports.update=async function (body, showId, user) {
             // Save extra column values, deferring to previous value if this column in restricted
             let previousValues=pos.extraColumnValues
             pos.extraColumnValues={}
-            for (key of body.extraColumns) {
+            for (key in body.extraColumns) {
                 !crudUtils.isRestrictedColumn(key, accessProfile)? pos.extraColumnValues[key]=item[key]:
                     pos.extraColumnValues[key]=previousValues[key]
             }
@@ -144,7 +144,7 @@ function initializeData(positions, _show, _args, _week, accessProfile) {
         if (!_show.departments.includes(item['Department'])) { item['Department']+='\xa0(NOT FOUND)' }
 
         // Add extra columns values
-        for (col of _week.positions.extraColumns) {
+        for (col in _week.positions.extraColumns) {
             item[col]=positions[posCodes[i]].extraColumnValues[col];
         }
 

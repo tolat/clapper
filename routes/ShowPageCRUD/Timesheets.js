@@ -67,7 +67,7 @@ module.exports.update=async function (body, showId, user) {
                 newMap={
                     cellValueMap: {},
                     displaySettings: {},
-                    extraColumns: [],
+                    extraColumns: {},
                     name: body.newMapName
                 }
             }

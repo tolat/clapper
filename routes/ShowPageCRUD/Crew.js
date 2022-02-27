@@ -147,7 +147,7 @@ module.exports.update=async function (body, showId, user) {
             // Save extra column values, deferring to previous value if this column in restricted
             let previousValues=record.weeksWorked[week._id].extraColumnValues[item['Position']]||false
             record.weeksWorked[week._id].extraColumnValues[item['Position']]={}
-            for (key of body.extraColumns) {
+            for (key in body.extraColumns) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     record.weeksWorked[week._id].extraColumnValues[item['Position']][key]=item[key]
                 } else if (previousValues) {
@@ -305,7 +305,7 @@ function initializeData(crew, _show, week, accessProfile=false) {
                 }
 
                 // Add extra column values
-                for (col of week.crew.extraColumns) {
+                for (col in week.crew.extraColumns) {
                     if (record.weeksWorked[week._id].extraColumnValues[pos.code]) {
                         item[col]=record.weeksWorked[week._id].extraColumnValues[pos.code][col];
                     }

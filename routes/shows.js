@@ -141,16 +141,16 @@ router.post('/', isLoggedIn, tryCatch(async (req, res, next) => {
         },
         crew: {
             crewList: [],
-            extraColumns: [],
+            extraColumns: {},
             taxColumns: []
         },
         rentals: {
             rentalList: [],
-            extraColumns: [],
+            extraColumns: {},
             taxColumns: [],
         },
         positions: {
-            extraColumns: [],
+            extraColumns: {},
             positionList: {}
         }
     }

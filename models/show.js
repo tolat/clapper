@@ -11,23 +11,23 @@ const ShowSchema=new Schema({
         end: Date,
         multipliers: Object,
         crew: {
-            extraColumns: [String],
+            extraColumns: Object,
             taxColumns: [String],
             crewList: [{ type: Schema.Types.ObjectId, ref: 'User' }]
         },
         rentals: {
             displaySettings: Object,
-            extraColumns: [String],
+            extraColumns: Object,
             taxColumns: [String],
             rentalList: [Object],
         },
         positions: {
-            extraColumns: [String],
+            extraColumns: Object,
             positionList: Object
         },
     }],
     purchases: {
-        extraColumns: [String],
+        extraColumns: Object,
         taxColumns: [],
         purchaseList: [Object]
     },
@@ -36,7 +36,7 @@ const ShowSchema=new Schema({
     departmentColorMap: Object,
     costReport: {
         displaySettings: Object,
-        extraColumns: [String],
+        extraColumns: Object,
         estimateVersion: String,
         setNumberMap: Object,
         setExtraColumnMap: Object,

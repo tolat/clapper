@@ -250,7 +250,7 @@ initializeVariables=() => {
         }
     }
 
-    for (col of _args.extraColumns) {
+    for (col in _args.extraColumns) {
         variables.push({
             name: `${col}`,
             description: `User added column from Crew page`,

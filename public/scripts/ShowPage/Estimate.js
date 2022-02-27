@@ -625,7 +625,7 @@ toggleComparisonVersionModal=(show, save=false) => {
     }
 }
 
-// Set style for inactive rows
+// Set style for inactive rows NOT USED
 setInactive=(set, item) => {
     if (!set) {
         item['*']='*'

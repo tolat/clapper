@@ -53,18 +53,18 @@ module.exports.createWeek=async function (body, show, newWeekId, apName) {
         let newWeek={
             crew: {
                 displaySettings: {},
-                extraColumns: [],
+                extraColumns: {},
                 taxColumns: [],
                 crewList: []
             },
             rentals: {
                 displaySettings: {},
-                extraColumns: [],
+                extraColumns: {},
                 taxColumns: [],
                 rentalList: []
             },
             positions: {
-                extracolumns: [],
+                extracolumns: {},
                 positionList: {}
             },
             multipliers: {

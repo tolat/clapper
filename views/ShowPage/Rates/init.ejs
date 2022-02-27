@@ -96,10 +96,12 @@
             { id: "Rate", name: "Rate", field: "Rate", editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save rate' },
         ];
 
-        // Add extra columns
-        for (key of _extraColumns) {
-            let column={ id: key, deletable: true, name: key, field: key, width: 150, editor: Slick.Editors.Text, sortable: true };
-            columns.push(column);
+        for (key in _extraColumns) {
+            // Select column editor based on extracolumns map
+            let editor=Slick.Editors.Text
+            if (_extraColumns[key]=='longtext') { editor=Slick.Editors.LongText }
+
+            columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor, sortable: true, headerCssClass: 'deletable-header' });
         }
 
 
