@@ -149,12 +149,13 @@ app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
 
     for (show of allShows) {
         for (ev in show.estimateVersions) {
-            let newExtraCols={}
-            for (col of show.estimateVersions[ev].extraColumns) {
-                newExtraCols[col]='text'
+            for (set of show.estimateVersions[ev].sets) {
+                if (!set['*']) {
+                    set['*']='*'
+                }
             }
-            show.estimateVersions[ev].extraColumns=newExtraCols
         }
+
         show.markModified('estimateVersions')
         await show.save()
     }

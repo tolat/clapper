@@ -49,6 +49,21 @@
         // Apply cell styles
         applyCellStyles(_cellCssStyles)
 
+        // Click listener to toggle star column cells on click
+        grid.onDblClick.subscribe(function (e, args) {
+            let cols=grid.getColumns()
+            let starCol=cols.indexOf(cols.find(c => c.name=='*'))
+
+            let dv=grid.getData()
+            let oldItem=dv.getItemByIdx(args.row)
+            let newItem=JSON.parse(JSON.stringify(oldItem))
+
+            if (args.cell==starCol) {
+                oldItem['*']=='*'? newItem['*']=undefined:newItem['*']='*'
+                updateItemCustom(args.row, args.cell, newItem, oldItem)
+            }
+        })
+
         // Recalculate after paste
         grid.recalculate=async function (item, editedfields=false) {
             let cols=grid.getColumns()
@@ -88,6 +103,9 @@
 
             // Run validators on cell edit 
             runValidators(_validators, args);
+
+            // Handle * column changes
+            // setInactive(!args.item['*'], args.item)
 
             updateTotalsRow();
         });
@@ -144,10 +162,10 @@
     function initializeColumns() {
         let columns=[
             // Core feature columns
+            { id: "*", name: "*", field: "*", width: 28, sortable: true, headerCssClass: 'star-column-header' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true },
-            //{ id: "Active", name: "Active", field: "Active", width: 150, editor: Slick.Editors.Text, sortable: true }
         ];
 
         // Non-department estimate specific columns
@@ -157,7 +175,7 @@
                 let editor=Slick.Editors.Text
                 if (_extraColumns[key]=='longtext') { editor=Slick.Editors.LongText }
 
-                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor, sortable: true });
+                columns.push({ id: key, deletable: true, name: key, field: key, width: 150, editor, sortable: true, headerCssClass: 'deletable-header' });
             }
         }
 

@@ -624,3 +624,31 @@ toggleComparisonVersionModal=(show, save=false) => {
         }
     }
 }
+
+// Set style for inactive rows
+setInactive=(set, item) => {
+    if (!set) {
+        item['*']='*'
+    }
+
+    for (key in item) {
+        if (!_cellCssStyles['inactive']) {
+            _cellCssStyles['inactive']={}
+        }
+
+        if (!_cellCssStyles['inactive'][item.id]) {
+            _cellCssStyles['inactive'][item.id]={}
+        }
+
+        set?
+            _cellCssStyles['inactive'][item.id][key]='inactive':
+            delete _cellCssStyles['inactive'][item.id][key]
+
+        // Remove empty inactive styles
+        if (!Object.keys(_cellCssStyles['inactive'][item.id])[0]) {
+            delete _cellCssStyles['inactive'][item.id]
+        }
+    }
+    applyCellStyles(_cellCssStyles)
+
+}

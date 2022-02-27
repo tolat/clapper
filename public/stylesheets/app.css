@@ -984,6 +984,15 @@ tbody tr{
 .slick-header-column{
     background: rgb(243, 243, 243) !important;
     color: black;
+    font-weight: bold;
+}
+
+.deletable-header{
+    font-weight: normal;
+}
+
+.star-column-header{
+    font-size: 1.1rem;
 }
 
 .slick-header-column:hover{
@@ -1073,7 +1082,8 @@ tbody tr{
 }
 
 .inactive{
-    opacity: 0.5;
+    opacity: 0.3;
+    /* border: 1px solid rgb(122, 122, 122) !important; */
 }
 
 .invalid-cell{

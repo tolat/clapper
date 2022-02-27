@@ -1607,7 +1607,8 @@ async function executeAddColumn() {
         width: 150,
         editor: Slick.Editors.Text,
         deletable: true,
-        sortable: true
+        sortable: true,
+        headerCssClass: 'deletable-header'
     }
 
     if (this.istaxcolumn) {
@@ -1698,6 +1699,12 @@ selectAll=() => {
     }
     grid.setActiveCell(0, 0);
     grid.setSelectedRows(allRows);
+
+    // Update selectionModel
+    let selectionModel=grid.getSelectionModel()
+    selectionModel.getSelectedRanges()[0].toRow=grid.getData().getItems().length-1
+    grid.setSelectionModel(selectionModel)
+    console.log(selectionModel.getSelectedRanges())
 
 }
 
