@@ -157,6 +157,11 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
         // Get set for item
         let set=sets.find(s => s['Set Code']==item['Set Code']);
 
+        // Do not include sets that are inactive
+        if (!set['*']) {
+            continue
+        }
+
         // Initialize overall totals
         let costs=calculateCosts(item, show, week, showCrew);
 

@@ -1889,6 +1889,12 @@ updateTotalsRow=() => {
 // Gets specified 'type' of total from the grid's items
 getTotal=(field, type) => {
     let items=dataView.getItems();
+
+    // Do not sum over sets that are inactive
+    if (_args.section=='Estimate') {
+        items=items.filter(i => i['*'])
+    }
+
     switch (type) {
         case 'sum':
             return sumItems(items, field);
