@@ -82,7 +82,6 @@ module.exports.get=async function (id, section, query, args, res, sharedModals, 
     } else {
         res.render('ShowPage/Template', {
             title: `${show['Name']} - ${section}`,
-            show,
             section,
             args,
             sharedModals,
@@ -230,7 +229,7 @@ module.exports.update=async function (body, showId, user) {
             }
 
             // Update unrestricted core display keys
-            for (key of ['Set Code', 'Episode', 'Name', '*']) {
+            for (key of ['Set Code', 'Episode', 'Name', '*', '#']) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     set[key]=item[key];
                 }
@@ -360,7 +359,8 @@ function initializeData(sets, _show, _args, _version, accessProfile) {
                 'Set Code': sets[i]['Set Code'],
                 'Episode': sets[i]['Episode'],
                 'Name': sets[i]['Name'],
-                '*': sets[i]['*']
+                '*': sets[i]['*'],
+                '#': sets[i]['#']
             }
 
             // Version specific features

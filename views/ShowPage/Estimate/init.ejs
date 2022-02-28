@@ -1,6 +1,5 @@
 <script>
     // Global variables
-    let _show= <%- JSON.stringify(show)%>;
     let _accessProfile= <%- JSON.stringify(accessProfile)%>;
     let _user= <%- JSON.stringify(user)%>;
     let _apName= <%- JSON.stringify(apName)%>;
@@ -162,10 +161,11 @@
     function initializeColumns() {
         let columns=[
             // Core feature columns
-            { id: "*", name: "*", field: "*", width: 28, sortable: true, headerCssClass: 'star-column-header' },
+            { id: "#", name: "#", field: "#", width: 30, editor: Slick.Editors.Integer, sortable: true },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save identifier' },
             { id: "Episode", name: "Episode", field: "Episode", width: 80, editor: Slick.Editors.Text, sortable: true },
             { id: "Name", name: "Name", field: "Name", width: 200, editor: Slick.Editors.Text, sortable: true },
+            { id: "*", name: "*", field: "*", width: 30, sortable: true, headerCssClass: 'star-column-header' },
         ];
 
         // Non-department estimate specific columns

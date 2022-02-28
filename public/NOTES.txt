@@ -35,12 +35,11 @@ Dad GUI updates
 -   Make sure week ending date (DONE)
 -   Make autonumber feature without end number (just autonuumber up to end of grid) (DONE)
 
--   Extend Object extraColumns to all pages
--   Change username to Phone Number on Crew page
--   Change Supplier to Supplier Phone on Rentals page 
+-   Extend Object extraColumns to all pages (DONE)
+-   Figure out username problem
 -   Need totals synopsis per department on crew page
 -   Active Set slector column (DONE)
--   Grid scroll on column drag
+-   Grid scroll on column drag (ALREADY DONE)
 -   Cell contents visible on hover for 1 second
 -   Fix bug in rentals page where there are red cells on save
 -   # column on every page

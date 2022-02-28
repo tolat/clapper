@@ -993,6 +993,7 @@ tbody tr{
 
 .star-column-header{
     font-size: 1.1rem;
+    color: rgb(255, 0, 0);
 }
 
 .slick-header-column:hover{
@@ -1079,11 +1080,6 @@ tbody tr{
 }
 .departments-bar-item:active{
     opacity: 0.5;
-}
-
-.inactive{
-    opacity: 0.3;
-    /* border: 1px solid rgb(122, 122, 122) !important; */
 }
 
 .invalid-cell{

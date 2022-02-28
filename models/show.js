@@ -11,6 +11,7 @@ const ShowSchema=new Schema({
         end: Date,
         multipliers: Object,
         crew: {
+            posNumberMap: Object,
             extraColumns: Object,
             taxColumns: [String],
             crewList: [{ type: Schema.Types.ObjectId, ref: 'User' }]

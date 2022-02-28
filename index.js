@@ -148,41 +148,8 @@ app.get('/fixdb', isLoggedIn, isAdmin, async (req, res) => {
     let allShows=await Show.find({})
 
     for (show of allShows) {
-        for (week of show.weeks) {
-            let newEcols={}
-            for (col of week.crew.extraColumns) {
-                newEcols[col]='text'
-            }
-            week.crew.extraColumns=newEcols
-
-            let newEcols1={}
-            for (col of week.positions.extraColumns) {
-                newEcols1[col]='text'
-            }
-            week.positions.extraColumns=newEcols1
-
-            let newEcols2={}
-            for (col of week.rentals.extraColumns) {
-                newEcols2[col]='text'
-            }
-            week.rentals.extraColumns=newEcols2
-        }
-
-        let newEcols3={}
-        for (col of show.purchases.extraColumns) {
-            newEcols3[col]='text'
-        }
-        show.purchases.extraColumns=newEcols3
-
-        let newEcols4={}
-        for (col of show.costReport.extraColumns) {
-            newEcols4[col]='text'
-        }
-        show.costReport.extraColumns=newEcols4
 
         show.markModified('weeks')
-        show.markModified('purchases')
-        show.markModified('costReport')
         await show.save()
     }
 

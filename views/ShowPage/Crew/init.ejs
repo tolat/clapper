@@ -150,6 +150,7 @@
     // Creates grid columns 
     function initializeColumns() {
         let columns=[
+            { id: "#", name: "#", field: "#", width: 30, editor: Slick.Editors.Integer, sortable: true },
             { id: "username", name: "Username", field: "username", width: 120, editor: AutoCompleteEditor, dataSource: _allUsernames, sortable: true, minWidth: 0, cssClass: 'required-for-save identifier' },
             { id: "Position", name: "Position", field: "Position", width: 80, editor: AutoCompleteEditor, dataSource: Object.keys(_positions), sortable: true, minWidth: 0, cssClass: 'required-for-save' },
             { id: "Name", name: "Name", field: "Name", width: 120, editor: AutoCompleteEditor, dataSource: _dropdownNames, sortable: true, minWidth: 0, },

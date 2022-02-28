@@ -56,6 +56,7 @@ router.get('/', isLoggedIn, hasShowAccess, tryCatch(async (req, res, next) => {
 
     // Set args
     let args={
+        show,
         section: section,
         showid: id,
         weekid,

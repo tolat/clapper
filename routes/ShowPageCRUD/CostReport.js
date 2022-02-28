@@ -114,7 +114,15 @@ module.exports.update=async function (body, showId, user) {
                 }
             }
         }
+
+        // Save number for this set  
+        if (!show.costReport.setNumberMap)
+            show.costReport.setNumberMap={}
+        show.costReport.setNumberMap[item['Set Code']]=item['#']
     }
+
+
+
 
     show.markModified('costReport.setExtraColumnMap');
     show.markModified('costReport.setNumberMap');
@@ -145,6 +153,11 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
     }
 
     for (let i=0; i<sets.length; i++) {
+        // Get number for this set  
+        if (!show.costReport.setNumberMap)
+            show.costReport.setNumberMap={}
+        let setNum=show.costReport.setNumberMap[sets[i]['Set Code']]
+
         let item={
             id: 'id_'+i,
             setid: sets[i]._id,
@@ -152,6 +165,7 @@ function initializeData(sets, show, week, accessProfile, estimateVersion, showCr
             ['Set Code']: sets[i]['Set Code'],
             ['Episode']: sets[i]['Episode'],
             ['Name']: sets[i]['Name'],
+            '#': setNum
         }
 
         // Get set for item

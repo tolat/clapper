@@ -42,6 +42,9 @@
         // Create data grid
         await createSlickGrid(data, columns, options);
 
+        // Placeholder function
+        grid.recalculate=function () { }
+
         // Update grid on cell change
         grid.onCellChange.subscribe(function (e, args) {
             // Run validators on cell edit 
@@ -71,6 +74,7 @@
     function initializeColumns() {
         let columns=[
             // Core feature columns
+            { id: "#", name: "#", field: "#", width: 30, editor: Slick.Editors.Integer, sortable: true },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, sortable: true, cssClass: 'uneditable cost-report-column' },
             { id: "Episode", name: "Episode", field: "Episode", width: 80, sortable: true, cssClass: 'uneditable cost-report-column' },
             { id: "Name", name: "Name", field: "Name", width: 300, sortable: true, cssClass: 'uneditable cost-report-column' },

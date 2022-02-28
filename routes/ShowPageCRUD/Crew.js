@@ -155,7 +155,7 @@ module.exports.update=async function (body, showId, user) {
                 }
             }
 
-            // Save extra column values, deferring to previous value if this column in restricted
+            // Save tax column values, deferring to previous value if this column is restricted
             previousValues=record.weeksWorked[week._id].taxColumnValues[item['Position']]||false
             record.weeksWorked[week._id].taxColumnValues[item['Position']]={}
             for (key of body.taxColumns) {
@@ -184,6 +184,13 @@ module.exports.update=async function (body, showId, user) {
                     record.positions.push(recordPosition)
                 }
             }
+
+            // Update posNumberMap for week
+            if (!week.crew.posNumberMap)
+                week.crew.posNumberMap={}
+            if (!week.crew.posNumberMap[user.username])
+                week.crew.posNumberMap[user.username]={}
+            week.crew.posNumberMap[user.username][item['Position']]=item['#']
 
             // Update the hours and set for each day worked
             for (day of body.currentWeekDays) {
@@ -224,7 +231,6 @@ module.exports.update=async function (body, showId, user) {
             } else {
                 keepPositionMap[user._id.toString()].push(item['Position'])
             }
-
         }
     }
 
@@ -285,6 +291,13 @@ function initializeData(crew, _show, week, accessProfile=false) {
                 let position=week.positions.positionList[pos.code]||pos.code=='NOT FOUND'
                 let department=_show.departments.find(d => d==position['Department'])
 
+                // Get number for this user's position 
+                if (!week.crew.posNumberMap)
+                    week.crew.posNumberMap={}
+                if (!week.crew.posNumberMap[crew[i]['username']])
+                    week.crew.posNumberMap[crew[i]['username']]={}
+                let posNum=week.crew.posNumberMap[crew[i]['username']][pos.code]
+
                 let item={
                     id: 'id_'+count,
                     userid: crew[i]._id,
@@ -293,6 +306,7 @@ function initializeData(crew, _show, week, accessProfile=false) {
                     'Position': pos.code,
                     'Date Joined': (new Date(record['Date Joined'])).toLocaleDateString('en-US'),
                     'Department': department,
+                    '#': posNum,
                     editedfields: [],
                 }
 
