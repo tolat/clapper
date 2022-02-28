@@ -78,7 +78,7 @@ module.exports.update=async function (body, showId, user) {
             let pos=week.positions.positionList[item['Code']]||{}
 
             // Set core position values
-            for (key of RFSkeys) {
+            for (key of ['Position Title', 'Department', 'Code', 'Rate', '#']) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile)) {
                     pos[key]=item[key]
                 }
@@ -138,6 +138,7 @@ function initializeData(positions, _show, _args, _week, accessProfile) {
             'Code': posCodes[i],
             'Department': positions[posCodes[i]]['Department'],
             'Rate': positions[posCodes[i]]['Rate'],
+            '#': positions[posCodes[i]]['#']
         }
 
         // Mark deleted departments

@@ -179,7 +179,7 @@
 
         // Add tax columns
         for (tax of _taxColumns) {
-            columns.push({ id: tax, name: tax, field: tax, width: 60, sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column', deletable: true, istaxcolumn: true })
+            columns.push({ id: tax, name: tax, field: tax, width: 60, sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column', deletable: true, istaxcolumn: true, headerCssClass: 'deletable-header' })
         }
 
         // Add rentals and total columns

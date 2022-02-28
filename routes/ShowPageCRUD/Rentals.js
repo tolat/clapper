@@ -122,7 +122,7 @@ module.exports.update=async function (body, showId, user) {
                 week.rentals.rentalList.push(rental)
             }
 
-            let displayKeys=['Rental Type', 'Day Rate', 'Set Code', 'Department', 'Days Rented', 'Supplier', 'Supplier Code']
+            let displayKeys=['Rental Type', 'Day Rate', 'Set Code', 'Department', 'Days Rented', 'Supplier', 'Supplier Code', '#']
             for (key of displayKeys) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile))
                     rental[key]=item[key];
@@ -188,6 +188,7 @@ function initializeData(rentals, _week, accessProfile) {
             'Set Code': rentals[i]['Set Code'],
             'Supplier': rentals[i]['Supplier'],
             'Supplier Code': rentals[i]['Supplier Code'],
+            '#': rentals[i]['#'],
             editedfields: []
         }
 

@@ -41,8 +41,8 @@ Dad GUI updates
 -   Active Set slector column (DONE)
 -   Grid scroll on column drag (ALREADY DONE)
 -   Cell contents visible on hover for 1 second
--   Fix bug in rentals page where there are red cells on save
 -   # column on every page
+-   allow rentals to be assigned to any user, not just week crew
 
 
 TORIN:

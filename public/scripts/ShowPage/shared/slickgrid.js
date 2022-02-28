@@ -1639,7 +1639,7 @@ async function undoAddColumn() {
 
     if (this.istaxcolumn) {
         // *****ONLY CHANGE TAX COLUMNS FOR CURRENT SECTION (RENTALS PURCHASE OR CREW PAGE)*****
-        _taxColumns.splice(_args.weekTaxColumns.indexOf(this.colName), 1)
+        _taxColumns.splice(_taxColumns.indexOf(this.colName), 1)
         await calculateAllWeeklyTotals()
     } else {
         delete _extraColumns[this.colName]
@@ -1663,7 +1663,7 @@ async function executeDeleteColumn() {
     let cName=this.column.name;
 
     if (this.column.istaxcolumn) {
-        _taxColumns.splice(_args.weekTaxColumns.indexOf(cName), 1)
+        _taxColumns.splice(_taxColumns.indexOf(cName), 1)
 
         await calculateAllWeeklyTotals()
     } else {

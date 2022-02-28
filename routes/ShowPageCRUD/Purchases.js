@@ -98,7 +98,7 @@ module.exports.update=async function (body, showId, user) {
             }
 
             // Save display key data
-            let displayKeys=['Set Code', 'Department', 'Date', 'PO Num', 'Invoice Num', 'Supplier', 'Amount', 'Description']
+            let displayKeys=['Set Code', 'Department', 'Date', 'PO Num', 'Invoice Num', 'Supplier', 'Amount', 'Description', '#']
             for (key of displayKeys) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile))
                     p[key]=item[key];
@@ -163,6 +163,7 @@ function initializeData(purchases, _show, _args, week, accessProfile, version) {
             'Invoice Num': purchases[i]['Invoice Num'],
             'Supplier': purchases[i]['Supplier'],
             'Description': purchases[i]['Description'],
+            '#': purchases[i]['#'],
             'Amount': parseFloat((numberUtils.zeroNanToNull(purchases[i]['Amount'])||0)).toFixed(2),
         }
 

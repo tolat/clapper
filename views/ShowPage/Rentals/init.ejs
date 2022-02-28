@@ -146,6 +146,7 @@
     // Creates grid columns 
     function initializeColumns(positions) {
         let columns=[
+            { id: "#", name: "#", field: "#", width: 30, editor: Slick.Editors.Integer, sortable: true },
             { id: "Rental Type", name: "Rental Type", field: "Rental Type", width: 200, editor: Slick.Editors.Text, sortable: true },
             { id: "Day Rate", name: "Day Rate", field: "Day Rate", width: 80, editor: Slick.Editors.Text, sortable: true, cssClass: 'required-for-save currency' },
             { id: "Set Code", name: "Set Code", field: "Set Code", width: 80, editor: AutoCompleteEditor, dataSource: _currentWeekSetCodes, sortable: true, cssClass: 'required-for-save' },
@@ -168,7 +169,7 @@
         for (taxCol of _taxColumns) {
             columns.push({
                 id: taxCol, name: taxCol, field: taxCol, width: 80,
-                sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column'
+                sortable: true, editor: Slick.Editors.Text, cssClass: 'tax-column', headerCssClass: 'deletable-header'
             })
         }
 
