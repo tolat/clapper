@@ -856,7 +856,7 @@ button:active{
 }
 
 .active-row{
-    border-bottom: 1px solid black !important;
+    border-bottom: 1px dashed black;
 }
 
 .slick-row.new-row{
