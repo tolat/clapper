@@ -23,6 +23,7 @@ let _accessProfilesSaved=true
 let _initialAccessProfiles
 let _scrollVector={ x: 0, y: 0 }
 let _cellDblClick=false
+let _showContentsHover=false
 
 // Edit History Buffer
 let undoRedoBuffer={
@@ -241,7 +242,7 @@ createSlickGrid=(data, columns, options) => {
 
     // If shift click on a cell, select cells starting at active cell to clicked cell
     grid.onClick.subscribe(async function (e, args) {
-        let activeCell=await grid.getActiveCell()
+        let activeCell={ row: args.row, cell: args.cell }
         let cancelDblClick=false
 
         // Handle shift clicking
@@ -286,11 +287,45 @@ createSlickGrid=(data, columns, options) => {
         // Handle double click to edit
         if (activeCell&&_cellDblClick&&_cellDblClick.row==activeCell.row&&_cellDblClick.cell==activeCell.cell&&!cancelDblClick) {
             grid.editActiveCell()
+            grid.getCellEditor().focus()
             _cellDblClick=false
         } else {
             _cellDblClick=activeCell
+
+            // Set active row to be highlighted
+            let item=grid.getData().getItemByIdx(activeCell.row)
+            delete _cellCssStyles['active-row']
+            for (key in item) {
+                if (!_cellCssStyles['active-row'])
+                    _cellCssStyles['active-row']={}
+                if (!_cellCssStyles['active-row'][item.id])
+                    _cellCssStyles['active-row'][item.id]={}
+                _cellCssStyles['active-row'][item.id][key]='active-row'
+            }
+            applyCellStyles(_cellCssStyles)
         }
         setTimeout(() => { _cellDblClick=false }, 300);
+
+    })
+
+
+    // Listener to display cell contents on one second hover
+    grid.onMouseEnter.subscribe(function (e, args) {
+        let cellNode=e.currentTarget
+        _showContentsHover=e.currentTarget
+        document.getElementById('hover-cell-contents').style.display='none';
+
+        let cellObject={ cellNode, x: e.clientX, y: e.clientY }
+        // Wait 200 MS to display cell contents
+        setTimeout(function () {
+            if (cellObject.cellNode==_showContentsHover&&cellObject.cellNode.innerText) {
+                let hcc=document.getElementById('hover-cell-contents')
+                hcc.style.display='inline-block'
+                hcc.innerText=cellNode.innerText
+                hcc.style.top=`${cellObject.y}px`
+                hcc.style.left=`${cellObject.x}px`
+            }
+        }, 1200)
     })
 
     // Grid Key Listener
@@ -1507,6 +1542,21 @@ revertCellStyles=(command) => {
 
 // Apply cell styles defined by styles
 applyCellStyles=(styles) => {
+    // Apply all active edits
+    let editor=grid.getCellEditor()
+    if (editor) {
+        let dv=grid.getData()
+        if (editor.args) {
+            let item=editor.args.item
+            let field=editor.args.column.field
+            let newItem=JSON.parse(JSON.stringify(item))
+            newItem[field]=editor.getValue()
+            if (newItem[field]!=item[field])
+                updateItemCustom(dv.getRowById(item.id), grid.getColumns().indexOf(editor.args.column), newItem, item)
+            editor.destroy()
+        }
+    }
+
     for (style in styles) {
         let rowHash={}
         for (id in styles[style]) {

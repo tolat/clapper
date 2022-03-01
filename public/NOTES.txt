@@ -41,8 +41,10 @@ Dad GUI updates
 -   Active Set slector column (DONE)
 -   Grid scroll on column drag (ALREADY DONE)
 -   Cell contents visible on hover for 1 second
--   # column on every page
+-   # column on every page (DONE)
 -   allow rentals to be assigned to any user, not just week crew
+-   Get printing to look ok
+-   Import layouts from other shows
 
 
 TORIN:
