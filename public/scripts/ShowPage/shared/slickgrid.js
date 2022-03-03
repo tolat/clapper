@@ -287,7 +287,15 @@ createSlickGrid=(data, columns, options) => {
         // Handle double click to edit
         if (activeCell&&_cellDblClick&&_cellDblClick.row==activeCell.row&&_cellDblClick.cell==activeCell.cell&&!cancelDblClick) {
             grid.editActiveCell()
-            grid.getCellEditor().focus()
+
+            // Focus open editor
+            setTimeout(() => {
+                let editor=grid.getCellEditor();
+                if (editor) {
+                    editor.focus()
+                }
+            }, 50)
+
             _cellDblClick=false
         } else {
             _cellDblClick=activeCell

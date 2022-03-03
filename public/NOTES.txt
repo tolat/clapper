@@ -40,7 +40,7 @@ Dad GUI updates
 -   Need totals synopsis per department on crew page
 -   Active Set slector column (DONE)
 -   Grid scroll on column drag (ALREADY DONE)
--   Cell contents visible on hover for 1 second
+-   Cell contents visible on hover for 1 second (DONE)
 -   # column on every page (DONE)
 -   allow rentals to be assigned to any user, not just week crew
 -   Get printing to look ok
