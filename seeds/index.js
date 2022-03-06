@@ -57,24 +57,24 @@ const seedShows=async () => {
                     }
                 },
                 crew: {
-                    extraColumns: [],
+                    extraColumns: {},
                     taxColumns: ['GST', 'PST'],
                     crewList: []
                 },
                 rentals: {
                     displaySettings: {},
-                    extraColumns: [],
+                    extraColumns: {},
                     taxColumns: ['GST', 'PST'],
                     rentalList: []
                 },
                 positions: {
-                    extraColumns: [],
+                    extraColumns: {},
                     positionList: {}
                 }
             }],
             estimateVersions: {
                 '100': {
-                    extraColumns: ['Location', 'Notes'],
+                    extraColumns: { 'Location': 'text', 'Notes': 'longtext' },
                     mandayRates: {
                         'Construction': 550,
                         'Paint': 300,
@@ -92,12 +92,12 @@ const seedShows=async () => {
                 }
             },
             purchases: {
-                extraColumns: [],
+                extraColumns: {},
                 taxColumns: ['GST', 'PST'],
                 purchaseList: []
             },
             costReport: {
-                extraColumns: [],
+                extraColumns: {},
                 setExtraColumnMap: {},
             },
             timesheets: {
@@ -367,6 +367,7 @@ const seedSets=async () => {
                     'Set Code': `${i}0${j}`,
                     'Episode': `${i}00`,
                     'Name': getDescription(),
+                    '*': '*',
                     departmentValues: {
                         'Construction Man Days': Math.floor(Math.random()*10),
                         'Construction Materials': Math.floor(Math.random()*1000),
