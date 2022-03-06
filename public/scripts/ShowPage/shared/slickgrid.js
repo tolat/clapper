@@ -24,6 +24,7 @@ let _initialAccessProfiles
 let _scrollVector={ x: 0, y: 0 }
 let _cellDblClick=false
 let _showContentsHover=false
+let _activeCell={}
 
 // Edit History Buffer
 let undoRedoBuffer={
@@ -242,18 +243,17 @@ createSlickGrid=(data, columns, options) => {
 
     // If shift click on a cell, select cells starting at active cell to clicked cell
     grid.onClick.subscribe(async function (e, args) {
-        let activeCell={ row: args.row, cell: args.cell }
         let cancelDblClick=false
 
         // Handle shift clicking
-        if (e.shiftKey&&activeCell) {
+        if (e.shiftKey&&_activeCell) {
             // Disable cell double click
             cancelDblClick=true
 
             let toRow=args.row;
             let toCell=args.cell;
-            let fromRow=activeCell.row;
-            let fromCell=activeCell.cell;
+            let fromRow=_activeCell.row;
+            let fromCell=_activeCell.cell;
 
             let temp;
             let originalFromCell=fromCell
@@ -282,10 +282,12 @@ createSlickGrid=(data, columns, options) => {
             await grid.setSelectionModel(selectionModel)
             await grid.invalidate()
             await grid.render()
+        } else {
+            _activeCell={ row: args.row, cell: args.cell }
         }
 
         // Handle double click to edit
-        if (activeCell&&_cellDblClick&&_cellDblClick.row==activeCell.row&&_cellDblClick.cell==activeCell.cell&&!cancelDblClick) {
+        if (_activeCell&&_cellDblClick&&_cellDblClick.row==_activeCell.row&&_cellDblClick.cell==_activeCell.cell&&!cancelDblClick) {
             grid.editActiveCell()
 
             // Focus open editor
@@ -298,10 +300,10 @@ createSlickGrid=(data, columns, options) => {
 
             _cellDblClick=false
         } else {
-            _cellDblClick=activeCell
+            _cellDblClick=_activeCell
 
             // Set active row to be highlighted
-            let item=grid.getData().getItemByIdx(activeCell.row)
+            let item=grid.getData().getItemByIdx(_activeCell.row)
             delete _cellCssStyles['active-row']
             for (key in item) {
                 if (!_cellCssStyles['active-row'])
@@ -313,7 +315,6 @@ createSlickGrid=(data, columns, options) => {
             applyCellStyles(_cellCssStyles)
         }
         setTimeout(() => { _cellDblClick=false }, 300);
-
     })
 
 
