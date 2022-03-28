@@ -332,7 +332,7 @@ module.exports.isValidItem=function (item, RFSkeys, accessProfile) {
     if (!item) { return false }
     const isWhitelist=accessProfile.columnFilter.type=='w'
     for (key of RFSkeys) {
-        if (!item[key]) {
+        if (!item[key]&&!parseInt(item[key])==0) {
             if (accessProfile.columnFilter.filter.includes(key)) {
                 if (isWhitelist) {
                     return false
