@@ -2381,7 +2381,7 @@ clearDeletedItems=() => {
     let reqForSaveCols=grid.getColumns().filter(c => c.cssClass&&c.cssClass.includes('required-for-save'))
     for (item of items) {
         for (col of reqForSaveCols) {
-            if (!item[col.field]) {
+            if (!item[col.field]&&!parseInt(item[col.field])==0) {
                 dataView.updateItem(item.id, { id: item.id })
             }
         }
