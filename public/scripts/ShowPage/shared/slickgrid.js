@@ -2902,7 +2902,7 @@ blankRequiredWarning=() => {
     for (item of dataView.getItems()) {
         if (!isEmpty(item)) {
             for (col of requiredCols) {
-                if (!item[col.field]) {
+                if (!item[col.field]&&!parseInt(item[col.field])==0) {
                     toggleBlankRequiredWarningModal(true)
                     grid.scrollCellIntoView(dataView.getRowByItem(item), grid.getColumns().indexOf(col))
                     return true
