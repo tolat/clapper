@@ -114,14 +114,17 @@ module.exports.update=async function (body, showId, user) {
             let rental=await week.rentals.rentalList.find(r => r._id==item._id)
 
             // If no rental exists, create new rental
+            let uID=await genUniqueId()
             if (!rental) {
                 rental={
-                    _id: genUniqueId(),
+                    _id: uID,
                     taxColumnValues: {},
                     extraColumnValues: {}
                 }
                 week.rentals.rentalList.push(rental)
             }
+
+            console.log(`found rental with id: ${rental._id}`)
 
             let displayKeys=['Rental Type', 'Day Rate', 'Set Code', 'Department', 'Days Rented', 'Supplier', 'Supplier Code', '#']
             for (key of displayKeys) {
