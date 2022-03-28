@@ -59,7 +59,7 @@ getGroupAggregators=() => {
 // Save cost report
 saveData=(reload=false, updateVersion=false) => {
     // Run pre save procedure
-    preSaveProcedure(reload)
+    if (!preSaveProcedure(reload)) { return }
 
     // Post estimate data and version to server
     fetch(server+`/shows/${_args.showid}/CostReport`, {

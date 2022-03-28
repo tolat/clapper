@@ -51,7 +51,7 @@ getGroupAggregators=() => {
 // Update estimate
 saveData=(reload=false) => {
     // Run pre save procedure
-    preSaveProcedure(reload)
+    if (!preSaveProcedure(reload)) { return }
 
     // Clear highlighted cells
     grid.removeCellCssStyles("hangingSetsOrHours");

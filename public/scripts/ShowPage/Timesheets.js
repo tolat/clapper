@@ -91,7 +91,7 @@ function downloadTimesheets(filename) {
 // Update Timesheets
 saveData=(reload=false, newMapName=false, isNewMap=false, openMap=false, deleteMap=false) => {
     // Run pre save procedure
-    preSaveProcedure(reload)
+    if (!preSaveProcedure(reload)) { return }
 
     // Do nothing if trying to open current map
     if (!reload&&openMap) {

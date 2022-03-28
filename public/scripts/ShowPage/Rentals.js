@@ -169,7 +169,7 @@ calculateAllWeeklyTotals=() => {
 // Update rentals
 saveData=(reload=false) => {
     // Run pre save procedure
-    preSaveProcedure(reload)
+    if (!preSaveProcedure(reload)) { return }
 
     // Post estimate data and version to server
     fetch(server+`/shows/${_args.showid}/Rentals`, {

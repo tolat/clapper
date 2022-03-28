@@ -3923,7 +3923,7 @@ preSaveProcedure=(reload) => {
     grid.getEditController().commitCurrentEdit()
 
     // Only save if saving is not already underway, and the user has not overidden the RFS warning
-    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return } else { _savingUnderway=true }
+    if (_savingUnderway||(!_overrideBlankRFSWarning&&blankRequiredWarning())) { return false } else { _savingUnderway=true }
 
     // Indicate grid is saving
     let statusElement=document.getElementById('save-status');
@@ -3938,11 +3938,13 @@ preSaveProcedure=(reload) => {
         toggleLoadingScreen(false)
         updateSaveStatus(_dataSaved)
         _savingUnderway=false
-        return
+        return false
     }
 
     // Grey screen if reloading 
     if (reload) { toggleLoadingScreen(true) }
+
+    return true
 }
 
 
