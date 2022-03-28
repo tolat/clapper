@@ -111,13 +111,12 @@ module.exports.update=async function (body, showId, user) {
     const RFSkeys=['Day Rate', 'Set Code', 'Department']
     for (item of body.data) {
         if (crudUtils.isValidItem(item, RFSkeys, accessProfile)&&!crudUtils.isRestrictedItem(item, accessProfile)) {
-            let rental=await week.rentals.rentalList.find(r => r._id==item._id)
+            let rental=await week.rentals.rentalList.find(r => r._id==item._id&&item._id)
 
             // If no rental exists, create new rental
-            let uID=await genUniqueId()
             if (!rental) {
                 rental={
-                    _id: uID,
+                    _id: genUniqueId(),
                     taxColumnValues: {},
                     extraColumnValues: {}
                 }
