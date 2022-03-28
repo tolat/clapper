@@ -116,6 +116,7 @@ module.exports.update=async function (body, showId, user) {
             // If no rental exists, create new rental
             if (!rental) {
                 rental={
+                    _id: genUniqueId(),
                     taxColumnValues: {},
                     extraColumnValues: {}
                 }
