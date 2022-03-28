@@ -123,8 +123,6 @@ module.exports.update=async function (body, showId, user) {
                 week.rentals.rentalList.push(rental)
             }
 
-            console.log(`found rental with id: ${rental._id}`)
-
             let displayKeys=['Rental Type', 'Day Rate', 'Set Code', 'Department', 'Days Rented', 'Supplier', 'Supplier Code', '#']
             for (key of displayKeys) {
                 if (!crudUtils.isRestrictedColumn(key, accessProfile))
