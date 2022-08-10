@@ -1,37 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <%- include("partials/head")%>
-</head>
+  </head>
 
-<body class="landing-background" style="color: white;">
+  <body class="landing-background" style="color: white">
     <%- include("partials/navbar-simple")%>
-        <div id="login-container">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
-                <h1 style="margin: 0; color: white; font-style: italic;">Login</h1>
-            </div>
-            <form id="login-form" action="/login" method="POST">
-                <%- include("partials/flash") %>
-                    <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">Email address</label>
-                        <input type="text" class="form-control" id="username" name="username"
-                            aria-describedby="emailHelp">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password">
-                        <button type="button" class="btn button-secondary"
-                            style="font-size: 0.75rem; color: white; width: unset;"
-                            onclick="location.href = '/passwordRecovery';">Forgot
-                            Password?</button>
-                    </div>
-                    <button type="submit" class="btn btn-success">Login</button>
-                    <button type="button" class="btn button-secondary" onclick="location.href = '/createAccount';"
-                        style="margin-top: 15px; color: white;">Create
-                        Account</button>
-            </form>
+    <div id="login-container">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        "
+      >
+        <h1 style="margin: 0; color: white; font-style: italic">Login</h1>
+      </div>
+      <form id="login-form" action="/login" method="POST">
+        <%- include("partials/flash") %>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label"
+            >Email address</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            aria-describedby="emailHelp"
+          />
         </div>
-</body>
-
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+          />
+          <button
+            type="button"
+            class="btn button-secondary"
+            style="font-size: 0.75rem; color: white; width: unset"
+            onclick="location.href = '/passwordRecovery';"
+          >
+            Forgot Password?
+          </button>
+        </div>
+        <button type="submit" class="btn btn-success">Login</button>
+        <button
+          type="button"
+          class="btn button-secondary"
+          onclick="location.href = '/createAccount';"
+          style="margin-top: 15px; color: white"
+        >
+          Create Account
+        </button>
+      </form>
+    </div>
+  </body>
 </html>
