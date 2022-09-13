@@ -1,146 +1,172 @@
 <div id="shows-list-container">
-    <% for (show of shows) {%>
-        <div class="show-list-item-container" id="<%=show._id%>-table-item">
-            <div style="display: flex; flex-direction: column; flex-grow: 1;">
-                <div id="<%=show.id%>_name" style="font-size: 1.3rem; width: 100%;"
-                    onclick="window.location = ('/shows/<%=show._id%>/0')">
-                    <%=show['Name']%>
-                </div>
-                <div id="show-item-body-container" style="display: flex;">
-                    <div id="widget-container" style="display: flex;">
-                        <div style="display:flex; flex-direction: row; flex-wrap: wrap;">
-                            <div class="show-data-item">
-                                <div>Budget:</div>
-                                <div>
-                                    <%=show.costReport.budget%>
-                                </div>
-                            </div>
-                            <div class="show-data-item">
-                                <div>To Date:</div>
-                                <div>
-                                    <%=show.costReport.toDate%>
-                                </div>
-                            </div>
-                            <div class="show-data-item">
-                                <div>Remaining:</div>
-                                <div>
-                                    <%=show.costReport.remaining%>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="flex-grow: 1;" onclick="window.location = ('/shows/<%=show._id%>/0')"></div>
-                </div>
+  <% for (show of shows) {%>
+  <div class="show-list-item-container" id="<%=show._id%>-table-item">
+    <div style="display: flex; flex-direction: column; flex-grow: 1">
+      <div
+        id="<%=show.id%>_name"
+        style="font-size: 1.3rem; width: 100%"
+        onclick="window.location = ('/shows/<%=show._id%>/0')"
+      >
+        <%=show['Name']%>
+      </div>
+      <div id="show-item-body-container" style="display: flex">
+        <div id="widget-container" style="display: flex">
+          <div style="display: flex; flex-direction: row; flex-wrap: wrap">
+            <div class="show-data-item">
+              <div>Budget:</div>
+              <div><%=show.costReport.budget%></div>
             </div>
-            <div id="row-end-button-container"
-                style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div class="shows-table-delete-button"
-                    onclick="toggleDeleteShowWarningModal(true, false,'<%=show._id%>')">
-                    Delete
-                </div>
-                <div class="shows-table-download-button underline-on-hover"
-                    onclick="downloadShow('<%=show._id.toString()%>')">
-                    Download
-                </div>
+            <div class="show-data-item">
+              <div>To Date:</div>
+              <div><%=show.costReport.toDate%></div>
             </div>
+            <div class="show-data-item">
+              <div>Remaining:</div>
+              <div><%=show.costReport.remaining%></div>
+            </div>
+          </div>
         </div>
-        <%}%>
+        <div
+          style="flex-grow: 1"
+          onclick="window.location = ('/shows/<%=show._id%>/0')"
+        ></div>
+      </div>
+    </div>
+    <div
+      id="row-end-button-container"
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      "
+    >
+      <div
+        class="shows-table-delete-button"
+        onclick="toggleDeleteShowWarningModal(true, false,'<%=show._id%>')"
+      >
+        Delete
+      </div>
+      <div
+        class="shows-table-download-button"
+        onclick="downloadShow('<%=show._id.toString()%>')"
+      >
+        <img
+          style="color: white"
+          src="../../public/images/download-cloud.svg"
+        />
+        <div class="underline-on-hover" style="margin-left: 5px">Donwload</div>
+      </div>
+    </div>
+  </div>
+  <%}%>
 </div>
 
 <script>
-    // Send show download job to server and poll every second to see if job has been completed, then download
-    async function downloadShow(showid) {
+  // Send show download job to server and poll every second to see if job has been completed, then download
+  async function downloadShow(showid) {
+    // Show loading screen
+    toggleLoadingScreen(true, "Downloading...");
 
-        // Show loading screen
-        toggleLoadingScreen(true, 'Downloading...')
-
-        // Get all showData fromt the server
-        let activeData={
-            CostReport: {},
-            Estimate: {},
-            Purchases: {},
-            Rates: {},
-            Rentals: {},
-            Crew: {}
+    // Get all showData fromt the server
+    let activeData = {
+      CostReport: {},
+      Estimate: {},
+      Purchases: {},
+      Rates: {},
+      Rentals: {},
+      Crew: {},
+    };
+    for (page in activeData) {
+      const response = await fetch(
+        _args.server + `/shows/${showid}/${page}?dataOnly=1`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
         }
-        for (page in activeData) {
-            const response=await fetch(_args.server+`/shows/${showid}/${page}?dataOnly=1`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            })
+      );
 
-            const responseObject=await response.json()
-            activeData[page]=responseObject.data
-        }
-
-        // fetch request to downloadShow
-        fetch(_args.server+`/downloadShow/${showid}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ activeData })
-        })
-            .then(response => { return response.json() })
-            .then(responseData => {
-                // Check evey  1000 ms to see if generation is done
-                checkGenerationInterval=setInterval(() => {
-                    console.log('checking for show download...')
-                    fetch(_args.server+`/checkgenerated/${responseData.filename}`, { method: 'GET', credentials: 'include' })
-                        .then(response => { return response.json() })
-                        .then(responseData => {
-                            // If timesheets generated then download the .xlsx file from server
-                            if (responseData.filename) {
-                                toggleLoadingScreen(false)
-                                download(responseData.filename)
-                                console.log('Done')
-                                window.clearInterval(checkGenerationInterval)
-                            }
-                        })
-                }, 1000);
-            })
-
-        // Downlaod timesheets from server
-        function download(filename) {
-            let downloadElt=document.createElement('div')
-            downloadElt.style.diplay='none'
-            downloadElt.innerHTML=`<a id="download-link" href="/uploads/${filename}.xlsx" download></a>`
-            document.body.appendChild(downloadElt)
-            document.getElementById('download-link').click()
-            downloadElt.parentElement.removeChild(downloadElt)
-        }
+      const responseObject = await response.json();
+      activeData[page] = responseObject.data;
     }
 
-    // Hide and show the loading screen with spinner and message 'msg'
-    toggleLoadingScreen=(show, msg='Loading...') => {
-        if (show) {
-            document.getElementById('grid-modal-container').style.display='flex';
-            document.getElementById('grid-modal-container').innerHTML+=`
+    // fetch request to downloadShow
+    fetch(_args.server + `/downloadShow/${showid}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ activeData }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        // Check evey  1000 ms to see if generation is done
+        checkGenerationInterval = setInterval(() => {
+          console.log("checking for show download...");
+          fetch(_args.server + `/checkgenerated/${responseData.filename}`, {
+            method: "GET",
+            credentials: "include",
+          })
+            .then((response) => {
+              return response.json();
+            })
+            .then((responseData) => {
+              // If timesheets generated then download the .xlsx file from server
+              if (responseData.filename) {
+                toggleLoadingScreen(false);
+                download(responseData.filename);
+                console.log("Done");
+                window.clearInterval(checkGenerationInterval);
+              }
+            });
+        }, 1000);
+      });
+
+    // Downlaod timesheets from server
+    function download(filename) {
+      let downloadElt = document.createElement("div");
+      downloadElt.style.diplay = "none";
+      downloadElt.innerHTML = `<a id="download-link" href="/uploads/${filename}.xlsx" download></a>`;
+      document.body.appendChild(downloadElt);
+      document.getElementById("download-link").click();
+      downloadElt.parentElement.removeChild(downloadElt);
+    }
+  }
+
+  // Hide and show the loading screen with spinner and message 'msg'
+  toggleLoadingScreen = (show, msg = "Loading...") => {
+    if (show) {
+      document.getElementById("grid-modal-container").style.display = "flex";
+      document.getElementById("grid-modal-container").innerHTML += `
                 <div id="loading-spinner" style="margin-top: 25%; display: flex; flex-direction: column; align-items: center">
                     <div class="spinner-border text-light" role="status"></div>
                     <br>
                     <div style="color: white">${msg}</div>
                 </div>
                 `;
-        } else {
-            document.getElementById('grid-modal-container').style.display=null;
-            let elt=document.getElementById('loading-spinner');
-            if (elt) { elt.remove() }
-        }
+    } else {
+      document.getElementById("grid-modal-container").style.display = null;
+      let elt = document.getElementById("loading-spinner");
+      if (elt) {
+        elt.remove();
+      }
     }
+  };
 
+  // Hide and show download show modal - need user password to make fetch calls from worker process
+  function toggleDownloadShowModal(show, showid) {
+    if (show) {
+      document.getElementById("grid-modal-container").style.display = "flex";
+      document.getElementById("download-show-modal").style.display = "flex";
 
-    // Hide and show download show modal - need user password to make fetch calls from worker process
-    function toggleDownloadShowModal(show, showid) {
-        if (show) {
-            document.getElementById('grid-modal-container').style.display='flex'
-            document.getElementById('download-show-modal').style.display='flex'
-
-            // Set Download button to call download shsow on correct showid
-            document.getElementById('download-show-download-button').setAttribute('onclick', `downloadShow("${showid}")`)
-        } else {
-            document.getElementById('grid-modal-container').style.display=null
-            document.getElementById('download-show-modal').style.display='none'
-        }
+      // Set Download button to call download shsow on correct showid
+      document
+        .getElementById("download-show-download-button")
+        .setAttribute("onclick", `downloadShow("${showid}")`);
+    } else {
+      document.getElementById("grid-modal-container").style.display = null;
+      document.getElementById("download-show-modal").style.display = "none";
     }
+  }
 </script>
