@@ -4,7 +4,6 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: "Roboto";
 }
 
 @font-face {
