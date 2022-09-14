@@ -340,9 +340,11 @@ createSlickGrid = (data, columns, options) => {
       _cellDblClick = _activeCell;
 
       // Set active row to be highlighted
-      let item = grid.getData().getItemByIdx(_activeCell.row);
+      let item = grid
+        .getData()
+        .getItemById(grid.getData().mapRowsToIds([_activeCell.row])[0]);
       delete _cellCssStyles["active-row"];
-      for (key in item) {
+      for (key of grid.getColumns().map((c) => c.id)) {
         if (!_cellCssStyles["active-row"]) _cellCssStyles["active-row"] = {};
         if (!_cellCssStyles["active-row"][item.id])
           _cellCssStyles["active-row"][item.id] = {};
@@ -1833,7 +1835,8 @@ applyCellStyles = (styles) => {
   for (style in styles) {
     let rowHash = {};
     for (id in styles[style]) {
-      let row = dataView.mapIdsToRows([id])[0];
+      let row = grid.getData().mapIdsToRows([id])[0];
+      console.log(id, row, grid.getData(), grid.getData().mapIdsToRows([id]));
       rowHash[row] = styles[style][id];
     }
     grid.setCellCssStyles(style, rowHash);
