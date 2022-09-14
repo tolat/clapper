@@ -1928,6 +1928,8 @@ addColumn = () => {
   ).checked;
 
   queueAndExecuteEdit(null, null, command);
+
+  applyCellStyles(_cellCssStyles);
 };
 
 // 'Execute' function for add column
