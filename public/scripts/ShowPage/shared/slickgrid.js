@@ -4574,6 +4574,8 @@ revertAccessProfile = (ap) => {
     }
   }
   populateAccessProfileModal(ap, false, false, false);
+
+  updateApSaveStatus(true);
 };
 
 // Hide and show modal to change access profile level
