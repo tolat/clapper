@@ -804,8 +804,6 @@ triggerPaste = async () => {
   newClipText = newClipText.replaceAll("\r", "");
   let rows = newClipText.split("\n");
 
-  console.log(rows);
-
   // Split up rows into cell values WRONG --> ??(trim last cell since it will always be a blank (after last \t))?? <-- WRONG
   for (i = 0; i < rows.length; i++) {
     rows[i] = rows[i].split("\t");
@@ -1836,7 +1834,6 @@ applyCellStyles = (styles) => {
     let rowHash = {};
     for (id in styles[style]) {
       let row = grid.getData().mapIdsToRows([id])[0];
-      console.log(id, row, grid.getData(), grid.getData().mapIdsToRows([id]));
       rowHash[row] = styles[style][id];
     }
     grid.setCellCssStyles(style, rowHash);
@@ -2047,7 +2044,6 @@ selectAll = () => {
   selectionModel.getSelectedRanges()[0].toRow =
     grid.getData().getItems().length - 1;
   grid.setSelectionModel(selectionModel);
-  console.log(selectionModel.getSelectedRanges());
 };
 
 // duplicates an array
