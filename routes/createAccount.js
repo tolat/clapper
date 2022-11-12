@@ -8,7 +8,10 @@ const {
   userValidationSchema,
 } = require("../utils/validationSchemas");
 const { parsePhoneNumber } = require("libphonenumber-js");
-const nodemailer = require("nodemailer");
+const mailgun = require("mailgun-js");
+const DOMAIN = "sandbox5f997647fda34a9499e53996dc7e02e2.mailgun.org";
+const API_KEY = "7c3c3b76aca284d29f7330fd2e71b60a-48c092ba-c15e22d6";
+const mg = mailgun({ apiKey: API_KEY, domain: DOMAIN });
 
 // Create Account Load
 router.get("/", (req, res) => {
@@ -66,25 +69,19 @@ router.post(
 
       await User.register(user, req.body.user.password);
 
-      // Send verification email
-      const transporter = nodemailer.createTransport({
-        host: "smtp.mailgun.org",
-        port: process.env.MAILGUN_SMTP_PORT,
-        auth: {
-          user: `${process.env.MAILGUN_SMTP_LOGIN}`,
-          pass: `${process.env.MAILGUN_SMTP_PASSWORD}`,
-        },
-      });
-
       // Try sending verification email to client
       try {
-        await transporter.sendMail({
+        const data = {
           from: "noreply@clapper.ca",
           to: user.username,
           subject: "Verify your clapper.ca account email below:",
           html: `<a href='${
             process.env.SERVER
           }/emailVerification/${user._id.toString()}'>Verify Email</a>`,
+        };
+
+        mg.messages().send(data, function (error, body) {
+          console.log(body);
         });
       } catch (e) {
         console.log(e);
