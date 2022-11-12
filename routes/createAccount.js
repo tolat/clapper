@@ -10,9 +10,8 @@ const {
 const { parsePhoneNumber } = require("libphonenumber-js");
 const RestClient = require("rest-client");
 
-API_KEY = ENV["MAILGUN_API_KEY"];
-API_URL =
-  "https://api:#{API_KEY}@api.mailgun.net/v2/sandbox5f997647fda34a9499e53996dc7e02e2.mailgun.org";
+API_KEY = process.env.MAILGUN_API_KEY;
+API_URL = `https://api:#{${API_KEY}}@api.mailgun.net/v2/sandbox5f997647fda34a9499e53996dc7e02e2.mailgun.org`;
 
 // Create Account Load
 router.get("/", (req, res) => {
