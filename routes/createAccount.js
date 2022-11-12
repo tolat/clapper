@@ -69,7 +69,7 @@ router.post(
       // Send verification email
       const transporter = nodemailer.createTransport({
         host: "smtp.mailgun.org",
-        port: MAILGUN_SMTP_PORT,
+        port: process.env.MAILGUN_SMTP_PORT,
         auth: {
           user: `${process.env.MAILGUN_SMTP_LOGIN}`,
           pass: `${process.env.MAILGUN_SMTP_PASSWORD}`,
