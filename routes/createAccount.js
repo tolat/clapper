@@ -8,10 +8,7 @@ const {
   userValidationSchema,
 } = require("../utils/validationSchemas");
 const { parsePhoneNumber } = require("libphonenumber-js");
-const RestClient = require("rest-client");
-
-API_KEY = process.env.MAILGUN_API_KEY;
-API_URL = `https://api:#{${API_KEY}}@api.mailgun.net/v2/sandbox5f997647fda34a9499e53996dc7e02e2.mailgun.org`;
+const nodemailer = require("nodemailer");
 
 // Create Account Load
 router.get("/", (req, res) => {
@@ -69,16 +66,25 @@ router.post(
 
       await User.register(user, req.body.user.password);
 
+      // Send verification email
+      const transporter = nodemailer.createTransport({
+        host: "smtp.mailgun.org",
+        port: MAILGUN_SMTP_PORT,
+        auth: {
+          user: `${process.env.MAILGUN_SMTP_LOGIN}`,
+          pass: `${process.env.MAILGUN_SMTP_PASSWORD}`,
+        },
+      });
+
       // Try sending verification email to client
       try {
-        RestClient.post(API_URL + "/messages", {
-          from: "ev@example.com",
-          to: "ev@mailgun.net",
-          subject: "This is subject",
-          text: "Text body",
+        await transporter.sendMail({
+          from: "noreply@clapper.ca",
+          to: user.username,
+          subject: "Verify your clapper.ca account email below:",
           html: `<a href='${
             process.env.SERVER
-          }/emailVerification/${user._id.toString()}'>Click to confirm email</a>`,
+          }/emailVerification/${user._id.toString()}'>Verify Email</a>`,
         });
       } catch (e) {
         console.log(e);
