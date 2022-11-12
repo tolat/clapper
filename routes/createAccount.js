@@ -8,8 +8,7 @@ const {
   userValidationSchema,
 } = require("../utils/validationSchemas");
 const { parsePhoneNumber } = require("libphonenumber-js");
-const nodemailer = require("nodemailer");
-const RestClient = requre("rest-client");
+const RestClient = require("rest-client");
 
 API_KEY = ENV["MAILGUN_API_KEY"];
 API_URL =
