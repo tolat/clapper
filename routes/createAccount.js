@@ -4,7 +4,7 @@ const ExpressError = require("../utils/ExpressError");
 const router = express.Router({ mergeParams: true });
 const User = require("../models/user");
 const {
-  oiValidate,
+  joiValidate,
   userValidationSchema,
 } = require("../utils/validationSchemas");
 const mailgun = require("mailgun-js");
