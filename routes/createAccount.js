@@ -50,7 +50,7 @@ router.post(
             args: {
               server: req.app.get("server"),
               text: "Check your email for the account confirmation link!",
-              button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="">Resend email</div>`,
+              button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="sendMail">Resend email</div>`,
             },
           });
           return;
@@ -69,26 +69,30 @@ router.post(
 
       await User.register(user, req.body.user.password);
 
-      // Try sending verification email to client
-      try {
-        const data = {
-          from: "noreply@clapper.ca",
-          to: user.username,
-          subject: "Verify your clapper.ca account email below:",
-          html: `<a href='${
-            process.env.SERVER
-          }/emailVerification/${user._id.toString()}'>Verify Email</a>`,
-        };
+      const sendMail = async () => {
+        // Send verification email to client
+        try {
+          const data = {
+            from: "noreply@clapper.ca",
+            to: user.username,
+            subject: "Verify your clapper.ca account email below:",
+            html: `<a href='${
+              process.env.SERVER
+            }/emailVerification/${user._id.toString()}'>Verify Email</a>`,
+          };
 
-        console.log("sending", data);
+          await console.log("sending", data);
 
-        mg.messages().send(data, function (error, body) {
-          console.log(body);
-        });
-      } catch (e) {
-        console.log(e);
-        req.flash("error", e.message);
-      }
+          await mg.messages().send(data, function (error, body) {
+            console.log(body);
+          });
+        } catch (e) {
+          console.log(e);
+          req.flash("error", e.message);
+        }
+      };
+
+      sendMail();
 
       // Redirect to email verification page
       res.redirect("/emailVerification");
