@@ -80,6 +80,8 @@ router.post(
           }/emailVerification/${user._id.toString()}'>Verify Email</a>`,
         };
 
+        console.log("sending", data);
+
         mg.messages().send(data, function (error, body) {
           console.log(body);
         });
