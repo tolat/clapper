@@ -4,14 +4,14 @@ const ExpressError = require("../utils/ExpressError");
 const router = express.Router({ mergeParams: true });
 const User = require("../models/user");
 const {
-  joiValidate,
+  oiValidate,
   userValidationSchema,
 } = require("../utils/validationSchemas");
-const { parsePhoneNumber } = require("libphonenumber-js");
 const mailgun = require("mailgun-js");
-const DOMAIN = "sandbox5f997647fda34a9499e53996dc7e02e2.mailgun.org";
-const API_KEY = "7c3c3b76aca284d29f7330fd2e71b60a-48c092ba-c15e22d6";
-const mg = mailgun({ apiKey: API_KEY, domain: DOMAIN });
+const mg = mailgun({
+  apiKey: process.env.MAILGUN_API_KEY,
+  domain: process.env.MAILGUN_DOMAIN,
+});
 
 // Create Account Load
 router.get("/", (req, res) => {
