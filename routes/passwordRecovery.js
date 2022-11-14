@@ -1,14 +1,13 @@
 const express = require("express");
+const path = require("path");
 const tryCatch = require("../utils/tryCatch");
 const ExpressError = require("../utils/ExpressError");
+const Show = require("../models/show");
 const User = require("../models/user");
+const nodemailer = require("nodemailer");
 const numUtils = require("../utils/numberUtils");
+
 const router = express.Router({ mergeParams: true });
-const mailgun = require("mailgun-js");
-const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY,
-  domain: process.env.MAILGUN_DOMAIN,
-});
 
 // Load password recovery page
 router.get("/", (req, res) => {
@@ -38,7 +37,7 @@ router.get("/", (req, res) => {
 
 // Load password recovery page from recovery link
 router.get("/:recoveryKey", async (req, res) => {
-  // Args for valid password reset link
+  // Args for valid password resset link
   let args = {
     server: req.app.get("server"),
     html: `<div id="login-container">
@@ -123,17 +122,24 @@ router.post("/", async (req, res) => {
     user.status = `awaiting-password-recovery-${recoveryKey}`;
     await user.save();
 
+    // Send verification email
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: `${process.env.VERIFICATION_EMAIL}`,
+        pass: `${process.env.GOOGLE_APP_PASSWORD}`,
+      },
+    });
+
     // Try sending verification email to client
     try {
-      let data = {
-        from: "noreply@clapper.ca",
+      let info = await transporter.sendMail({
+        from: `"clapper.ca-noreply" <${process.env.VERIFICATION_EMAIL}>`,
         to: user.username,
         subject: "Recover clapper.ca password",
         html: `<a href='${process.env.SERVER}/passwordRecovery/${recoveryKey}'>Click to recover password</a>`,
-      };
-
-      mg.messages().send(data, function (error, body) {
-        console.log(body);
       });
     } catch (e) {
       console.log(e);
