@@ -7,11 +7,7 @@ const {
   joiValidate,
   userValidationSchema,
 } = require("../utils/validationSchemas");
-const mailgun = require("mailgun-js");
-const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY,
-  domain: process.env.MAILGUN_DOMAIN,
-});
+const nodemailer = require("nodemailer");
 
 // Create Account Load
 router.get("/", (req, res) => {
@@ -50,7 +46,7 @@ router.post(
             args: {
               server: req.app.get("server"),
               text: "Check your email for the account confirmation link!",
-              button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="sendMail">Resend email</div>`,
+              button: `<div class="button-secondary cursor-pointer" style="color: white" onclick="">Resend email</div>`,
             },
           });
           return;
@@ -69,30 +65,31 @@ router.post(
 
       await User.register(user, req.body.user.password);
 
-      const sendMail = async () => {
-        // Send verification email to client
-        try {
-          const data = {
-            from: "noreply@clapper.ca",
-            to: user.username,
-            subject: "Verify your clapper.ca account email below:",
-            html: `<a href='${
-              process.env.SERVER
-            }/emailVerification/${user._id.toString()}'>Verify Email</a>`,
-          };
+      // Send verification email
+      let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: `${process.env.VERIFICATION_EMAIL}`,
+          pass: `${process.env.GOOGLE_APP_PASSWORD}`,
+        },
+      });
 
-          await console.log("sending", data);
-
-          await mg.messages().send(data, function (error, body) {
-            console.log(body);
-          });
-        } catch (e) {
-          console.log(e);
-          req.flash("error", e.message);
-        }
-      };
-
-      sendMail();
+      // Try sending verification email to client
+      try {
+        let info = await transporter.sendMail({
+          from: `"noreply@clapper.ca" <${process.env.VERIFICATION_EMAIL}>`,
+          to: user.username,
+          subject: "Confirm clapper.ca email",
+          html: `<a href='${
+            process.env.SERVER
+          }/emailVerification/${user._id.toString()}'>Click to confirm email</a>`,
+        });
+      } catch (e) {
+        console.log(e);
+        req.flash("error", e.message);
+      }
 
       // Redirect to email verification page
       res.redirect("/emailVerification");
