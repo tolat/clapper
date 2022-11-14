@@ -136,10 +136,10 @@ router.post("/", async (req, res) => {
     // Try sending verification email to client
     try {
       let info = await transporter.sendMail({
-        from: `"clapper.ca-noreply" <${process.env.VERIFICATION_EMAIL}>`,
+        from: "clapper.ca-noreply",
         to: user.username,
         subject: "Recover clapper.ca password",
-        html: `<a href='${process.env.SERVER}/passwordRecovery/${recoveryKey}'>Click to recover password</a>`,
+        text: `Click the link below to confirm your Clapper account:\n${process.env.SERVER}/passwordRecovery/${recoveryKey}`,
       });
     } catch (e) {
       console.log(e);

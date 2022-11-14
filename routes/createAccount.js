@@ -82,9 +82,9 @@ router.post(
           from: `"noreply@clapper.ca" <${process.env.VERIFICATION_EMAIL}>`,
           to: user.username,
           subject: "Confirm clapper.ca email",
-          html: `<a href='${
+          text: `Click the link below to confirm your Clapper account:\n${
             process.env.SERVER
-          }/emailVerification/${user._id.toString()}'>Click to confirm email</a>`,
+          }/emailVerification/${user._id.toString()}`,
         });
       } catch (e) {
         console.log(e);
