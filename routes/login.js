@@ -1,6 +1,7 @@
 const express=require('express');
 const path=require('path');
 const tryCatch=require('../utils/tryCatch');
+const {handleGuestLogin} = require("../utils/customMiddleware");
 const ExpressError=require('../utils/ExpressError');
 const passport=require('passport')
 
@@ -18,7 +19,7 @@ router.get('/', (req, res) => {
 
 
 // Log in 
-router.post('/', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
+router.post('/', handleGuestLogin, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
     // Redirect to confirm email page if user has not been verified
     if (req.user.status.includes('awaiting-verification')) {
         res.redirect('/emailVerification')

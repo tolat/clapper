@@ -4,6 +4,13 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: "RobotoMono"
+}
+
+@font-face {
+  font-family: "RobotoMono";
+  src: url("../fonts/Roboto_Mono/static/RobotoMono-Regular.ttf")
+  format("truetype")
 }
 
 @font-face {
@@ -186,13 +193,13 @@ button.navbar-toggler {
 
 .show-list-item-container {
   transition: background-color 0.15s;
-  width: 98%;
   display: flex;
   border-radius: 2px;
-  margin: 10px;
+  margin: 0 0 1.5rem 0;
   padding: 10px;
   background-color: rgb(246, 246, 246);
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border: 1px solid rgb(203, 203, 203);
+  /* box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; */
 }
 .show-list-item-container:hover {
   transition: background-color 0.15s;
@@ -218,7 +225,7 @@ button.navbar-toggler {
   background-color: rgb(255, 193, 49);
   text-align: center;
   border-radius: 2px;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+ /*  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px; */
   height: 2.2rem;
   width: 2.2rem;
   font-weight: bold;

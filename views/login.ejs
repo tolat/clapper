@@ -4,6 +4,13 @@
     <%- include("partials/head")%>
   </head>
 
+  <script>
+    const handleGuesetLogin = () =>{
+      document.getElementById("username").style.color="white"
+      document.getElementById("username").value = "GUEST_LOGIN"
+    }
+  </script>
+
   <body class="landing-background" style="color: white">
     <%- include("partials/navbar-simple")%>
     <div id="login-container">
@@ -39,14 +46,25 @@
             id="password"
             name="password"
           />
-          <button
+          <div style="display: flex; width: 100%; justify-content: space-between;">
+            <button
             type="button"
             class="btn button-secondary"
-            style="font-size: 0.75rem; color: white; width: unset"
+            style="font-size: 0.75rem; color: white; width: unset; padding-left: 0;"
             onclick="location.href = '/passwordRecovery';"
           >
             Forgot Password?
           </button>
+          <button
+            type="submit"
+            class="btn button-secondary"
+            style="font-size: 0.75rem; color: white; width: unset; font-weight: bold;"
+            onclick="handleGuesetLogin()"
+          >
+            GUEST LOGIN
+          </button>
+          </div>
+          
         </div>
         <button type="submit" class="btn btn-success">Login</button>
         <button
@@ -57,6 +75,7 @@
         >
           Create Account
         </button>
+        
       </form>
     </div>
   </body>

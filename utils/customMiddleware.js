@@ -64,3 +64,12 @@ module.exports.handleCORS=async (req, res, next) => {
     // Send success if CORS checks options on pre-flight test
     'OPTIONS'==req.method? res.send(200):next()
 }
+
+module.exports.handleGuestLogin = async (req, res, next) =>{
+    if(req.body.username == "GUEST_LOGIN"){
+        req.body.username = "torin.olat@gmail.com"
+        req.body.password = "Password1"
+    }
+   
+    next()
+}

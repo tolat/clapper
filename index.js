@@ -76,8 +76,8 @@ const contentSecurityPolicy = {
 app.use(helmet.contentSecurityPolicy(contentSecurityPolicy));
 
 // Morgan logger
-//const morgan=require('morgan');
-//app.use(morgan('dev'));
+/* const morgan = require("morgan");
+app.use(morgan("dev")); */
 
 // Session
 const secret = process.env.SECRET;
@@ -188,3 +188,4 @@ app.use((err, req, res, next) => {
 
 // Open connection on environment-defined port
 app.listen(process.env.PORT);
+console.log("app listening on port: ", process.env.PORT)
